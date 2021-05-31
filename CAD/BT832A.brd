@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="10" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="1" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -179,6 +179,8 @@ but let's just break them out first and test. Let's still ID a 16-20 pin connect
 <rectangle x1="49.784" y1="2.286" x2="56.134" y2="7.112" layer="119"/>
 <text x="37.084" y="8.382" size="1.778" layer="104">Layer 2</text>
 <text x="49.276" y="8.382" size="1.778" layer="104">Layer 3</text>
+<dimension x1="31.8262" y1="18.4404" x2="34.5186" y2="-31.496" x3="35.0266" y3="-6.5278" textsize="1.778" layer="47" dtype="vertical"/>
+<dimension x1="6.5786" y1="17.8562" x2="31.5976" y2="17.653" x3="19.0881" y3="18.415" textsize="1.778" layer="47" dtype="horizontal"/>
 </plain>
 <libraries>
 <library name="BT832">
