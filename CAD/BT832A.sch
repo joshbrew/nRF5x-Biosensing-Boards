@@ -6976,9 +6976,10 @@ W = angled&lt;p&gt;
 <text x="-12.7" y="73.66" size="1.778" layer="97">LFXTAL061486Reel</text>
 <text x="139.7" y="142.24" size="1.778" layer="97" rot="R90">830050789</text>
 <text x="127" y="38.1" size="1.778" layer="97">MicroUSB</text>
-<text x="-12.7" y="172.72" size="1.778" layer="95">TODO:
+<text x="-12.7" y="170.18" size="1.778" layer="95">TODO:
 
-Add 220pf caps between + and - inputs.</text>
+Add 2.2uF caps between + and - inputs
+(at least for EEG)</text>
 <wire x1="109.22" y1="25.4" x2="109.22" y2="76.2" width="0.1524" layer="97"/>
 <wire x1="109.22" y1="76.2" x2="50.8" y2="76.2" width="0.1524" layer="97"/>
 <wire x1="50.8" y1="76.2" x2="50.8" y2="25.4" width="0.1524" layer="97"/>
