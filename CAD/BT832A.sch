@@ -11815,8 +11815,8 @@ General-purpose diode for high-speed switching</description>
 <parts>
 <part name="U2" library="BT832" deviceset="BT832" device=""/>
 <part name="U3" library="LP5907MFX-3.3_NOPB" deviceset="LP5907MFX-3.3/NOPB" device=""/>
-<part name="X2_32.768KHZ" library="crystal" library_urn="urn:adsk.eagle:library:204" deviceset="FC-12M" device="" package3d_urn="urn:adsk.eagle:package:12123/1"/>
-<part name="X1_8.192MHZ" library="Crystals_Oscillators" library_urn="urn:adsk.eagle:library:24014151" deviceset="ABM3B-8.000MHZ-B2-T" device="" package3d_urn="urn:adsk.eagle:package:10899604/4"/>
+<part name="X2" library="crystal" library_urn="urn:adsk.eagle:library:204" deviceset="FC-12M" device="" package3d_urn="urn:adsk.eagle:package:12123/1"/>
+<part name="X1" library="Crystals_Oscillators" library_urn="urn:adsk.eagle:library:24014151" deviceset="ABM3B-8.000MHZ-B2-T" device="" package3d_urn="urn:adsk.eagle:package:10899604/4"/>
 <part name="C1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="C0402" package3d_urn="urn:adsk.eagle:package:6240340/1"/>
 <part name="C2" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="C0402" package3d_urn="urn:adsk.eagle:package:6240340/1"/>
 <part name="C3" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="C0402" package3d_urn="urn:adsk.eagle:package:6240340/1"/>
@@ -11912,10 +11912,10 @@ Power Switches</text>
 <attribute name="NAME" x="68.58" y="122.92" size="2.0828" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VALUE" x="68.58" y="102.68" size="2.0828" layer="96" ratio="10" rot="SR0"/>
 </instance>
-<instance part="X2_32.768KHZ" gate="G$1" x="142.24" y="147.32" smashed="yes" rot="R90">
+<instance part="X2" gate="G$1" x="142.24" y="147.32" smashed="yes" rot="R90">
 <attribute name="NAME" x="136.144" y="139.7" size="1.778" layer="95" rot="R90"/>
 </instance>
-<instance part="X1_8.192MHZ" gate="G$1" x="-5.08" y="88.9" smashed="yes">
+<instance part="X1" gate="G$1" x="-5.08" y="88.9" smashed="yes">
 <attribute name="NAME" x="-8.128" y="69.85" size="1.778" layer="95"/>
 </instance>
 <instance part="C1" gate="G$1" x="119.38" y="142.24" smashed="yes" rot="R90">
@@ -12156,12 +12156,12 @@ Power Switches</text>
 <label x="-108.204" y="37.846" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
-<pinref part="X1_8.192MHZ" gate="G$1" pin="4"/>
+<pinref part="X1" gate="G$1" pin="4"/>
 <wire x1="0" y1="83.82" x2="0" y2="81.28" width="0.1524" layer="91"/>
 <label x="0" y="81.28" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
-<pinref part="X1_8.192MHZ" gate="G$1" pin="2"/>
+<pinref part="X1" gate="G$1" pin="2"/>
 <wire x1="-2.54" y1="83.82" x2="-2.54" y2="81.28" width="0.1524" layer="91"/>
 <label x="-2.54" y="81.28" size="1.778" layer="95" rot="R270"/>
 </segment>
@@ -12270,7 +12270,7 @@ Power Switches</text>
 <label x="-47.244" y="93.472" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="X1_8.192MHZ" gate="G$1" pin="3"/>
+<pinref part="X1" gate="G$1" pin="3"/>
 <wire x1="5.08" y1="88.9" x2="7.62" y2="88.9" width="0.1524" layer="91"/>
 <label x="5.08" y="91.44" size="1.778" layer="95"/>
 </segment>
@@ -12287,7 +12287,7 @@ Power Switches</text>
 <label x="-47.498" y="96.52" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="X1_8.192MHZ" gate="G$1" pin="1"/>
+<pinref part="X1" gate="G$1" pin="1"/>
 <wire x1="-7.62" y1="88.9" x2="-10.16" y2="88.9" width="0.1524" layer="91"/>
 <label x="-12.7" y="91.44" size="1.778" layer="95"/>
 </segment>
@@ -12650,7 +12650,7 @@ Power Switches</text>
 <label x="147.32" y="147.32" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="X2_32.768KHZ" gate="G$1" pin="2"/>
+<pinref part="X2" gate="G$1" pin="2"/>
 <wire x1="142.24" y1="149.86" x2="142.24" y2="152.4" width="0.1524" layer="91"/>
 <label x="142.24" y="152.4" size="1.778" layer="95"/>
 </segment>
@@ -12667,7 +12667,7 @@ Power Switches</text>
 <label x="147.32" y="144.78" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="X2_32.768KHZ" gate="G$1" pin="1"/>
+<pinref part="X2" gate="G$1" pin="1"/>
 <wire x1="142.24" y1="144.78" x2="142.24" y2="142.24" width="0.1524" layer="91"/>
 <label x="142.24" y="139.7" size="1.778" layer="95"/>
 </segment>
@@ -12980,6 +12980,20 @@ Power Switches</text>
 <pinref part="C13" gate="G$1" pin="2"/>
 <wire x1="55.88" y1="118.872" x2="55.88" y2="121.158" width="0.1524" layer="91"/>
 <label x="54.102" y="121.92" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SWDIO" class="0">
+<segment>
+<pinref part="U2" gate="G$1" pin="SWDIO"/>
+<wire x1="157.48" y1="101.6" x2="153.924" y2="101.6" width="0.1524" layer="91"/>
+<label x="144.526" y="100.838" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SWDCLK" class="0">
+<segment>
+<pinref part="U2" gate="G$1" pin="SWDCLK"/>
+<wire x1="157.48" y1="104.14" x2="153.924" y2="104.14" width="0.1524" layer="91"/>
+<label x="142.748" y="103.378" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
