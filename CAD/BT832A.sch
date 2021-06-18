@@ -11803,6 +11803,74 @@ General-purpose diode for high-speed switching</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="CL-SB-12B-01T">
+<packages>
+<package name="CL-SB-12B">
+<wire x1="-4.25" y1="1.75" x2="4.25" y2="1.75" width="0.127" layer="21"/>
+<wire x1="4.25" y1="1.75" x2="4.25" y2="-1.75" width="0.127" layer="21"/>
+<wire x1="4.25" y1="-1.75" x2="-4.25" y2="-1.75" width="0.127" layer="21"/>
+<wire x1="-4.25" y1="-1.75" x2="-4.25" y2="1.75" width="0.127" layer="21"/>
+<hole x="3.4" y="0" drill="0.9"/>
+<smd name="1" x="-2.5" y="-2.25" dx="1.2" dy="1.4" layer="1"/>
+<smd name="2" x="0" y="2.25" dx="1.2" dy="1.4" layer="1"/>
+<smd name="3" x="2.5" y="-2.25" dx="1.2" dy="1.4" layer="1"/>
+<hole x="-3.4" y="0" drill="0.9"/>
+</package>
+</packages>
+<symbols>
+<symbol name="SWITCH3P">
+<circle x="-2.54" y="0" radius="0.635" width="0.1524" layer="94"/>
+<wire x1="-2.54" y1="0.635" x2="0" y2="2.54" width="0.1524" layer="94"/>
+<circle x="0" y="3.175" radius="0.635" width="0.1524" layer="94"/>
+<circle x="2.54" y="0" radius="0.635" width="0.1524" layer="94"/>
+<wire x1="5.08" y1="-5.08" x2="5.08" y2="0" width="0.1524" layer="94"/>
+<wire x1="5.08" y1="0" x2="5.08" y2="6.35" width="0.1524" layer="94"/>
+<wire x1="5.08" y1="6.35" x2="0" y2="6.35" width="0.1524" layer="94"/>
+<wire x1="0" y1="6.35" x2="-5.08" y2="6.35" width="0.1524" layer="94"/>
+<wire x1="-5.08" y1="6.35" x2="-5.08" y2="0" width="0.1524" layer="94"/>
+<wire x1="-5.08" y1="0" x2="-5.08" y2="-5.08" width="0.1524" layer="94"/>
+<wire x1="-5.08" y1="-5.08" x2="5.08" y2="-5.08" width="0.1524" layer="94"/>
+<wire x1="-6.35" y1="0" x2="-5.08" y2="0" width="0.1524" layer="94"/>
+<wire x1="0" y1="6.35" x2="0" y2="7.62" width="0.1524" layer="94"/>
+<wire x1="6.35" y1="0" x2="5.08" y2="0" width="0.1524" layer="94"/>
+<text x="-5.09348125" y="6.36685" size="1.27336875" layer="95" ratio="10">&gt;NAME</text>
+<text x="-5.08863125" y="-6.360790625" size="1.27215" layer="96" ratio="10">&gt;VALUE</text>
+<wire x1="0" y1="3.81" x2="0" y2="6.35" width="0.1524" layer="94"/>
+<wire x1="-5.08" y1="0" x2="-3.175" y2="0" width="0.1524" layer="94"/>
+<wire x1="3.175" y1="0" x2="5.08" y2="0" width="0.1524" layer="94"/>
+<pin name="1" x="-8.89" y="0" length="short"/>
+<pin name="2" x="0" y="10.16" length="short" rot="R270"/>
+<pin name="3" x="8.89" y="0" length="short" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="CL-SB-12B-01T" prefix="S">
+<description> &lt;a href="https://pricing.snapeda.com/parts/CL-SB-12B-01T/Nidec%20Copal/view-part?ref=eda"&gt;Check prices&lt;/a&gt;</description>
+<gates>
+<gate name="A" symbol="SWITCH3P" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="CL-SB-12B">
+<connects>
+<connect gate="A" pin="1" pad="1"/>
+<connect gate="A" pin="2" pad="2"/>
+<connect gate="A" pin="3" pad="3"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="AVAILABILITY" value="In Stock"/>
+<attribute name="DESCRIPTION" value=" Slide Switch SPDT Surface Mount "/>
+<attribute name="MF" value="Nidec Copal"/>
+<attribute name="MP" value="CL-SB-12B-01T"/>
+<attribute name="PACKAGE" value="None"/>
+<attribute name="PRICE" value="None"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -11867,6 +11935,7 @@ General-purpose diode for high-speed switching</description>
 <part name="SUPPLY8" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="SUPPLY9" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
+<part name="S1" library="CL-SB-12B-01T" deviceset="CL-SB-12B-01T" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -12099,6 +12168,10 @@ Power Switches</text>
 </instance>
 <instance part="P+5" gate="1" x="49.022" y="71.628" smashed="yes">
 <attribute name="VALUE" x="52.578" y="68.834" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="S1" gate="A" x="95.758" y="78.994" smashed="yes">
+<attribute name="NAME" x="90.66451875" y="85.36085" size="1.27336875" layer="95" ratio="10"/>
+<attribute name="VALUE" x="90.66936875" y="72.633209375" size="1.27215" layer="96" ratio="10"/>
 </instance>
 </instances>
 <busses>
@@ -12606,6 +12679,11 @@ Power Switches</text>
 <wire x1="-50.292" y1="109.728" x2="-47.752" y2="109.728" width="0.1524" layer="91"/>
 <label x="-46.99" y="108.966" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="S1" gate="A" pin="2"/>
+<wire x1="95.758" y1="89.154" x2="95.758" y2="91.948" width="0.1524" layer="91"/>
+<label x="97.282" y="89.662" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="CAP" class="0">
 <segment>
@@ -12950,9 +13028,9 @@ Power Switches</text>
 <label x="44.958" y="35.814" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
-<pinref part="D3" gate="G$1" pin="AA"/>
-<wire x1="74.676" y1="85.09" x2="74.676" y2="82.296" width="0.1524" layer="91"/>
-<label x="75.184" y="81.788" size="1.778" layer="95"/>
+<pinref part="S1" gate="A" pin="1"/>
+<wire x1="86.868" y1="78.994" x2="84.328" y2="78.994" width="0.1524" layer="91"/>
+<label x="81.534" y="78.994" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VIN" class="0">
@@ -12994,6 +13072,18 @@ Power Switches</text>
 <pinref part="U2" gate="G$1" pin="SWDCLK"/>
 <wire x1="157.48" y1="104.14" x2="153.924" y2="104.14" width="0.1524" layer="91"/>
 <label x="142.748" y="103.378" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="D3" class="0">
+<segment>
+<pinref part="D3" gate="G$1" pin="AA"/>
+<wire x1="74.676" y1="85.09" x2="74.676" y2="82.296" width="0.1524" layer="91"/>
+<label x="75.184" y="81.788" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="S1" gate="A" pin="3"/>
+<wire x1="104.648" y1="78.994" x2="107.696" y2="78.994" width="0.1524" layer="91"/>
+<label x="105.664" y="80.01" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
