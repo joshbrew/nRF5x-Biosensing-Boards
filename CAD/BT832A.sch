@@ -11911,7 +11911,6 @@ General-purpose diode for high-speed switching</description>
 <part name="SUPPLY3" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="P+2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="P+3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="R1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="R-US_" device="R0402" package3d_urn="urn:adsk.eagle:package:6240564/1" value="4.7kΩ"/>
 <part name="C12" library="adafruit" deviceset="C-US" device="C0402" value="1uF"/>
 <part name="C13" library="adafruit" deviceset="C-US" device="C0402" value="1uF"/>
 <part name="SUPPLY4" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
@@ -11936,6 +11935,7 @@ General-purpose diode for high-speed switching</description>
 <part name="SUPPLY9" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="S1" library="CL-SB-12B-01T" deviceset="CL-SB-12B-01T" device=""/>
+<part name="SUPPLY10" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -12081,10 +12081,6 @@ Power Switches</text>
 <instance part="P+3" gate="1" x="154.94" y="66.04" smashed="yes" rot="R90">
 <attribute name="VALUE" x="160.02" y="64.77" size="1.778" layer="96" rot="R180"/>
 </instance>
-<instance part="R1" gate="G$1" x="203.2" y="76.2" smashed="yes" rot="R90">
-<attribute name="NAME" x="201.7014" y="72.39" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="206.502" y="72.39" size="1.778" layer="96" rot="R90"/>
-</instance>
 <instance part="C12" gate="G$1" x="97.79" y="126.238" smashed="yes" rot="R180">
 <attribute name="NAME" x="96.774" y="125.603" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="96.774" y="130.429" size="1.778" layer="96" rot="R180"/>
@@ -12132,9 +12128,9 @@ Power Switches</text>
 <attribute name="NAME" x="214.6554" y="144.272" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="219.456" y="144.272" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="R4" gate="G$1" x="102.87" y="58.166" smashed="yes" rot="R90">
-<attribute name="NAME" x="101.3714" y="54.356" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="106.172" y="54.356" size="1.778" layer="96" rot="R90"/>
+<instance part="R4" gate="G$1" x="108.712" y="58.166" smashed="yes" rot="R90">
+<attribute name="NAME" x="107.2134" y="54.356" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="112.014" y="54.356" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="R5" gate="G$1" x="44.704" y="55.372" smashed="yes" rot="R270">
 <attribute name="NAME" x="46.2026" y="59.182" size="1.778" layer="95" rot="R270"/>
@@ -12163,8 +12159,8 @@ Power Switches</text>
 <instance part="SUPPLY8" gate="GND" x="44.704" y="45.466" smashed="yes">
 <attribute name="VALUE" x="42.799" y="42.291" size="1.778" layer="96"/>
 </instance>
-<instance part="SUPPLY9" gate="GND" x="102.87" y="48.006" smashed="yes">
-<attribute name="VALUE" x="100.965" y="44.831" size="1.778" layer="96"/>
+<instance part="SUPPLY9" gate="GND" x="108.712" y="47.498" smashed="yes">
+<attribute name="VALUE" x="106.807" y="44.323" size="1.778" layer="96"/>
 </instance>
 <instance part="P+5" gate="1" x="49.022" y="71.628" smashed="yes">
 <attribute name="VALUE" x="52.578" y="68.834" size="1.778" layer="96" rot="R90"/>
@@ -12172,6 +12168,9 @@ Power Switches</text>
 <instance part="S1" gate="A" x="95.758" y="78.994" smashed="yes">
 <attribute name="NAME" x="90.66451875" y="85.36085" size="1.27336875" layer="95" ratio="10"/>
 <attribute name="VALUE" x="90.66936875" y="72.633209375" size="1.27215" layer="96" ratio="10"/>
+</instance>
+<instance part="SUPPLY10" gate="GND" x="66.802" y="26.924" smashed="yes">
+<attribute name="VALUE" x="64.897" y="23.749" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -12332,8 +12331,14 @@ Power Switches</text>
 </segment>
 <segment>
 <pinref part="R4" gate="G$1" pin="1"/>
-<wire x1="102.87" y1="53.086" x2="102.87" y2="50.546" width="0.1524" layer="91"/>
+<wire x1="108.712" y1="53.086" x2="108.712" y2="50.038" width="0.1524" layer="91"/>
 <pinref part="SUPPLY9" gate="GND" pin="GND"/>
+</segment>
+<segment>
+<pinref part="U1" gate="A" pin="VSS"/>
+<wire x1="68.834" y1="34.544" x2="66.802" y2="34.544" width="0.1524" layer="91"/>
+<wire x1="66.802" y1="34.544" x2="66.802" y2="29.464" width="0.1524" layer="91"/>
+<pinref part="SUPPLY10" gate="GND" pin="GND"/>
 </segment>
 </net>
 <net name="XTAL2_2" class="0">
@@ -12855,12 +12860,8 @@ Power Switches</text>
 <net name="CPRST" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="!RST"/>
-<wire x1="200.66" y1="68.58" x2="203.2" y2="68.58" width="0.1524" layer="91"/>
 <label x="205.74" y="68.58" size="1.778" layer="95"/>
-<pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="203.2" y1="68.58" x2="205.74" y2="68.58" width="0.1524" layer="91"/>
-<wire x1="203.2" y1="68.58" x2="203.2" y2="71.12" width="0.1524" layer="91"/>
-<junction x="203.2" y="68.58"/>
+<wire x1="200.66" y1="68.58" x2="205.74" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U2" gate="G$1" pin="P08"/>
@@ -12878,11 +12879,6 @@ Power Switches</text>
 <pinref part="C12" gate="G$1" pin="2"/>
 <wire x1="97.79" y1="131.318" x2="97.79" y2="134.112" width="0.1524" layer="91"/>
 <label x="98.298" y="134.366" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="203.2" y1="81.28" x2="203.2" y2="83.82" width="0.1524" layer="91"/>
-<label x="203.454" y="83.566" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="IC1" gate="G$1" pin="VDD"/>
@@ -12930,8 +12926,8 @@ Power Switches</text>
 <wire x1="98.552" y1="65.786" x2="96.266" y2="65.786" width="0.1524" layer="91"/>
 <junction x="98.552" y="65.786"/>
 <pinref part="R4" gate="G$1" pin="2"/>
-<wire x1="102.87" y1="63.246" x2="102.87" y2="65.786" width="0.1524" layer="91"/>
-<wire x1="98.552" y1="65.786" x2="102.87" y2="65.786" width="0.1524" layer="91"/>
+<wire x1="108.712" y1="63.246" x2="108.712" y2="65.786" width="0.1524" layer="91"/>
+<wire x1="98.552" y1="65.786" x2="108.712" y2="65.786" width="0.1524" layer="91"/>
 <label x="100.33" y="66.548" size="1.778" layer="95"/>
 </segment>
 <segment>
@@ -13021,6 +13017,11 @@ Power Switches</text>
 <pinref part="S1" gate="A" pin="1"/>
 <wire x1="86.868" y1="78.994" x2="84.328" y2="78.994" width="0.1524" layer="91"/>
 <label x="81.534" y="78.994" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U1" gate="A" pin="VBAT"/>
+<wire x1="96.774" y1="44.704" x2="98.552" y2="44.704" width="0.1524" layer="91"/>
+<label x="99.314" y="43.942" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VIN" class="0">
