@@ -1591,13 +1591,13 @@ design rules under a new name.</description>
 <attribute name="NAME" x="22.6568" y="-9.0678" size="0.508" layer="25" rot="R270"/>
 <attribute name="VALUE" x="23.2918" y="-8.8138" size="0.508" layer="27" rot="R270"/>
 </element>
-<element name="S1" library="CL-SB-12B-01T" package="CL-SB-12B" value="CL-SB-12B-01T" x="10.8204" y="-14.5288" smashed="yes" rot="R90">
-<attribute name="AVAILABILITY" value="In Stock" x="10.8204" y="-14.5288" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="DESCRIPTION" value=" Slide Switch SPDT Surface Mount " x="10.8204" y="-14.5288" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MF" value="Nidec Copal" x="10.8204" y="-14.5288" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MP" value="CL-SB-12B-01T" x="10.8204" y="-14.5288" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="PACKAGE" value="None" x="10.8204" y="-14.5288" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="PRICE" value="None" x="10.8204" y="-14.5288" size="1.778" layer="27" rot="R90" display="off"/>
+<element name="S1" library="CL-SB-12B-01T" package="CL-SB-12B" value="CL-SB-12B-01T" x="10.4394" y="-15.5702" smashed="yes" rot="R90">
+<attribute name="AVAILABILITY" value="In Stock" x="10.4394" y="-15.5702" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DESCRIPTION" value=" Slide Switch SPDT Surface Mount " x="10.4394" y="-15.5702" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="Nidec Copal" x="10.4394" y="-15.5702" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MP" value="CL-SB-12B-01T" x="10.4394" y="-15.5702" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PACKAGE" value="None" x="10.4394" y="-15.5702" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PRICE" value="None" x="10.4394" y="-15.5702" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 </elements>
 <signals>
@@ -1829,7 +1829,7 @@ design rules under a new name.</description>
 </signal>
 <signal name="NC">
 <contactref element="S1" pad="2"/>
-<wire x1="8.5704" y1="-14.5288" x2="-25.896" y2="1.163" width="0" layer="19" extent="1-16"/>
+<wire x1="8.1894" y1="-15.5702" x2="-25.896" y2="1.163" width="0" layer="19" extent="1-16"/>
 <contactref element="U5" pad="27"/>
 </signal>
 <signal name="CAP">
@@ -2041,12 +2041,14 @@ design rules under a new name.</description>
 <signal name="B+">
 <contactref element="S1" pad="1"/>
 <contactref element="J1" pad="2"/>
-<wire x1="13.986" y1="-21.7" x2="13.986" y2="-17.9444" width="0.508" layer="1"/>
-<wire x1="13.986" y1="-17.9444" x2="13.0704" y2="-17.0288" width="0.508" layer="1"/>
+<wire x1="13.986" y1="-21.7" x2="13.986" y2="-19.3668" width="0.508" layer="1"/>
+<wire x1="13.986" y1="-19.3668" x2="12.6894" y2="-18.0702" width="0.508" layer="1"/>
 <contactref element="U1" pad="3"/>
-<wire x1="13.0704" y1="-17.0288" x2="13.0704" y2="-14.9204" width="0.508" layer="1"/>
-<wire x1="14.859" y1="-13.1318" x2="15.367" y2="-13.1318" width="0.508" layer="1"/>
-<wire x1="13.0704" y1="-14.9204" x2="14.859" y2="-13.1318" width="0.508" layer="1"/>
+<wire x1="12.6894" y1="-18.0702" x2="12.6894" y2="-17.3842" width="0.508" layer="1"/>
+<wire x1="15.367" y1="-13.1318" x2="15.367" y2="-13.589" width="0.508" layer="1"/>
+<wire x1="15.367" y1="-13.589" x2="14.351" y2="-14.605" width="0.508" layer="1"/>
+<wire x1="14.351" y1="-14.605" x2="14.351" y2="-15.7226" width="0.508" layer="1"/>
+<wire x1="14.351" y1="-15.7226" x2="12.6894" y2="-17.3842" width="0.508" layer="1"/>
 </signal>
 <signal name="VIN">
 <contactref element="U3" pad="1"/>
@@ -2083,9 +2085,10 @@ design rules under a new name.</description>
 <signal name="D3">
 <contactref element="D3" pad="3"/>
 <contactref element="S1" pad="3"/>
-<wire x1="13.0704" y1="-12.0288" x2="13.0704" y2="-8.0292" width="0.508" layer="1"/>
-<wire x1="13.0704" y1="-8.0292" x2="14.2494" y2="-6.8502" width="0.508" layer="1"/>
-<wire x1="14.2494" y1="-6.8502" x2="16.4338" y2="-6.8502" width="0.508" layer="1"/>
+<wire x1="13.553" y1="-8.6896" x2="13.553" y2="-12.2066" width="0.508" layer="1"/>
+<wire x1="12.6894" y1="-13.0702" x2="13.553" y2="-12.2066" width="0.508" layer="1"/>
+<wire x1="13.553" y1="-8.6896" x2="15.3924" y2="-6.8502" width="0.508" layer="1"/>
+<wire x1="15.3924" y1="-6.8502" x2="16.4338" y2="-6.8502" width="0.508" layer="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
