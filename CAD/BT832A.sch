@@ -11936,6 +11936,7 @@ General-purpose diode for high-speed switching</description>
 <part name="P+5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="S1" library="CL-SB-12B-01T" deviceset="CL-SB-12B-01T" device=""/>
 <part name="SUPPLY10" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
+<part name="SUPPLY11" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -12172,6 +12173,9 @@ Power Switches</text>
 <instance part="SUPPLY10" gate="GND" x="66.802" y="26.924" smashed="yes">
 <attribute name="VALUE" x="64.897" y="23.749" size="1.778" layer="96"/>
 </instance>
+<instance part="SUPPLY11" gate="GND" x="90.932" y="116.586" smashed="yes">
+<attribute name="VALUE" x="89.027" y="113.411" size="1.778" layer="96"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -12344,6 +12348,12 @@ Power Switches</text>
 <pinref part="LED2" gate="G$1" pin="C"/>
 <wire x1="216.154" y1="133.858" x2="216.154" y2="130.81" width="0.1524" layer="91"/>
 <label x="213.36" y="128.016" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U3" gate="G$1" pin="GND"/>
+<wire x1="88.9" y1="122.428" x2="90.932" y2="122.428" width="0.1524" layer="91"/>
+<wire x1="90.932" y1="122.428" x2="90.932" y2="119.126" width="0.1524" layer="91"/>
+<pinref part="SUPPLY11" gate="GND" pin="GND"/>
 </segment>
 </net>
 <net name="XTAL2_2" class="0">
@@ -12899,12 +12909,6 @@ Power Switches</text>
 <pinref part="R3" gate="G$1" pin="2"/>
 <wire x1="216.154" y1="153.162" x2="216.154" y2="156.21" width="0.1524" layer="91"/>
 <label x="216.662" y="157.226" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="N$8" class="0">
-<segment>
-<pinref part="U3" gate="G$1" pin="GND"/>
-<wire x1="88.9" y1="122.428" x2="90.932" y2="122.428" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$1" class="0">
