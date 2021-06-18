@@ -12340,6 +12340,11 @@ Power Switches</text>
 <wire x1="66.802" y1="34.544" x2="66.802" y2="29.464" width="0.1524" layer="91"/>
 <pinref part="SUPPLY10" gate="GND" pin="GND"/>
 </segment>
+<segment>
+<pinref part="LED2" gate="G$1" pin="C"/>
+<wire x1="216.154" y1="133.858" x2="216.154" y2="130.81" width="0.1524" layer="91"/>
+<label x="213.36" y="128.016" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="XTAL2_2" class="0">
 <segment>
@@ -12885,6 +12890,16 @@ Power Switches</text>
 <wire x1="162.56" y1="60.96" x2="160.274" y2="60.96" width="0.1524" layer="91"/>
 <label x="156.21" y="58.928" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="U2" gate="G$1" pin="VDD"/>
+<wire x1="198.12" y1="152.4" x2="202.438" y2="152.4" width="0.1524" layer="91"/>
+<label x="202.438" y="153.416" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R3" gate="G$1" pin="2"/>
+<wire x1="216.154" y1="153.162" x2="216.154" y2="156.21" width="0.1524" layer="91"/>
+<label x="216.662" y="157.226" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="N$8" class="0">
 <segment>
@@ -12897,24 +12912,6 @@ Power Switches</text>
 <pinref part="R3" gate="G$1" pin="1"/>
 <pinref part="LED2" gate="G$1" pin="A"/>
 <wire x1="216.154" y1="143.002" x2="216.154" y2="141.478" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$3" class="0">
-<segment>
-<pinref part="LED2" gate="G$1" pin="C"/>
-<wire x1="216.154" y1="133.858" x2="216.154" y2="130.81" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$4" class="0">
-<segment>
-<pinref part="U2" gate="G$1" pin="VDD"/>
-<wire x1="198.12" y1="152.4" x2="202.438" y2="152.4" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="R3" gate="G$1" pin="2"/>
-<wire x1="216.154" y1="153.162" x2="216.154" y2="156.21" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="10K" class="0">
