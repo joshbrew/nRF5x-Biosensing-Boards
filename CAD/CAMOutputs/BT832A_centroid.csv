@@ -1,7 +1,7 @@
 Screaming Circuits SMD component position file.
 Created by Centroid_ScreamingCircuits_smd.ulp 1.2.0.
 
-Centroid Data for pc board: "BT832A.brd" as of: 6/20/2021 12:47 AM
+Centroid Data for pc board: "BT832A.brd" as of: 6/23/2021 11:49 PM
 Measurements are in inches. Comma delimited
 Only surface mount components included
 
@@ -15,18 +15,17 @@ C6,Bottom,0.831,0.229,270
 C7,Bottom,0.752,-0.381,270
 C8,Bottom,0.525,-0.382,270
 C9,Bottom,0.396,0.045,90
-C10,Top,0.967,-0.818,180
-C11,Top,0.966,-0.770,180
 C12,Top,1.136,-0.416,90
 C13,Top,0.897,-0.444,90
-C14,Top,0.883,-0.695,90
 C15,Top,1.037,-0.330,0
 C16,Top,0.526,-0.594,270
 C17,Top,0.805,-0.465,180
+C18,Top,0.993,-0.799,90
+C19,Top,1.042,-0.799,90
+C20,Top,0.953,-0.696,0
 D1,Top,0.774,-0.418,180
 D2,Top,0.711,-0.807,270
 D3,Top,0.635,-0.419,0
-IC1,Top,1.069,-0.616,0
 J1,Top,0.414,-0.951,90
 LED1,Top,0.648,-0.671,270
 LED2,Top,1.181,-0.412,180
@@ -34,7 +33,7 @@ R1,Top,0.683,-0.715,180
 R2,Top,1.157,-0.334,180
 R3,Top,0.813,-0.827,90
 R4,Top,0.880,-0.828,270
-R5,Top,0.783,-0.552,270
+R5,Top,0.782,-0.549,270
 R6,Top,0.838,-0.551,90
 S1,Top,0.392,-0.579,90
 U$1,Top,0.970,-1.041,90
@@ -44,5 +43,6 @@ U3,Top,1.019,-0.422,0
 U4,Bottom,0.636,-0.390,0
 U5,Bottom,0.639,0.111,90
 U6,Top,0.807,-0.700,90
+U7,Top,1.106,-0.632,0
 X1,Bottom,0.938,0.171,90
 X2,Top,0.971,0.029,0
