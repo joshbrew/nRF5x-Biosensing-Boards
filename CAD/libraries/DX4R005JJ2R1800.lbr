@@ -132,14 +132,15 @@
 </connects>
 <technologies>
 <technology name="">
-<attribute name="Package" value="None"/>
-<attribute name="Price" value="None"/>
-<attribute name="Availability" value="In Stock"/>
 <attribute name="MF" value="JAE Electronics"/>
+<attribute name="Package" value="None"/>
+<attribute name="Purchase-URL" value="https://pricing.snapeda.com/search/part/DX4R005JJ2R1800/?ref=eda"/>
 <attribute name="MP" value="DX4R005JJ2R1800"/>
 <attribute name="Description" value="
 USB - micro B USB 2.0 Receptacle Connector 5 Position Surface Mount, Right Angle; Through Hole
 "/>
+<attribute name="Availability" value="In Stock"/>
+<attribute name="Price" value="None"/>
 </technology>
 </technologies>
 </device>
