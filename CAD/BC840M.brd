@@ -922,7 +922,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="32.430721875" y="57.3786" size="0.508" layer="26" rot="MR180"/>
 </element>
 <element name="C6" library="standardparts" package="0201" value="220uF" x="35.773359375" y="48.630840625" smashed="yes" rot="MR270">
-<attribute name="NAME" x="35.341559375" y="46.878240625" size="0.508" layer="26" rot="MR180"/>
+<attribute name="NAME" x="35.544759375" y="46.898559375" size="0.508" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="34.554159375" y="50.967640625" size="0.508" layer="28" rot="MR180"/>
 </element>
 <element name="C7" library="standardparts" package="0201" value="1uF" x="34.89198125" y="62.263021875" smashed="yes" rot="MR0">
@@ -1027,76 +1027,76 @@ design rules under a new name.</description>
 <element name="R5" library="standardparts" package="0201" value="3.3kΩ" x="29.9974" y="34.3916" smashed="yes" rot="R180">
 <attribute name="NAME" x="30.6324" y="33.8836" size="0.4064" layer="25" font="vector" rot="R180"/>
 </element>
-<element name="C16" library="standardparts" package="0603" value="0.1pF" x="25.4" y="43.18" smashed="yes" rot="MR90">
+<element name="C16" library="standardparts" package="0603" value="10pF" x="25.4" y="43.18" smashed="yes" rot="MR90">
 <attribute name="NAME" x="26.162" y="42.6974" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R6" library="standardparts" package="0603" value="1GOhm" x="23.3172" y="42.2656" smashed="yes" rot="MR180">
+<element name="R6" library="standardparts" package="0603" value="10MOhm" x="23.3172" y="42.2656" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.844" y="42.4942" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="C17" library="standardparts" package="0603" value="0.1pF" x="25.4" y="45.847" smashed="yes" rot="MR270">
+<element name="C17" library="standardparts" package="0603" value="10pF" x="25.4" y="45.847" smashed="yes" rot="MR270">
 <attribute name="NAME" x="26.2636" y="45.6184" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R7" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="46.6344" smashed="yes" rot="MR180">
+<element name="R7" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="46.6344" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.844" y="46.6598" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="R8" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="43.7134" smashed="yes" rot="MR180">
+<element name="R8" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="43.7134" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.8694" y="43.8912" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="R9" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="45.1866" smashed="yes" rot="MR180">
+<element name="R9" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="45.1866" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.844" y="45.2628" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="C20" library="standardparts" package="0603" value="0.1pF" x="25.3746" y="48.6664" smashed="yes" rot="MR90">
+<element name="C20" library="standardparts" package="0603" value="10pF" x="25.3746" y="48.6664" smashed="yes" rot="MR90">
 <attribute name="NAME" x="26.2128" y="48.2346" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R10" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="48.1076" smashed="yes" rot="MR180">
+<element name="R10" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="48.1076" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.8186" y="48.6156" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="C21" library="standardparts" package="0603" value="0.1pF" x="25.3492" y="51.435" smashed="yes" rot="MR270">
+<element name="C21" library="standardparts" package="0603" value="10pF" x="25.3492" y="51.435" smashed="yes" rot="MR270">
 <attribute name="NAME" x="26.1366" y="51.0032" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R11" library="standardparts" package="0603" value="1GOhm" x="23.3172" y="52.4256" smashed="yes" rot="MR180">
+<element name="R11" library="standardparts" package="0603" value="10MOhm" x="23.3172" y="52.4256" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.4884" y="51.8922" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R12" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="49.53" smashed="yes" rot="MR180">
+<element name="R12" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="49.53" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.844" y="50.0126" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="R13" library="standardparts" package="0603" value="1GOhm" x="23.3172" y="50.9778" smashed="yes" rot="MR180">
+<element name="R13" library="standardparts" package="0603" value="10MOhm" x="23.3172" y="50.9778" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.8694" y="51.435" size="0.4064" layer="26" font="vector" rot="MR270"/>
 </element>
-<element name="C24" library="standardparts" package="0603" value="0.1pF" x="25.3238" y="54.5846" smashed="yes" rot="MR90">
+<element name="C24" library="standardparts" package="0603" value="10pF" x="25.3238" y="54.5846" smashed="yes" rot="MR90">
 <attribute name="NAME" x="26.1366" y="54.229" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R14" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="53.8734" smashed="yes" rot="MR180">
+<element name="R14" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="53.8734" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.4884" y="53.467" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="C25" library="standardparts" package="0603" value="0.1pF" x="25.3238" y="57.4294" smashed="yes" rot="MR270">
+<element name="C25" library="standardparts" package="0603" value="10pF" x="25.3238" y="57.4294" smashed="yes" rot="MR270">
 <attribute name="NAME" x="26.162" y="57.023" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R15" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="58.166" smashed="yes" rot="MR180">
+<element name="R15" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="58.166" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.4376" y="57.7088" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R16" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="55.3212" smashed="yes" rot="MR180">
+<element name="R16" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="55.3212" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.4884" y="54.8132" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R17" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="56.769" smashed="yes" rot="MR180">
+<element name="R17" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="56.769" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.4884" y="56.2356" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="C28" library="standardparts" package="0603" value="0.1pF" x="25.3238" y="60.325" smashed="yes" rot="MR90">
+<element name="C28" library="standardparts" package="0603" value="10pF" x="25.3238" y="60.325" smashed="yes" rot="MR90">
 <attribute name="NAME" x="26.162" y="59.8678" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R18" library="standardparts" package="0603" value="1GOhm" x="23.2918" y="59.6138" smashed="yes" rot="MR180">
+<element name="R18" library="standardparts" package="0603" value="10MOhm" x="23.2918" y="59.6138" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.463" y="59.1566" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="C29" library="standardparts" package="0603" value="0.1pF" x="25.2984" y="63.1952" smashed="yes" rot="MR270">
+<element name="C29" library="standardparts" package="0603" value="10pF" x="25.2984" y="63.1952" smashed="yes" rot="MR270">
 <attribute name="NAME" x="26.2382" y="62.7888" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R19" library="standardparts" package="0603" value="1GOhm" x="23.2156" y="64.1096" smashed="yes" rot="MR180">
+<element name="R19" library="standardparts" package="0603" value="10MOhm" x="23.2156" y="64.1096" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.3868" y="63.6778" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R20" library="standardparts" package="0603" value="1GOhm" x="23.2664" y="61.0616" smashed="yes" rot="MR180">
+<element name="R20" library="standardparts" package="0603" value="10MOhm" x="23.2664" y="61.0616" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.463" y="60.5536" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
-<element name="R21" library="standardparts" package="0603" value="1GOhm" x="23.2664" y="62.5348" smashed="yes" rot="MR180">
+<element name="R21" library="standardparts" package="0603" value="10MOhm" x="23.2664" y="62.5348" smashed="yes" rot="MR180">
 <attribute name="NAME" x="21.463" y="62.0522" size="0.4064" layer="26" font="vector" rot="MR90"/>
 </element>
 </elements>
@@ -1152,10 +1152,10 @@ design rules under a new name.</description>
 <contactref element="LED2" pad="C"/>
 <contactref element="U3" pad="2"/>
 <polygon width="0.1524" layer="16">
-<vertex x="13.0764" y="63.439040625"/>
+<vertex x="13.0764" y="64.759840625"/>
 <vertex x="13.0764" y="45.327171875"/>
-<vertex x="13.084084375" y="41.78133125"/>
-<vertex x="27.077753125" y="41.78133125"/>
+<vertex x="13.084359375" y="41.65433125"/>
+<vertex x="26.950753125" y="41.65433125"/>
 <vertex x="31.021503125" y="45.72508125"/>
 <vertex x="31.021503125" y="52.092859375"/>
 <vertex x="32.642025" y="53.71338125"/>
@@ -1163,6 +1163,7 @@ design rules under a new name.</description>
 <vertex x="33.8836" y="56.4388"/>
 <vertex x="33.8836" y="63.422065625"/>
 <vertex x="32.642025" y="63.439040625"/>
+<vertex x="31.321225" y="64.759840625"/>
 </polygon>
 <contactref element="C15" pad="1"/>
 <contactref element="U$1" pad="MP1"/>
