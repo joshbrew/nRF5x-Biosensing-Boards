@@ -5043,7 +5043,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="C7" library="standardparts" deviceset="CAPACITOR" device=".0201" value="1uF"/>
 <part name="C8" library="standardparts" deviceset="CAPACITOR" device=".0201" value="1uF"/>
 <part name="U5" library="ADS131M08IPBS" deviceset="ADS131M08IPBS" device=""/>
-<part name="C9" library="standardparts" deviceset="CAPACITOR" device=".0201" value="100uF"/>
 <part name="P+1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="SUPPLY3" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="C12" library="standardparts" deviceset="CAPACITOR" device=".0201" value="1uF"/>
@@ -5195,10 +5194,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U5" gate="G$1" x="375.1326" y="44.6786" smashed="yes">
 <attribute name="NAME" x="362.4326" y="93.9386" size="2.0828" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VALUE" x="370.0526" y="20.3586" size="2.0828" layer="96" ratio="10" rot="SR0"/>
-</instance>
-<instance part="C9" gate="G$1" x="428.7266" y="83.947" smashed="yes" rot="R90">
-<attribute name="NAME" x="428.0916" y="84.963" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="432.9176" y="84.963" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="P+1" gate="1" x="119.0244" y="56.1848" smashed="yes">
 <attribute name="VALUE" x="116.4844" y="51.1048" size="1.778" layer="96" rot="R90"/>
@@ -5493,11 +5488,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="C6" gate="G$1" pin="2"/>
 <wire x1="412.4706" y1="87.0204" x2="412.4706" y2="92.4306" width="0.1524" layer="91"/>
 <label x="413.2326" y="91.4146" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="C9" gate="G$1" pin="1"/>
-<wire x1="428.7266" y1="81.407" x2="428.7266" y2="77.4446" width="0.1524" layer="91"/>
-<label x="429.7426" y="77.4446" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="C5" gate="G$1" pin="1"/>
@@ -5959,11 +5949,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="U5" gate="G$1" pin="REFIN"/>
 <wire x1="392.9126" y1="31.9786" x2="395.4526" y2="31.9786" width="0.1524" layer="91"/>
 <label x="396.2146" y="31.7246" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="C9" gate="G$1" pin="2"/>
-<wire x1="428.7266" y1="86.487" x2="428.7266" y2="92.1766" width="0.1524" layer="91"/>
-<label x="428.9806" y="89.8906" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SYNC/RESET" class="0">
