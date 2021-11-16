@@ -216,6 +216,10 @@ but let's just break them out first and test. Let's still ID a 16-20 pin connect
 <dimension x1="35.9156" y1="70.358" x2="35.34410625" y2="30.35808125" x3="43.990259375" y3="50.358040625" textsize="1.778" layer="47" dtype="vertical"/>
 <dimension x1="12.6746" y1="68.201540625" x2="38.1508" y2="68.072" x3="25.4127" y3="75.1078" textsize="1.778" layer="47" dtype="horizontal"/>
 <text x="38.623240625" y="44.848778125" size="0.762" layer="48">VDD</text>
+<text x="9.16178125" y="62.6491" size="0.8128" layer="48">SWO</text>
+<text x="7.2136" y="60.19291875" size="0.8128" layer="48">SWDCLK</text>
+<text x="7.21868125" y="57.68848125" size="0.8128" layer="48">SWDIO</text>
+<text x="18.315940625" y="60.258959375" size="0.8128" layer="48">RESET</text>
 </plain>
 <libraries>
 <library name="LP5907MFX-3.3_NOPB">
