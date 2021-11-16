@@ -6254,6 +6254,17 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="411.5816" y1="66.0146" x2="411.607" y2="72.0598" width="0.1524" layer="91"/>
 <label x="412.369" y="71.5518" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="R25" gate="G$1" pin="1"/>
+<wire x1="144.5514" y1="56.2356" x2="140.0302" y2="56.2356" width="0.1524" layer="91"/>
+<label x="134.112" y="56.3626" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R25" gate="G$1" pin="2"/>
+<wire x1="149.6314" y1="56.2356" x2="153.162" y2="56.2356" width="0.1524" layer="91"/>
+<wire x1="153.162" y1="56.2356" x2="153.162" y2="56.3118" width="0.1524" layer="91"/>
+<label x="152.4762" y="57.023" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="VIN" class="0">
 <segment>
