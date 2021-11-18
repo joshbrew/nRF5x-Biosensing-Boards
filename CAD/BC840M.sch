@@ -6962,13 +6962,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="43.3832" y="93.2942" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="N$76" class="0">
-<segment>
-<pinref part="U$2" gate="G$1" pin="OUT@11"/>
-<wire x1="86.1822" y1="154.305" x2="88.0872" y2="154.305" width="0.1524" layer="91"/>
-<wire x1="88.0872" y1="154.305" x2="88.0872" y2="154.2796" width="0.1524" layer="91"/>
-</segment>
-</net>
 <net name="ILM" class="0">
 <segment>
 <pinref part="R3" gate="G$1" pin="2"/>
@@ -7378,6 +7371,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="U$2" gate="G$1" pin="EN1"/>
 <wire x1="50.6222" y1="126.365" x2="47.2186" y2="126.365" width="0.1524" layer="91"/>
 <label x="46.2534" y="127.3556" size="1.778" layer="95" rot="R180"/>
+</segment>
+<segment>
+<pinref part="U$2" gate="G$1" pin="OUT@11"/>
+<wire x1="86.1822" y1="154.305" x2="88.0872" y2="154.305" width="0.1524" layer="91"/>
+<wire x1="88.0872" y1="154.305" x2="88.0872" y2="154.2796" width="0.1524" layer="91"/>
+<label x="82.6516" y="151.1046" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="+5V_ISO" class="0">
