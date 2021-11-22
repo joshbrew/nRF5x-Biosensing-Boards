@@ -5019,6 +5019,77 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="TPD4S012DRYR">
+<packages>
+<package name="PSON50P145X100X60-6N">
+<wire x1="-0.5" y1="0.725" x2="-0.5" y2="-0.725" width="0.127" layer="51"/>
+<wire x1="-0.5" y1="-0.725" x2="0.5" y2="-0.725" width="0.127" layer="51"/>
+<wire x1="0.5" y1="-0.725" x2="0.5" y2="0.725" width="0.127" layer="51"/>
+<wire x1="-0.75" y1="0.975" x2="0.75" y2="0.975" width="0.05" layer="39"/>
+<wire x1="0.75" y1="0.975" x2="0.75" y2="-0.975" width="0.05" layer="39"/>
+<wire x1="0.75" y1="-0.975" x2="-0.75" y2="-0.975" width="0.05" layer="39"/>
+<wire x1="-0.75" y1="-0.975" x2="-0.75" y2="0.975" width="0.05" layer="39"/>
+<circle x="-1" y="0.5" radius="0.1" width="0.2" layer="51"/>
+<circle x="-1" y="0.5" radius="0.1" width="0.2" layer="21"/>
+<text x="-1" y="1.25" size="0.8128" layer="25">&gt;NAME</text>
+<text x="-1" y="-1.25" size="0.8128" layer="27" align="top-left">&gt;VALUE</text>
+<wire x1="-0.5" y1="0.725" x2="0.5" y2="0.725" width="0.127" layer="51"/>
+<wire x1="-0.5" y1="0.97" x2="0.5" y2="0.97" width="0.127" layer="21"/>
+<wire x1="-0.5" y1="-0.97" x2="0.5" y2="-0.97" width="0.127" layer="21"/>
+<smd name="1" x="-0.29" y="0.5" dx="0.42" dy="0.3" layer="1" roundness="25"/>
+<smd name="2" x="-0.295" y="0" dx="0.41" dy="0.3" layer="1" roundness="25"/>
+<smd name="3" x="-0.295" y="-0.5" dx="0.41" dy="0.3" layer="1" roundness="25"/>
+<smd name="4" x="0.295" y="-0.5" dx="0.41" dy="0.3" layer="1" roundness="25"/>
+<smd name="5" x="0.295" y="0" dx="0.41" dy="0.3" layer="1" roundness="25"/>
+<smd name="6" x="0.295" y="0.5" dx="0.41" dy="0.3" layer="1" roundness="25"/>
+</package>
+</packages>
+<symbols>
+<symbol name="TPD4S012DRYR">
+<wire x1="-12.7" y1="12.7" x2="12.7" y2="12.7" width="0.41" layer="94"/>
+<wire x1="12.7" y1="12.7" x2="12.7" y2="-12.7" width="0.41" layer="94"/>
+<wire x1="12.7" y1="-12.7" x2="-12.7" y2="-12.7" width="0.41" layer="94"/>
+<wire x1="-12.7" y1="-12.7" x2="-12.7" y2="12.7" width="0.41" layer="94"/>
+<text x="-12.7" y="13.7" size="2.0828" layer="95" ratio="10" rot="SR0">&gt;NAME</text>
+<text x="-12.7" y="-16.7" size="2.0828" layer="96" ratio="10" rot="SR0">&gt;VALUE</text>
+<pin name="D+" x="-17.78" y="2.54" length="middle"/>
+<pin name="D-" x="-17.78" y="0" length="middle"/>
+<pin name="ID" x="-17.78" y="-5.08" length="middle"/>
+<pin name="VBUS" x="17.78" y="10.16" length="middle" direction="pwr" rot="R180"/>
+<pin name="GND" x="17.78" y="-10.16" length="middle" direction="pwr" rot="R180"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="TPD4S012DRYR" prefix="U">
+<description> &lt;a href="https://pricing.snapeda.com/parts/TPD4S012DRYR/Texas%20Instruments/view-part?ref=eda"&gt;Check prices&lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="TPD4S012DRYR" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="PSON50P145X100X60-6N">
+<connects>
+<connect gate="G$1" pin="D+" pad="1"/>
+<connect gate="G$1" pin="D-" pad="2"/>
+<connect gate="G$1" pin="GND" pad="4"/>
+<connect gate="G$1" pin="ID" pad="3"/>
+<connect gate="G$1" pin="VBUS" pad="6"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="AVAILABILITY" value="In Stock"/>
+<attribute name="DESCRIPTION" value=" 4-channel USB ESD solution with power clamp 6-SON -40 to 85 "/>
+<attribute name="MF" value="Texas Instruments"/>
+<attribute name="MP" value="TPD4S012DRYR"/>
+<attribute name="PACKAGE" value="USON-6 Texas Instruments"/>
+<attribute name="PRICE" value="None"/>
+<attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/TPD4S012DRYR/?ref=eda"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -5133,6 +5204,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="R29" library="standardparts" deviceset="RESISTOR" device=".0402" value="10kΩ"/>
 <part name="R30" library="standardparts" deviceset="RESISTOR" device=".0402" value="100kΩ"/>
 <part name="R31" library="standardparts" deviceset="RESISTOR" device=".0402" value="100kΩ"/>
+<part name="U1" library="TPD4S012DRYR" deviceset="TPD4S012DRYR" device=""/>
+<part name="SUPPLY10" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
+<part name="C30" library="standardparts" deviceset="CAPACITOR" device=".0201" value="0.1uF"/>
+<part name="C31" library="standardparts" deviceset="CAPACITOR" device=".0201" value="10uF"/>
 </parts>
 <sheets>
 <sheet>
@@ -5141,19 +5216,19 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <text x="152.8064" y="153.7716" size="1.778" layer="97" rot="R90">830050789</text>
 <text x="35.179" y="50.9016" size="1.778" layer="97">MicroUSB</text>
 <wire x1="110.236" y1="7.9756" x2="110.2106" y2="171.9072" width="0.1524" layer="97"/>
-<wire x1="110.2106" y1="171.9072" x2="18.5928" y2="171.8564" width="0.1524" layer="97"/>
-<wire x1="18.5928" y1="171.8564" x2="18.6182" y2="7.9248" width="0.1524" layer="97"/>
-<wire x1="18.6182" y1="7.9248" x2="110.236" y2="7.9756" width="0.1524" layer="97"/>
+<wire x1="110.2106" y1="171.9072" x2="-40.5638" y2="172.0342" width="0.1524" layer="97"/>
+<wire x1="-40.5638" y1="172.0342" x2="-40.5384" y2="8.1026" width="0.1524" layer="97"/>
+<wire x1="-40.5384" y1="8.1026" x2="110.236" y2="7.9756" width="0.1524" layer="97"/>
 <text x="19.9644" y="168.5036" size="1.778" layer="97">Battery Charger/Switcher System (See BQ2407X datasheet)</text>
 <wire x1="476.7072" y1="6.6802" x2="301.4472" y2="6.6802" width="0.1524" layer="97"/>
 <wire x1="301.4472" y1="6.6802" x2="301.4218" y2="212.979" width="0.1524" layer="97"/>
 <wire x1="301.4218" y1="212.979" x2="476.6818" y2="212.979" width="0.1524" layer="97"/>
 <wire x1="476.6818" y1="212.979" x2="476.7072" y2="6.6802" width="0.1524" layer="97"/>
 <text x="304.1142" y="207.9752" size="1.778" layer="97">ADS131M08 Circuitry</text>
-<wire x1="18.1102" y1="213.0552" x2="298.9072" y2="213.1568" width="0.1524" layer="97"/>
+<wire x1="-43.1038" y1="213.0298" x2="298.9072" y2="213.1568" width="0.1524" layer="97"/>
 <wire x1="298.9072" y1="213.1568" x2="298.8564" y2="6.5532" width="0.1524" layer="97"/>
-<wire x1="298.8564" y1="6.5532" x2="18.0594" y2="6.4516" width="0.1524" layer="97"/>
-<wire x1="18.0594" y1="6.4516" x2="18.1102" y2="213.0552" width="0.1524" layer="97"/>
+<wire x1="298.8564" y1="6.5532" x2="-43.1546" y2="6.4262" width="0.1524" layer="97"/>
+<wire x1="-43.1546" y1="6.4262" x2="-43.1038" y2="213.0298" width="0.1524" layer="97"/>
 <text x="22.7838" y="208.7372" size="1.778" layer="97">Common LDO</text>
 <text x="215.265" y="174.9552" size="1.778" layer="97">BC840M</text>
 <text x="325.6788" y="89.9922" size="1.778" layer="97">Low Pass Filters</text>
@@ -5512,6 +5587,21 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="NAME" x="207.9244" y="35.3822" size="1.016" layer="95" rot="MR0"/>
 <attribute name="VALUE" x="207.9244" y="37.9222" size="1.016" layer="96" rot="R180"/>
 </instance>
+<instance part="U1" gate="G$1" x="-9.4234" y="68.707" smashed="yes">
+<attribute name="NAME" x="-22.1234" y="82.407" size="2.0828" layer="95" ratio="10" rot="SR0"/>
+<attribute name="VALUE" x="-22.1234" y="52.007" size="2.0828" layer="96" ratio="10" rot="SR0"/>
+</instance>
+<instance part="SUPPLY10" gate="GND" x="12.2174" y="53.5432" smashed="yes">
+<attribute name="VALUE" x="10.3124" y="50.3682" size="1.778" layer="96"/>
+</instance>
+<instance part="C30" gate="G$1" x="18.542" y="76.3016" smashed="yes" rot="R90">
+<attribute name="NAME" x="16.637" y="75.0316" size="1.016" layer="95" rot="MR0"/>
+<attribute name="VALUE" x="16.637" y="77.5716" size="1.016" layer="96" rot="R180"/>
+</instance>
+<instance part="C31" gate="G$1" x="25.4254" y="76.3524" smashed="yes" rot="R90">
+<attribute name="NAME" x="23.5204" y="75.0824" size="1.016" layer="95" rot="MR0"/>
+<attribute name="VALUE" x="23.5204" y="77.6224" size="1.016" layer="96" rot="R180"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -5811,6 +5901,22 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="R30" gate="G$1" pin="2"/>
 <wire x1="218.3638" y1="33.7566" x2="218.3638" y2="32.4104" width="0.1524" layer="91"/>
 <label x="215.8238" y="29.2354" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="GND"/>
+<pinref part="SUPPLY10" gate="GND" pin="GND"/>
+<wire x1="8.3566" y1="58.547" x2="12.2174" y2="58.547" width="0.1524" layer="91"/>
+<wire x1="12.2174" y1="58.547" x2="12.2174" y2="56.0832" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C30" gate="G$1" pin="1"/>
+<wire x1="18.542" y1="73.7616" x2="18.542" y2="71.374" width="0.1524" layer="91"/>
+<label x="15.3924" y="68.9102" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C31" gate="G$1" pin="1"/>
+<wire x1="25.4254" y1="73.8124" x2="25.4254" y2="71.247" width="0.1524" layer="91"/>
+<label x="22.7076" y="68.6562" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="CLKIN" class="0">
@@ -6261,6 +6367,22 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="115.3922" y1="123.5964" x2="115.443" y2="123.5964" width="0.1524" layer="91"/>
 <label x="114.681" y="121.3104" size="1.778" layer="95" rot="R90"/>
 </segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="VBUS"/>
+<wire x1="8.3566" y1="78.867" x2="10.7696" y2="78.867" width="0.1524" layer="91"/>
+<wire x1="10.7696" y1="78.867" x2="10.7696" y2="78.8924" width="0.1524" layer="91"/>
+<label x="10.3632" y="79.8068" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C30" gate="G$1" pin="2"/>
+<wire x1="18.542" y1="78.8416" x2="18.542" y2="82.1944" width="0.1524" layer="91"/>
+<label x="16.0782" y="83.2612" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C31" gate="G$1" pin="2"/>
+<wire x1="25.4254" y1="78.8924" x2="25.4254" y2="82.3214" width="0.1524" layer="91"/>
+<label x="22.8346" y="83.0834" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="D-" class="0">
 <segment>
@@ -6274,6 +6396,11 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="180.5482" y1="152.146" x2="175.641" y2="152.146" width="0.1524" layer="91"/>
 <label x="172.6184" y="151.511" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="D-"/>
+<wire x1="-27.2034" y1="68.707" x2="-34.1884" y2="68.707" width="0.1524" layer="91"/>
+<label x="-37.9222" y="67.7926" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="D+" class="0">
 <segment>
@@ -6286,6 +6413,12 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="180.5482" y1="154.1624" x2="175.6156" y2="154.1624" width="0.1524" layer="91"/>
 <wire x1="175.6156" y1="154.1624" x2="175.6156" y2="154.1272" width="0.1524" layer="91"/>
 <label x="172.4406" y="153.7716" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="D+"/>
+<wire x1="-27.2034" y1="71.247" x2="-34.1884" y2="71.247" width="0.1524" layer="91"/>
+<wire x1="-34.1884" y1="71.247" x2="-34.1884" y2="71.2216" width="0.1524" layer="91"/>
+<label x="-37.8206" y="70.612" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ID" class="0">
