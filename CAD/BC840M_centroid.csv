@@ -1,7 +1,7 @@
 Screaming Circuits SMD component position file.
 Created by Centroid_ScreamingCircuits_smd.ulp 1.2.0.
 
-Centroid Data for pc board: "BC840M.brd" as of: 11/24/2021 11:08 AM
+Centroid Data for pc board: "BC840M.brd" as of: 11/24/2021 2:08 PM
 Measurements are in inches. Comma delimited
 Only surface mount components included
 
@@ -42,7 +42,7 @@ DIN,Bottom,1.427,2.629,0
 DOUT,Bottom,1.406,2.594,0
 DRDY,Bottom,1.404,2.530,0
 I1,Top,0.685,1.456,270
-J1,Top,1.351,1.424,90
+J1,Top,1.360,1.423,90
 JP1,Bottom,0.678,2.036,90
 JP2,Top,0.678,2.036,90
 JP3,Top,1.329,2.135,90

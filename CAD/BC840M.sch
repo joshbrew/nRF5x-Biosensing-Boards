@@ -5028,53 +5028,49 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
-<library name="S2B-PH-SM4-TB_LF__SN_">
+<library name="SM02B-SRSS-TB_LF__SN_">
 <packages>
-<package name="JST_S2B-PH-SM4-TB(LF)(SN)">
-<wire x1="-3.95" y1="-0.35" x2="-1.9" y2="-0.35" width="0.127" layer="21"/>
-<wire x1="1.9" y1="-0.35" x2="3.95" y2="-0.35" width="0.127" layer="21"/>
-<wire x1="3.95" y1="-0.35" x2="3.95" y2="3.65" width="0.127" layer="21"/>
-<circle x="1.9" y="-1.6" radius="0.127" width="0" layer="21"/>
-<wire x1="2.2" y1="7.25" x2="-2.2" y2="7.25" width="0.127" layer="21"/>
-<wire x1="-3.95" y1="3.65" x2="-3.95" y2="-0.35" width="0.127" layer="21"/>
-<wire x1="-4.5" y1="8" x2="4.5" y2="8" width="0.127" layer="39"/>
-<wire x1="4.5" y1="8" x2="4.5" y2="-0.75" width="0.127" layer="39"/>
-<wire x1="4.5" y1="-0.75" x2="2.25" y2="-0.75" width="0.127" layer="39"/>
-<wire x1="2.25" y1="-0.75" x2="2.25" y2="-2.25" width="0.127" layer="39"/>
-<wire x1="2.25" y1="-2.25" x2="-2.25" y2="-2.25" width="0.127" layer="39"/>
-<wire x1="-2.25" y1="-2.25" x2="-2.25" y2="-0.75" width="0.127" layer="39"/>
-<wire x1="-2.25" y1="-0.75" x2="-4.5" y2="-0.75" width="0.127" layer="39"/>
-<wire x1="-4.5" y1="-0.75" x2="-4.5" y2="8" width="0.127" layer="39"/>
-<text x="-4.504859375" y="8.25891875" size="1.27136875" layer="25">&gt;NAME</text>
-<text x="-4.50495" y="-3.75413125" size="1.2714" layer="27">&gt;VALUE</text>
-<smd name="2" x="-1" y="0" dx="1" dy="3.5" layer="1"/>
-<smd name="1" x="1" y="0" dx="1" dy="3.5" layer="1"/>
-<smd name="P2" x="-3.35" y="5.75" dx="1.5" dy="3.4" layer="1"/>
-<smd name="P1" x="3.35" y="5.75" dx="1.5" dy="3.4" layer="1"/>
+<package name="SM02B-SRSS-TB(LF)(SN)">
+<description>&lt;b&gt;SM02B-SRSS-TB&lt;/b&gt;&lt;br&gt;
+</description>
+<text x="-0.34685625" y="-0.3909625" size="1.27315" layer="25" align="center">&gt;NAME</text>
+<text x="-0.3471375" y="-0.391284375" size="1.27416875" layer="27" align="center">&gt;VALUE</text>
+<wire x1="-2" y1="1.65" x2="2" y2="1.65" width="0.254" layer="51"/>
+<wire x1="2" y1="1.65" x2="2" y2="-2.6" width="0.254" layer="51"/>
+<wire x1="2" y1="-2.6" x2="-2" y2="-2.6" width="0.254" layer="51"/>
+<wire x1="-2" y1="-2.6" x2="-2" y2="1.65" width="0.254" layer="51"/>
+<wire x1="-2" y1="1.65" x2="-2" y2="-0.563" width="0.254" layer="21"/>
+<wire x1="2" y1="1.65" x2="2" y2="-0.697" width="0.254" layer="21"/>
+<wire x1="-0.767" y1="-2.6" x2="0.722" y2="-2.6" width="0.254" layer="21"/>
+<wire x1="-2" y1="1.65" x2="-1.145" y2="1.65" width="0.254" layer="21"/>
+<wire x1="2" y1="1.65" x2="1.1" y2="1.65" width="0.254" layer="21"/>
+<smd name="1" x="-0.5" y="1.975" dx="1.55" dy="0.6" layer="1" rot="R90"/>
+<smd name="2" x="0.5" y="1.975" dx="1.55" dy="0.6" layer="1" rot="R90"/>
+<smd name="3" x="-1.8" y="-1.9" dx="1.8" dy="1.2" layer="1" rot="R90"/>
+<smd name="4" x="1.8" y="-1.9" dx="1.8" dy="1.2" layer="1" rot="R90"/>
 </package>
 </packages>
 <symbols>
-<symbol name="S2B-PH-SM4-TB(LF)(SN)">
-<wire x1="0" y1="1.27" x2="2.54" y2="1.27" width="0.762" layer="94"/>
-<wire x1="0" y1="-1.27" x2="2.54" y2="-1.27" width="0.762" layer="94"/>
-<wire x1="-1.27" y1="3.81" x2="-1.27" y2="-3.81" width="0.254" layer="94"/>
-<wire x1="-1.27" y1="-3.81" x2="5.08" y2="-3.81" width="0.254" layer="94"/>
-<wire x1="5.08" y1="-3.81" x2="5.08" y2="3.81" width="0.254" layer="94"/>
-<wire x1="5.08" y1="3.81" x2="-1.27" y2="3.81" width="0.254" layer="94"/>
-<text x="-1.2719" y="3.8157" size="1.2719" layer="95">&gt;NAME</text>
-<text x="-1.272209375" y="-5.08881875" size="1.272209375" layer="96">&gt;VALUE</text>
-<pin name="1" x="-5.08" y="1.27" length="middle" direction="pas"/>
-<pin name="2" x="-5.08" y="-1.27" length="middle" direction="pas"/>
+<symbol name="SM02B-SRSS-TB(LF)(SN)">
+<wire x1="5.08" y1="7.62" x2="10.16" y2="7.62" width="0.254" layer="94"/>
+<wire x1="10.16" y1="0" x2="10.16" y2="7.62" width="0.254" layer="94"/>
+<wire x1="10.16" y1="0" x2="5.08" y2="0" width="0.254" layer="94"/>
+<wire x1="5.08" y1="7.62" x2="5.08" y2="0" width="0.254" layer="94"/>
+<text x="11.4936" y="5.10916875" size="1.78541875" layer="95" align="center-left">&gt;NAME</text>
+<text x="11.4908" y="2.558240625" size="1.784809375" layer="96" align="center-left">&gt;VALUE</text>
+<pin name="1" x="0" y="5.08" length="middle"/>
+<pin name="2" x="0" y="2.54" length="middle"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="S2B-PH-SM4-TB(LF)(SN)" prefix="P">
-<description>CONN HEADER PH SIDE 2POS 2MM SMD &lt;a href="https://pricing.snapeda.com/parts/S2B-PH-SM4-TB%20%28LF%29%28SN%29/JST%20Sales/view-part?ref=eda"&gt;Check prices&lt;/a&gt;</description>
+<deviceset name="SM02B-SRSS-TB(LF)(SN)" prefix="J">
+<description>&lt;b&gt;JST (JAPAN SOLDERLESS TERMINALS) - SM02B-SRSS-TB (LF)(SN) - HEADER, R/A, 2WAY&lt;/b&gt;&lt;p&gt;
+Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eSH.pdf"&gt; Datasheet &lt;/a&gt; &lt;a href="https://pricing.snapeda.com/parts/SM02B-SRSS-TB%28LF%29%28SN%29/JST%20Sales/view-part?ref=eda"&gt;Check prices&lt;/a&gt;</description>
 <gates>
-<gate name="G$1" symbol="S2B-PH-SM4-TB(LF)(SN)" x="0" y="0"/>
+<gate name="G$1" symbol="SM02B-SRSS-TB(LF)(SN)" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="JST_S2B-PH-SM4-TB(LF)(SN)">
+<device name="" package="SM02B-SRSS-TB(LF)(SN)">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -5082,9 +5078,9 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <technologies>
 <technology name="">
 <attribute name="AVAILABILITY" value="In Stock"/>
-<attribute name="DESCRIPTION" value=" Connector Header Surface Mount, Right Angle 2 position 0.079 (2.00mm) "/>
+<attribute name="DESCRIPTION" value=" Connector Header Surface Mount, Right Angle 2 position 0.039 (1.00mm) "/>
 <attribute name="MF" value="JST Sales"/>
-<attribute name="MP" value="S2B-PH-SM4-TB (LF)(SN)"/>
+<attribute name="MP" value="SM02B-SRSS-TB(LF)(SN)"/>
 <attribute name="PACKAGE" value="None"/>
 <attribute name="PRICE" value="None"/>
 </technology>
@@ -5128,7 +5124,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="SUPPLY13" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="U2" library="BC840M" deviceset="BC840M" device=""/>
 <part name="U6" library="BQ24072RGTR" deviceset="BQ24072RGTR" device=""/>
-<part name="J1" library="S2B-PH-SM4-TB_LF__SN_" deviceset="S2B-PH-SM4-TB(LF)(SN)" device=""/>
 <part name="JP1" library="pinhead+" deviceset="PINHD-2X8" device="SMT"/>
 <part name="JP2" library="pinhead+" deviceset="PINHD-2X10" device="SMT"/>
 <part name="JP3" library="pinhead+" deviceset="PINHD-2X10" device="SMT"/>
@@ -5212,6 +5207,7 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <part name="SUPPLY10" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="C30" library="standardparts" deviceset="CAPACITOR" device=".0201" value="0.1uF"/>
 <part name="C31" library="standardparts" deviceset="CAPACITOR" device=".0402" value="10uF"/>
+<part name="J1" library="SM02B-SRSS-TB_LF__SN_" deviceset="SM02B-SRSS-TB(LF)(SN)" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -5320,10 +5316,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <instance part="U6" gate="G$1" x="68.4022" y="123.825" smashed="yes">
 <attribute name="NAME" x="55.7022" y="160.385" size="2.0828" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VALUE" x="55.7022" y="84.265" size="2.0828" layer="96" ratio="10" rot="SR0"/>
-</instance>
-<instance part="J1" gate="G$1" x="89.1286" y="37.9476" smashed="yes">
-<attribute name="NAME" x="95.85583125" y="34.252" size="1.78541875" layer="95" rot="R90" align="center-left"/>
-<attribute name="VALUE" x="105.7556" y="30.283959375" size="1.784809375" layer="96" rot="R180" align="center-left"/>
 </instance>
 <instance part="JP1" gate="A" x="328.5236" y="120.3706" smashed="yes">
 <attribute name="NAME" x="322.1736" y="131.1656" size="1.778" layer="95"/>
@@ -5606,6 +5598,10 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <attribute name="NAME" x="23.5204" y="75.0824" size="1.016" layer="95" rot="MR0"/>
 <attribute name="VALUE" x="23.5204" y="77.6224" size="1.016" layer="96" rot="R180"/>
 </instance>
+<instance part="J1" gate="G$1" x="84.8868" y="34.163" smashed="yes">
+<attribute name="NAME" x="96.3804" y="39.27216875" size="1.78541875" layer="95" align="center-left"/>
+<attribute name="VALUE" x="96.3776" y="36.721240625" size="1.784809375" layer="96" align="center-left"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -5718,13 +5714,6 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <wire x1="37.719" y1="35.9156" x2="37.7698" y2="33.2486" width="0.1524" layer="91"/>
 <junction x="37.719" y="35.9156"/>
 <pinref part="SUPPLY13" gate="GND" pin="GND"/>
-</segment>
-<segment>
-<wire x1="84.0486" y1="39.2176" x2="80.4672" y2="39.2176" width="0.1524" layer="91"/>
-<wire x1="80.4672" y1="39.2176" x2="80.4672" y2="45.9994" width="0.1524" layer="91"/>
-<pinref part="SUPPLY7" gate="GND" pin="GND"/>
-<wire x1="80.4672" y1="45.9994" x2="75.9714" y2="45.9994" width="0.1524" layer="91"/>
-<pinref part="J1" gate="G$1" pin="1"/>
 </segment>
 <segment>
 <pinref part="R3" gate="G$1" pin="1"/>
@@ -5919,6 +5908,13 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <pinref part="C31" gate="G$1" pin="1"/>
 <wire x1="25.4254" y1="73.8124" x2="25.4254" y2="71.247" width="0.1524" layer="91"/>
 <label x="22.7076" y="68.6562" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="J1" gate="G$1" pin="1"/>
+<wire x1="84.8868" y1="39.243" x2="80.4926" y2="39.243" width="0.1524" layer="91"/>
+<wire x1="80.4926" y1="39.243" x2="80.4672" y2="45.9994" width="0.1524" layer="91"/>
+<pinref part="SUPPLY7" gate="GND" pin="GND"/>
+<wire x1="80.4672" y1="45.9994" x2="75.9714" y2="45.9994" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="CLKIN" class="0">
@@ -7158,10 +7154,11 @@ new: Attribute TP_SIGNAL_NAME&lt;br&gt;
 <label x="46.5074" y="134.747" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
-<pinref part="J1" gate="G$1" pin="2"/>
-<wire x1="84.0486" y1="36.6776" x2="77.8764" y2="36.6522" width="0.1524" layer="91"/>
+<wire x1="84.0486" y1="36.703" x2="77.8764" y2="36.6522" width="0.1524" layer="91"/>
 <wire x1="77.8764" y1="36.6522" x2="77.8764" y2="36.6776" width="0.1524" layer="91"/>
 <label x="77.851" y="35.179" size="1.778" layer="95" rot="R180"/>
+<pinref part="J1" gate="G$1" pin="2"/>
+<wire x1="84.8868" y1="36.703" x2="84.0486" y2="36.703" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="R23" gate="G$1" pin="1"/>
