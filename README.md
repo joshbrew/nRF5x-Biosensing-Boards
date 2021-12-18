@@ -2,7 +2,7 @@
 
 This contains our working prototypes for using nRF52 microcontrollers (ARM + BLE5) with low cost sensors. 
 
-Features Zephyr RTOS test firmware, which is hardware-agnostic.
+Features Zephyr RTOS test firmware, which is hardware-agnostic. [Firmware for BT832A prototype](https://github.com/moothyknight/BT832_Zephyr)
 
 The current prototypes here are breakout boards, they are pin compatible with several different modules while it's easy to spin up new designs with similar products. Next versions will be further miniaturized.
 
