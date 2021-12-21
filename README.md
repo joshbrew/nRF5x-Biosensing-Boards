@@ -14,4 +14,4 @@ License: AGPL v3.0
 
 Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich
 
-Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce](https://myalyce.com) wearables for neurofeedback and treatment recovery monitoring.
+Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce](https://github.com/myalyce/myalyce) wearables for neurofeedback and treatment recovery monitoring.
