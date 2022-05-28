@@ -1,6 +1,6 @@
 # nRF52 Biosensing Boards
 
-This contains our working prototypes for using nRF52 microcontrollers (ARM + BLE5) with low cost sensors. 
+This contains our working prototypes for using nRF52 microcontrollers (ARM + BLE5) with low cost sensors. [Doc](https://docs.google.com/document/d/1gOrWiBDynYziCYDMF4r1Rw85PXo9JbuBrYJEEkW2U-c/edit?usp=sharing). 
 
 Features Zephyr RTOS test firmware, which is hardware-agnostic. [Firmware for BT832A prototype](https://github.com/moothyknight/BT832_Zephyr)
 
@@ -14,4 +14,4 @@ License: AGPL v3.0
 
 Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich
 
-Developed for creating open source Brains@Play and MyAlyce wearables for neurofeedback and treatment recovery monitoring.
+Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce](https://github.com/myalyce/myalyce) wearables for neurofeedback and treatment recovery monitoring.
