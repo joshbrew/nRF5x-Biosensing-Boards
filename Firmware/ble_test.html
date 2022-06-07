@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+    <script>
+            class BLE { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
+        constructor(
+            namePrefix  = 'BT832A',
+            serviceUUID = '0000CAFE-B0BA-8BAD-F00D-DEADBEEF0000', //BLE service ID
+            rxUUID      = '0001CAFE-B0BA-8BAD-F00D-DEADBEEF0000',      //WRITE characteristic
+            txUUID      = '0002CAFE-B0BA-8BAD-F00D-DEADBEEF0000',      //NOTIFY characteristic
+            otaServiceUuid            = serviceUUID,                            //don't worry about these for now
+            versionCharacteristicUuid = '6E400006-B5A3-F393-E0A9-E50E24DCCA9E', // ..
+            fileCharacteristicUuid    = '6E400006-B5A3-F393-E0A9-E50E24DCCA9E', //  ..
+            defaultUI = false, 
+            async = false )
+        {
+        
+        this.namePrefix  = namePrefix;
+        this.serviceUUID = serviceUUID.toLowerCase();
+        this.rxUUID      = rxUUID.toLowerCase(); //characteristic that can receive input from this device
+        this.txUUID      = txUUID.toLowerCase(); //characteristic that can transmit input to this device
+        this.encoder     = new TextEncoder("utf-8");
+        this.decoder     = new TextDecoder("utf-8");
+    
+        this.device  = null;
+        this.server  = null;
+        this.service = null;
+    
+        this.async = async;
+    
+        this.android = navigator.userAgent.toLowerCase().indexOf("android") > -1; //Use fast mode on android (lower MTU throughput)
+    
+        this.n; //nsamples
+    
+    
+        //BLE Updater modified from this sparkfun tutorial: https://learn.sparkfun.com/tutorials/esp32-ota-updates-over-ble-from-a-react-web-application/all
+        
+        //See original copyright:
+        /*************************************************** 
+         This is a React WebApp written to Flash an ESP32 via BLE
+        
+        Written by Andrew England (SparkFun)
+        BSD license, all text above must be included in any redistribution.
+        *****************************************************/
+    
+        this.otaServiceUuid = otaServiceUuid.toLowerCase();
+        this.versionCharacteristicUuid = versionCharacteristicUuid.toLowerCase();
+        this.fileCharacteristicUuid = fileCharacteristicUuid.toLowerCase();
+    
+        this.otaService = null;
+        this.readyFlagCharacteristic = null;
+        this.dataToSend = null;
+        this.updateData = null;
+    
+        this.totalSize;
+        this.remaining;
+        this.amountToWrite;
+        this.currentPosition;
+    
+        this.currentHardwareVersion = "N/A";
+        this.softwareVersion = "N/A";
+        this.latestCompatibleSoftware = "N/A";
+    
+        this.characteristicSize = 512; //MTUs //20 byte limit on android   
+    
+        if(defaultUI === true){
+            this.initUI(undefined, buttonId);
+        }
+         
+        }
+     
+        initUI(parentId, 
+                buttonId='bleconnect',
+                inputId='blesend'
+            ) {
+            if(this.device !== null){
+                if (this.device.gatt.connected) {
+                    this.device.gatt.disconnect();
+                    console.log("device disconnected");
+                }
+            }
+            var HTMLtoAppend = `
+                <button id="${buttonId}">BLE Connect</button>
+                <input type='text' id=${inputId}></input>
+                <button id="${inputId}button">Send</button><br>
+                OUTPUT: <br>
+                <table id='output'></table><br>
+                ELAPSED SECONDS: <span id='elapsed'></span>
+                `;
+            if(parentId) document.getElementById(parentId).insertAdjacentHTML('afterbegin',HTMLtoAppend);
+            else document.body.insertAdjacentHTML('afterbegin',HTMLtoAppend);
+
+            document.getElementById(buttonId).onclick = () => { 
+                if(this.async === false) {
+                    this.connect();
+                } 
+                else{
+                    this.initBLEasync();
+                } 
+            }
+
+            document.getElementById(inputId+'button').onclick = () => {
+                let input = document.getElementById(inputId).value;
+                if(input.length > 0) this.sendMessage(input);
+            }
+
+        }
+     
+        //Typical web BLE calls
+        connect = async (
+            serviceUUID = this.serviceUUID, 
+            rxUUID      = this.rxUUID, 
+            txUUID      = this.txUUID) => 
+        { //Must be run by button press or user-initiated call
+            let err = false;
+            await navigator.bluetooth.requestDevice({   
+                //    acceptAllDevices: true,
+                filters: [{ services: [serviceUUID] }, { namePrefix: this.namePrefix }],
+                optionalServices: [serviceUUID] 
+            })
+            .then(device => {
+                //document.getElementById("device").innerHTML += device.name+ "/"+ device.id +"/"+ device.gatt.connected+"<br>";
+                this.device = device;
+                console.log('device',device)
+                return device.gatt.connect(); //Connect to HEG
+            })
+            .then(sleeper(100))
+            .then(server => server.getPrimaryService(serviceUUID))
+            .then(sleeper(100))
+            .then(service => { //over-the-air updates
+                console.log('service',service)
+                this.service = service;
+                this.otaService = service;
+                service.getCharacteristic(rxUUID).then(sleeper(100)).then(tx => {
+                     this.rxchar = tx;
+                     console.log('command char',tx)
+                     //return tx.writeValue(this.encoder.encode("t")); // Send command to start HEG automatically (if not already started)
+                });
+                if(this.android == true){
+                    service.getCharacteristic(rxUUID).then(sleeper(1000)).then(tx => {
+                        //return tx.writeValue(this.encoder.encode("o")); // Fast output mode for android
+                    });
+                }
+                return service.getCharacteristic(txUUID) // Get stream source
+            })
+            .then(sleeper(100))
+            .then(characteristic=>{
+                //console.log('notification char',characteristic)
+                this.txchar = characteristic;
+                this.onConnectedCallback(characteristic);
+                characteristic.addEventListener(
+                    'characteristicvaluechanged',
+                    this.onNotificationCallback) //Update page with each notification
+                return characteristic.startNotifications(); // Subscribe to stream
+            })
+            .then(sleeper(100))
+            .catch(err => {console.error(err); this.onErrorCallback(err); err = true;});
+            
+            function sleeper(ms) {
+                return function(x) {
+                    return new Promise(resolve => setTimeout(() => resolve(x), ms));
+                };
+            }
+        }
+     
+        onNotificationCallback = (e) => { //Customize this with the UI (e.g. have it call the handleScore function)
+          var val = this.decoder.decode(e.target.value);
+          console.log("BLE MSG: ",val);
+          let outputdiv = document.getElementById('output');
+          if(outputdiv) outputdiv.innerHTML = val;
+        }   
+     
+        onConnectedCallback = (characteristic) => {
+            console.log('connected', characteristic);
+           //Use this to set up the front end UI once connected here
+        }
+
+        onErrorCallback = (err) => {
+            //Use this to set up the front end UI once connected here
+            console.error(err);
+        }
+     
+        sendMessage = (msg) => {
+            if (this.service) 
+                this.service.getCharacteristic(this.rxUUID)
+                .then(tx => {return tx.writeValue(this.encoder.encode(msg));});
+        }
+    
+        //get the file to start the update process
+        getFile() {
+            var input = document.createElement('input');
+            input.accept = '.bin';
+            input.type = 'file';
+    
+            input.onchange = (e) => {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = (event) => {
+                    this.updateData = event.target.result;
+                    this.SendFileOverBluetooth();
+                    input.value = '';
+                }
+                reader.readAsArrayBuffer(file);
+            }
+            input.click();
+        }
+    
+        /* SendFileOverBluetooth(data)
+        * Figures out how large our update binary is, attaches an eventListener to our dataCharacteristic so the Server can tell us when it has finished writing the data to memory
+        * Calls SendBufferedData(), which begins a loop of write, wait for ready flag, write, wait for ready flag...
+        */
+        SendFileOverBluetooth() {
+            if(!this.otaService)
+            {
+                console.log("No ota Service");
+                return;
+            }
+            
+            this.totalSize = this.updateData.byteLength;
+            this.remaining = this.totalSize;
+            this.amountToWrite = 0;
+            this.currentPosition = 0;
+    
+            this.otaService.getCharacteristic(this.fileCharacteristicUuid)
+            .then(characteristic => {
+                this.readyFlagCharacteristic = characteristic;
+                return characteristic.startNotifications()
+                .then(_ => {
+                    this.readyFlagCharacteristic.addEventListener('characteristicvaluechanged', this.SendBufferedData)
+                });
+            })
+            .catch(error => { 
+                console.log(error); 
+            });
+            this.SendBufferedData();
+        }
+    
+        /* SendBufferedData()
+        * An ISR attached to the same characteristic that it writes to, this function slices data into characteristic sized chunks and sends them to the Server
+        */
+        SendBufferedData() {
+            if (this.remaining > 0) {
+                if (this.remaining >= this.characteristicSize) {
+                    this.amountToWrite = this.characteristicSize
+                }
+                else {
+                    this.amountToWrite = this.remaining;
+                }
+    
+                this.dataToSend = this.updateData.slice(this.currentPosition, this.currentPosition + this.amountToWrite);
+                this.currentPosition += this.amountToWrite;
+                this.remaining -= this.amountToWrite;
+                console.log("remaining: " + this.remaining);
+    
+                this.otaService.getCharacteristic(this.fileCharacteristicUuid)
+                .then(characteristic => this.RecursiveSend(characteristic, this.dataToSend))
+                .then(_ => {
+                    let progress = (100 * (this.currentPosition/this.totalSize)).toPrecision(3) + '%';
+                    this.onProgress(progress);
+                    return;
+                })
+                .catch(error => { 
+                    console.log(error); 
+                });
+            }
+        }
+    
+        onProgress(progress) {
+            console.log("Update Progress: ", progress);
+        }
+    
+        RecursiveSend(characteristic, data) {
+            return characteristic.writeValue(data)
+            .catch(error => {
+                return this.RecursiveSend(characteristic, data);
+            });
+        }
+    
+    
+    
+    
+     
+        //Async solution fix for slower devices (android). This is slower than the other method on PC. Credit Dovydas Stirpeika
+        async connectAsync() {
+             this.device = await navigator.bluetooth.requestDevice({
+                 filters: [{ namePrefix: this.namePrefix }],
+                 optionalServices: [this.serviceUUID]
+             });
+     
+             console.log("BLE Device: ", this.device);
+             
+             const btServer = await this.device.gatt?.connect();
+             if (!btServer) throw 'no connection';
+             this.device.addEventListener('gattserverdisconnected', onDisconnected);
+             
+             this.server = btServer;
+             
+             const service = await this.server.getPrimaryService(this.serviceUUID);
+             
+             // Send command to start HEG automatically (if not already started)
+             const tx = await service.getCharacteristic(this.rxUUID);
+             //await tx.writeValue(this.encoder.encode("t"));
+     
+             if(this.android == true){
+               //await tx.writeValue(this.encoder.encode("o"));
+             }
+             
+             this.characteristic = await service.getCharacteristic(this.txUUID);
+              this.onConnectedCallback();
+             return true;
+         }
+     
+         disconnect = () => {
+             this.server?.disconnect(); this.onDisconnectedCallback()
+         };
+     
+         onDisconnectedCallback = () => {
+           console.log("BLE device disconnected!");
+         }
+     
+         async readDeviceAsync () {
+             if (!this.characteristic) {
+                 console.log("HEG not connected");
+                 throw "error";
+             }
+     
+             // await this.characteristic.startNotifications();
+             this.doReadHeg = true;
+             
+             var data = ""
+             while (this.doReadHeg) {
+                 const val = this.decoder.decode(await this.characteristic.readValue());
+                 if (val !== this.data) {
+                     data = val;
+                     //console.log(data);
+                     //data = data[data.length - 1];
+                     //const arr = data.replace(/[\n\r]+/g, '')
+                     this.n += 1;
+                     this.onReadAsyncCallback(data);
+                 }
+             }
+         }
+     
+         onReadAsyncCallback = (data) => {
+           console.log("BLE Data: ",data)
+         }
+     
+         stopReadAsync = () => {
+             this.doReadHeg = false;
+             tx.writeValue(this.encoder.encode("f"));
+         }
+     
+         spsinterval = () => {
+           setTimeout(() => {
+             console.log("SPS", this.n + '');
+             this.n = 0;
+             this.spsinterval();
+           }, 1000);
+         }
+     
+         async initBLEasync() {
+           await this.connectAsync();
+           this.readDeviceasync();
+           this.spsinterval();
+         }
+           
+     }
+
+class ads131m08 { //Contains structs and necessary functions/API calls to analyze serial data for the FreeEEG32
+
+    constructor(
+        mode='ads131',
+        onDecodedCallback = this.onDecodedCallback,
+        onConnectedCallback = this.onConnectedCallback,
+        onDisconnectedCallback = this.onDisconnectedCallback,
+        CustomDecoder = this.decode,
+        baudrate = 10000000
+        ) {
+        this.onDecodedCallback = onDecodedCallback;
+        this.onConnectedCallback = onConnectedCallback;
+        this.onDisconnectedCallback = onDisconnectedCallback;
+        this.decode = CustomDecoder;
+        //Free EEG 32 data structure:
+        /*
+            [stop byte, start byte, counter byte, 32x3 channel data bytes (24 bit), 3x2 accelerometer data bytes, stop byte, start byte...] Gyroscope not enabled yet but would be printed after the accelerometer..
+            Total = 105 bytes/line
+        */
+        this.connected = false;
+        this.subscribed = false;
+
+        this.mode = mode //ads131, ppg
+        this.buffer = [];
+        this.byteLength = 227; //length of an array buffer
+        this.adcLength = 225;
+        this.sps = 500; // Sample rate
+        this.nChannels = 8;
+        this.nPeripheralChannels = 0; // accelerometer and gyroscope (2 bytes * 3 coordinates each)
+        this.updateMs = 1000/this.sps; //even spacing
+        this.stepSize = 1/Math.pow(2,24);
+        this.vref = 1.20; //2.5V voltage ref +/- 250nV
+        this.gain = 32;
+
+        if(this.mode === 'pulseox') {
+            this.byteLength = 243; //length of an array buffer
+            this.adcLength = 241;
+            this.sps = 50;
+        }
+        this.stopByte = 0x0D; // Stop byte value
+        this.startByte = 0x0A; // Start byte value
+        this.searchString = new Uint8Array([this.stopByte,this.startByte]); //Byte search string
+
+        this.readRate = 1; //Throttle EEG read speed. (1.953ms/sample min @103 bytes/line)
+        this.readBufferSize = 2000; //Serial read buffer size, increase for slower read speeds (~1030bytes every 20ms) to keep up with the stream (or it will crash)
+        this.decoder = new TextDecoder();
+
+        this.vscale = (this.vref/this.gain)*this.stepSize; //volts per step.
+        this.uVperStep = 1000000 * ((this.vref/this.gain)*this.stepSize); //uV per step.
+        this.scalar = 1/(1000000 / ((this.vref/this.gain)*this.stepSize)); //steps per uV.
+
+        this.maxBufferedSamples = this.sps*60*2; //max samples in buffer this.sps*60*nMinutes = max minutes of data
+        
+        this.data = { //Data object to keep our head from exploding. Get current data with e.g. this.data.A0[this.data.count-1]
+            count: 0,
+            startms: undefined,
+            ms: [],
+            'A0': [],'A1': [],'A2': [],'A3': [],'A4': [],'A5': [],'A6': [],'A7': [], //ADC 0
+            'RED':[],'IR':[],'AMB':[],
+            'ECG':[],'BIOZ':[],
+            'AX':[],'AY':[],'AZ':[],'GX':[],'GY':[],'GZ':[]
+        };
+
+        this.resetDataBuffers();
+
+        //navigator.serial utils
+        if(!navigator.serial){
+            console.error("`navigator.serial not found! Enable #enable-experimental-web-platform-features in chrome://flags (search 'experimental')")
+        }
+        this.port = null;
+        this.reader = null;
+        this.baudrate = baudrate;
+
+    }
+
+    resetDataBuffers(){
+        this.data.count = 0;
+        this.data.startms = 0;
+        for(const prop in this.data) {
+            if(typeof this.data[prop] === "object"){
+                this.data[prop] = new Array(this.maxBufferedSamples).fill(0);
+            }
+        }
+    }
+
+    setScalar(gain=24,stepSize=1/(Math.pow(2,23)-1),vref=4.50) {
+        this.stepSize = stepSize;
+        this.vref = vref; //2.5V voltage ref +/- 250nV
+        this.gain = gain;
+
+        this.vscale = (this.vref/this.gain)*this.stepSize; //volts per step.
+        this.uVperStep = 1000000 * ((this.vref/this.gain)*this.stepSize); //uV per step.
+        this.scalar = 1/(1000000 / ((this.vref/this.gain)*this.stepSize)); //steps per uV.
+    }
+
+    getLatestData(channel="A0",count=1) { //Return slice of specified size of the latest data from the specified channel
+        let ct = count;
+        if(ct <= 1) {
+            return this.data[channel][this.data.count-1];
+        }
+        else {
+            if(ct > this.data.count) {
+                ct = this.data.count;
+            }
+            return this.data[channel].slice(this.data.count-ct,this.data.count);
+        }
+    }
+
+    bytesToInt16(x0,x1){
+        return x0 * 256 + x1;
+    }
+
+    int16ToBytes(y){ //Turns a 24 bit int into a 3 byte sequence
+        return [y & 0xFF , (y >> 8) & 0xFF];
+    }
+
+    bytesToInt24(x0,x1,x2){ //Turns a 3 byte sequence into a 24 bit int
+        return x0 * 65536 + x1 * 256 + x2;
+    }
+
+    int24ToBytes(y){ //Turns a 24 bit int into a 3 byte sequence
+        return [y & 0xFF , (y >> 8) & 0xFF , (y >> 16) & 0xFF];
+    }
+
+    bytesToInt32(x0,x1,x2,x3){ //Turns a 3 byte sequence into a 24 bit int
+        return x0 * 16777216 + x1 * 65536 + x2 * 256 + x3;
+    }
+
+    int32ToBytes(y){ //Turns a 24 bit int into a 3 byte sequence
+        return [y & 0xFF , (y >> 8) & 0xFF , (y >> 16) & 0xFF, (y >> 24) & 0xFF];
+    }
+
+    decode(buffer=this.buffer) { //returns true if successful, returns false if not
+
+        
+		let needle = this.searchString
+		let haystack = buffer;
+		let search = this.boyerMoore(needle);
+		let skip = search.byteLength;
+		let indices = [];
+		let newLines = 0;
+		for (let i = search(haystack); i !== -1; i = search(haystack, i + skip)) {
+			indices.push(i);
+		}
+		//console.log(indices);
+		if(indices.length >= 2){
+			for(let k = 1; k < indices.length; k++) {
+				if(indices[k] - indices[k-1] !== this.byteLength) {
+					console.log(indices[k] - indices[k-1]);
+				} //This is not a valid sequence going by size, drop sequence and return
+				else {
+					let line = buffer.slice(indices[k-1],indices[k]); //Splice out this line to be decoded
+					//console.log(line)
+					// line[0] = stop byte, line[1] = start byte, line[2] = counter, line[3:99] = ADC data 32x3 bytes, line[100-104] = Accelerometer data 3x2 bytes
+                    
+                    //0x0D,0x0A,0:1,0:2,0:3,1:1,1:2,1:3,...8:3,CTR,0:1,0:2,0:3,... for 9 samples in a batch then 0X0D,0X0A again
+
+     
+                    if(this.mode === 'ads131') {
+
+                        let channelnum = 0;
+                        for(let i = 2; i < this.adcLength; i+=3) {
+                            if(channelnum === 0) {
+                                if(i > 2) {
+                                    i++;  
+                                }
+
+                                //console.log(i,newLines)
+
+                                if(this.data.count < this.maxBufferedSamples){
+                                    this.data.count++;
+                                }
+
+                                if(this.data.count-1 === 0) {
+                                    this.data.ms[this.data.count-1] = Date.now(); this.data.startms = this.data.ms[0];
+                                }
+                                else {
+                                    this.data.ms[this.data.count-1]=this.data.ms[this.data.count-2]+this.updateMs;//Assume no dropped samples
+                                    
+                                    if(this.data.count >= this.maxBufferedSamples) {
+                                        this.data.ms.splice(0,5120);
+                                        this.data.ms.push(new Array(5120).fill(0));
+                                    }
+                                }
+                                //console.log(this.data.count,this.data.ms[this.data.count-1])
+                            }
+                            
+                            let channel = "A"+channelnum;
+                            //console.log(channel, i)
+                            //console.log(channel, line[i],line[i+1],line[i+2],i)
+                            this.data[channel][this.data.count-1]=this.bytesToInt24(line[i],line[i+1],line[i+2]);
+                            
+                            if(this.data.count >= this.maxBufferedSamples) { 
+                                this.data[channel].splice(0,5120);
+                                this.data[channel].push(new Array(5120).fill(0));//shave off the last 10 seconds of data if buffer full (don't use shift())
+                            }
+
+                            if(channelnum === 0) {
+                            //line found, decode.
+                                if(this.data.count >= this.maxBufferedSamples) { 
+                                    this.data.count -= 5120;
+                                }
+                                newLines++;
+                               // console.log(i,newLines,line[i-1],line[i],line[i+1],line[i+2],this.data[channel][this.data.count-1],this.data.count);
+                            }
+                            
+                            //console.log(i,channelnum);
+                            channelnum++;
+                            if(channelnum === this.nChannels) channelnum = 0;
+                        }
+                         
+					} else if (this.mode === 'pulseox') {
+                        //4RED,4IR * 30, CT, \r, \n
+                        //console.log(line);
+                        let red = true;
+                        for(let i = 2; i < this.adcLength; i+=4) {
+                            //console.log(i)
+                            if(red === true){
+                                if(this.data.count < this.maxBufferedSamples){
+                                    this.data.count++;
+                                }
+
+                                if(this.data.count-1 === 0) {
+                                    this.data.ms[this.data.count-1]= Date.now(); this.data.startms = this.data.ms[0];
+                                }
+                                else {
+                                    this.data.ms[this.data.count-1]=this.data.ms[this.data.count-2]+this.updateMs;
+                                    
+                                    if(this.data.count >= this.maxBufferedSamples) {
+                                        this.data.ms.splice(0,5120);
+                                        this.data.ms.push(new Array(5120).fill(0));
+                                    }
+                                } 
+                                let num = this.bytesToInt32(line[i],line[i+1],line[i+2],line[i+3]);
+                                if(isNaN(num)) {
+                                    console.log(line[i],line[i+1],line[i+2],line[i+3],i);                                
+                                    console.log(i);
+                                }
+
+                                this.data['RED'][this.data.count-1] = num;
+                                if(this.data.count >= this.maxBufferedSamples) { 
+                                    this.data['RED'].splice(0,5120);
+                                    this.data['RED'].push(new Array(5120).fill(0));//shave off the last 10 seconds of data if buffer full (don't use shift())
+                                }
+                                red = false;
+                            } else {
+                                
+                                let num = this.bytesToInt32(line[i],line[i+1],line[i+2],line[i+3]);
+                                if(isNaN(num)) {
+                                    console.log(line[i],line[i+1],line[i+2],line[i+3],i);                                
+                                    console.log(i);
+                                }
+                                
+                                this.data['IR'][this.data.count-1] = num
+                                if(this.data.count >= this.maxBufferedSamples) { 
+                                    this.data['IR'].splice(0,5120);
+                                    this.data['IR'].push(new Array(5120).fill(0));//shave off the last 10 seconds of data if buffer full (don't use shift())
+                                }
+
+                                //Assume no dropped samples
+                                if(this.data.count >= this.maxBufferedSamples) { 
+                                    this.data.count -= 5120;
+                                }
+                                
+                                //console.log(this.data)
+                                newLines++;
+                                red = true;
+                            }  
+                        }
+                    }
+
+					
+				}
+				
+			}
+			if(newLines > 0) buffer.splice(0,indices[indices.length-1]);
+			return newLines;
+			//Continue
+		} return 0;
+		//else {this.buffer = []; return false;}
+    }
+
+    //Callbacks
+    onDecodedCallback(newLinesInt){
+        //console.log("new samples:", newLinesInt);
+    }
+
+    onConnectedCallback() {
+        console.log("port connected!");
+    }
+
+    onDisconnectedCallback() {
+        console.log("port disconnected!");
+    }
+
+    onReceive(value=[]){ //will be passing a uint8array
+        this.buffer.push(...value);
+        let newlines = this.decode(); //decode the buffer
+        //console.log(newlines)
+        if(newlines > 0) this.onDecodedCallback(newlines);
+    }
+
+    async onPortSelected(port,baud=this.baudrate) {
+        try{
+            try {
+                await port.open({ baudRate: baud, bufferSize: this.readBufferSize });
+                this.onConnectedCallback();
+                this.connected = true;
+                this.subscribed = true;
+                this.subscribe(port);//this.subscribeSafe(port);
+        
+            } //API inconsistency in syntax between linux and windows
+            catch {
+                await port.open({ baudrate: baud, buffersize: this.readBufferSize });
+                this.onConnectedCallback();
+                this.connected = true;
+                this.subscribed = true;
+                this.subscribe(port);//this.subscribeSafe(port);
+            }
+        }
+        catch(err){
+            console.log(err);
+            this.connected = false;
+        }
+    }
+
+    async subscribe(port){
+        if (this.port.readable && this.subscribed === true) {
+            this.reader = port.readable.getReader();
+            const streamData = async () => {
+                try {
+                    const { value, done } = await this.reader.read();
+                    if (done || this.subscribed === false) {
+                        // Allow the serial port to be closed later.
+                        await this.reader.releaseLock();
+                        
+                    }
+                    if (value) {
+                        //console.log(value.length);
+                        try{
+                            this.onReceive(value);
+                        }
+                        catch (err) {console.log(err)}
+                        //console.log("new Read");
+                        //console.log(this.decoder.decode(value));
+                    }
+                    if(this.subscribed === true) {
+                        setTimeout(()=>{streamData();}, this.readRate);//Throttled read 1/512sps = 1.953ms/sample @ 103 bytes / line or 1030bytes every 20ms
+                    }
+                } catch (error) {
+                    console.log(error);// TODO: Handle non-fatal read error.
+                    if(error.message.includes('framing') || error.message.includes('overflow') || error.message.includes('Overflow') || error.message.includes('break')) {
+                        this.subscribed = false;
+                        setTimeout(async ()=>{
+                            try{
+                            if (this.reader) {
+                                await this.reader.releaseLock();
+                                this.reader = null;
+                            }
+                            } catch (er){ console.error(er);}
+                            this.subscribed = true; 
+                            this.subscribe(port);
+                            //if that fails then close port and reopen it
+                        },30); //try to resubscribe 
+                    } else if (error.message.includes('parity') || error.message.includes('Parity') || error.message.includes('overrun')) {
+                        console.log(this.port);
+                        if(this.port){
+                            this.subscribed = false;
+                            setTimeout(async () => {
+                                try{
+                                if (this.reader) {
+                                    await this.reader.releaseLock();
+                                    this.reader = null;
+                                }
+                                await port.close();
+                                } catch (er){ console.error(er);}
+                                //this.port = null;
+                                this.connected = false;
+                                setTimeout(()=>{this.onPortSelected(this.port)},100); //close the port and reopen
+                            }, 50);
+                        }
+                    }
+                    else {
+                        this.closePort();	
+                    }	
+                }
+            }
+            streamData();
+        }
+    }
+
+async closePort(port=this.port) {
+    //if(this.reader) {this.reader.releaseLock();}
+    if(this.port){
+        this.subscribed = false;
+        setTimeout(async () => {
+            try{
+            if (this.reader) {
+                await this.reader.releaseLock();
+                this.reader = null;
+            }
+            await port.close();
+            } catch (er){ console.error(er);}
+            this.port = null;
+            this.connected = false;
+            this.onDisconnectedCallback();
+        }, 100);
+    }
+}
+
+async setupSerialAsync(baudrate=this.baudrate) { //You can specify baudrate just in case
+
+    const filters = [
+        { usbVendorId: 0x10c4, usbProductId: 0x0043 } //CP2102 filter (e.g. for UART via ESP32)
+    ];
+
+    this.port = await navigator.serial.requestPort();
+    navigator.serial.addEventListener("disconnect",(e) => {
+        this.closePort(this.port);
+    });
+    this.onPortSelected(this.port,baudrate);
+
+    //navigator.serial.addEventListener("onReceive", (e) => {console.log(e)});//this.onReceive(e));
+
+}
+
+
+//Boyer Moore fast byte search method copied from https://codereview.stackexchange.com/questions/20136/uint8array-indexof-method-that-allows-to-search-for-byte-sequences
+asUint8Array(input) {
+    if (input instanceof Uint8Array) {
+        return input;
+    } else if (typeof(input) === 'string') {
+        // This naive transform only supports ASCII patterns. UTF-8 support
+        // not necessary for the intended use case here.
+        var arr = new Uint8Array(input.length);
+        for (var i = 0; i < input.length; i++) {
+        var c = input.charCodeAt(i);
+        if (c > 127) {
+            throw new TypeError("Only ASCII patterns are supported");
+        }
+        arr[i] = c;
+        }
+        return arr;
+    } else {
+        // Assume that it's already something that can be coerced.
+        return new Uint8Array(input);
+    }
+}
+
+boyerMoore(patternBuffer) {
+    // Implementation of Boyer-Moore substring search ported from page 772 of
+    // Algorithms Fourth Edition (Sedgewick, Wayne)
+    // http://algs4.cs.princeton.edu/53substring/BoyerMoore.java.html
+    /*
+    USAGE:
+        // needle should be ASCII string, ArrayBuffer, or Uint8Array
+        // haystack should be an ArrayBuffer or Uint8Array
+        var search = boyerMoore(needle);
+        var skip = search.byteLength;
+        var indices = [];
+        for (var i = search(haystack); i !== -1; i = search(haystack, i + skip)) {
+            indices.push(i);
+        }
+    */
+    var pattern = this.asUint8Array(patternBuffer);
+    var M = pattern.length;
+    if (M === 0) {
+        throw new TypeError("patternBuffer must be at least 1 byte long");
+    }
+    // radix
+    var R = 256;
+    var rightmost_positions = new Int32Array(R);
+    // position of the rightmost occurrence of the byte c in the pattern
+    for (var c = 0; c < R; c++) {
+        // -1 for bytes not in pattern
+        rightmost_positions[c] = -1;
+    }
+    for (var j = 0; j < M; j++) {
+        // rightmost position for bytes in pattern
+        rightmost_positions[pattern[j]] = j;
+    }
+    var boyerMooreSearch = (txtBuffer, start, end) => {
+        // Return offset of first match, -1 if no match.
+        var txt = this.asUint8Array(txtBuffer);
+        if (start === undefined) start = 0;
+        if (end === undefined) end = txt.length;
+        var pat = pattern;
+        var right = rightmost_positions;
+        var lastIndex = end - pat.length;
+        var lastPatIndex = pat.length - 1;
+        var skip;
+        for (var i = start; i <= lastIndex; i += skip) {
+            skip = 0;
+            for (var j = lastPatIndex; j >= 0; j--) {
+            var c = txt[i + j];
+            if (pat[j] !== c) {
+                skip = Math.max(1, j - right[c]);
+                break;
+            }
+            }
+            if (skip === 0) {
+            return i;
+            }
+        }
+        return -1;
+    };
+    boyerMooreSearch.byteLength = pattern.byteLength;
+    return boyerMooreSearch;
+}
+//---------------------end copy/pasted solution------------------------
+
+}
+
+
+    
+    </script>
+</head>
+
+
+
+<body>
+    <!-- Decoder:
+    <select>
+        <option value='ads131'>ADS131</option>
+        <option value='pulseox'>Pulse Ox</option>
+    </select><br> -->
+    <div id='pa' style='width:100%;'></div>
+    <div id='pb' style='width:100%;'></div>
+    <div id='pc' style='width:100%;'></div>
+    <div id='pd' style='width:100%;'></div>
+    <hr>
+    <script>
+     
+        const ble = new BLE('BT832A');
+
+        ble.initUI();
+
+        let outputTimestamps = [];
+        let outputArray = [];
+        let plotY1 = [];
+        let plotY2 = [];
+
+        let plotPointLimit = 600;
+        let fps = 10;
+
+        let ms = 1000/fps;
+
+        //*********************************************
+        //************** Customize me *****************
+        //*********************************************
+        let start = Date.now();
+
+        let mode = 'ads131'; //ads131 pulseox
+        //let mode = 'pulseox'; //ads131 pulseox
+        
+        const ads = new ads131m08(mode,(newLinesInt) => {
+            if(mode === 'pulseox') {
+                let red = ads.getLatestData('RED',newLinesInt);
+                let ir  = ads.getLatestData('IR',newLinesInt);
+                let output;
+                // console.log(red,ir)
+                //console.log(newLinesInt, red);
+                if(Array.isArray(red)) {
+                    output = [
+                        red[newLinesInt-1],
+                        ir[newLinesInt-1]
+                    ]
+                }
+                else {
+                    output = [red,ir];
+                }
+                let elapsed = ads.getLatestData('ms',newLinesInt).map(t => (t-start)*0.001);
+                
+                //console.log("BLE MSG: ",...output.map(o => o.toFixed(3)));
+                // let outputdiv = document.getElementById('output');
+                // outputdiv.innerHTML = ``;
+                // if(outputdiv) output.forEach((o) => {
+                //     outputdiv.innerHTML+= `<tr><td>${o.toFixed(3)}</td><td>uV</td></tr>`;
+                // });
+                // let elapseddiv = document.getElementById('elapsed');
+                // if(elapseddiv) elapseddiv.innerHTML = `${elapsed[elapsed.length-1]}`;
+
+  
+                outputTimestamps.push(...elapsed);
+                //console.log(ch0);
+                if(Array.isArray(red)) {
+                    plotY1.push(...red);
+                    plotY2.push(...ir);
+                }
+                else {
+                    plotY1.push(red);
+                    plotY1.push(ir);
+                }
+            }
+            else if(mode === 'ads131') {
+                let ch0 = ads.getLatestData('A0',newLinesInt);
+                let ch1 = ads.getLatestData('A1',newLinesInt);
+                let ch2 = ads.getLatestData('A2',newLinesInt);
+                let ch3 = ads.getLatestData('A3',newLinesInt);
+                let ch4 = ads.getLatestData('A4',newLinesInt);
+                let ch5 = ads.getLatestData('A5',newLinesInt);
+                let ch6 = ads.getLatestData('A6',newLinesInt);
+                let ch7 = ads.getLatestData('A7',newLinesInt);
+                let output, elapsed;
+                //console.log(newLinesInt, ch0,ch7);
+                if(Array.isArray(ch0)) {
+                    output = [
+                        ch0[newLinesInt-1]*ads.uVperStep,
+                        ch1[newLinesInt-1]*ads.uVperStep,
+                        ch2[newLinesInt-1]*ads.uVperStep,
+                        ch3[newLinesInt-1]*ads.uVperStep,
+                        ch4[newLinesInt-1]*ads.uVperStep,
+                        ch5[newLinesInt-1]*ads.uVperStep,
+                        ch6[newLinesInt-1]*ads.uVperStep,
+                        ch7[newLinesInt-1]*ads.uVperStep
+                    ];
+                    elapsed = ads.getLatestData('ms',newLinesInt).map(t => (t-start)*0.001);
+                    //console.log(elapsed)
+                }
+                else {
+                    output = [ch0,ch1,ch2,ch3,ch4,ch5,ch6,ch7];
+                    output = output.map(v => v*ads.uVperStep);
+                    elapsed = (Date.now() - start)*0.001;
+                }
+                //console.log("BLE MSG: ",...output.map(o => o.toFixed(3)));
+
+                // let outputdiv = document.getElementById('output');
+                // outputdiv.innerHTML = ``;
+                // if(outputdiv) output.forEach((o) => {
+                //     outputdiv.innerHTML+= `<tr><td>${o.toFixed(3)}</td><td>uV</td></tr>`;
+                // });
+                // let elapseddiv = document.getElementById('elapsed');
+                // if(elapseddiv) elapseddiv.innerHTML = `${elapsed[elapsed.length-1]}`;
+
+                outputTimestamps.push(...elapsed);
+                //console.log(ch0);
+                if(Array.isArray(ch0)) {
+                    plotY1.push(...ch0.map(v => v*ads.uVperStep));
+                    plotY2.push(...ch1.map(v => v*ads.uVperStep));
+                }
+                else {
+                    plotY1.push(ch0);
+                    plotY1.push(ch1);
+                }
+            }
+        });
+
+        let n = 0;
+        ble.onNotificationCallback = (e) => {
+            let output = Array.from(new Uint8Array(e.target.value.buffer));
+            console.log(n++);
+            
+            //ads.onReceive([...output]);
+            let elapseddiv = document.getElementById('elapsed');
+            if(elapseddiv) elapseddiv.innerHTML = `${n}`;
+
+        } 
+        //*********************************************
+        //*********************************************
+        //*********************************************
+
+        //ble.onConnectedCallback = () => {}
+        //ble.onErrorCallback = (err) => {} //error prints to console anyway this is more for UI calls
+
+        const data = [{
+            x: outputTimestamps,
+            y: plotY1,
+            mode: 'lines',
+            marker: {
+                color: "rgba(255,100,255, 1)"
+            },
+            name: "Reading 1",
+            //xbins: {  size: 0.01  } 
+            },{
+            x: outputTimestamps,
+            y: plotY2,
+            mode: 'lines',
+            marker: {
+                color: "rgba(100,255,255, 1)"
+            },
+            name: "Reading 2",
+            //xbins: {  size: 0.01  } 
+            }];
+
+        const config = { 
+            scrollZoom: true, 
+            responsive: true, 
+        }
+
+        //Plotly.newPlot('pa',data,config);
+        //Plotly.newPlot('pb',data,config);
+
+
+
+
+        let animate = () => {
+
+            if(outputTimestamps.length > plotPointLimit || plotY1.length > plotPointLimit || plotY2.length > plotPointLimit) {
+                outputTimestamps.splice(0,outputTimestamps.length-plotPointLimit);
+                plotY1.splice(0,plotY1.length-plotPointLimit);
+                plotY2.splice(0,plotY2.length-plotPointLimit);   
+            }
+
+            let outputdiv = document.getElementById('output');
+            // outputdiv.innerHTML = `
+            //     <tr><td>${plotY1[plotY1.length-1]?.toFixed(3)}</td></tr>
+            //     <tr><td>${plotY2[plotY2.length-1]?.toFixed(3)}</td></tr>
+            // `;
+            // let elapseddiv = document.getElementById('elapsed');
+            // if(elapseddiv) elapseddiv.innerHTML = `${outputTimestamps[outputTimestamps.length-1]}`;
+
+
+            let newX = outputTimestamps;
+            let newY1 = plotY1;
+            let newY2 = plotY2;
+
+            let newData = {
+                data:[{
+                    x:newX,
+                    y:newY1
+                }, {
+                    x:newX,
+                    y:newY2
+                }]
+            };
+
+            let animsetting = {
+                    transition: {
+                        duration: 0
+                    },
+                    frame: {
+                        duration: 0,
+                        redraw: false
+                    }
+                }
+
+            // Plotly.animate(
+            //     'pa', 
+            //     newData,
+            //     [animsetting,animsetting]
+            // );
+
+            setTimeout(()=>{animate();},ms); //
+        }
+
+        //animate();
+
+    </script>
+</body>
+</html>
