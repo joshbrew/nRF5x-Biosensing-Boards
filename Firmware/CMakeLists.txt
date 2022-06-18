@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.17.0)
 
-set(DTC_OVERLAY_FILE "zephyr/nrf52dk_nrf52810.overlay")
+set(DTC_OVERLAY_FILE "nrf52840dk_nrf52840.overlay")
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(hello_world)

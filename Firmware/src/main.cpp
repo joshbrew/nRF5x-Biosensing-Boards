@@ -17,8 +17,8 @@
 //#include <bluetooth/uuid.h>
 //#include <bluetooth/gatt.h>
 
-#define DATA_READY_GPIO     ((uint8_t)4)
-#define DBG_LED             ((uint8_t)13)
+#define DATA_READY_GPIO     ((uint8_t)5)
+#define DBG_LED             ((uint8_t)16)
 
 LOG_MODULE_REGISTER(main);
 
@@ -31,6 +31,7 @@ static int activate_irq_on_data_ready(void);
 
 /* Global variables */
 const struct device *gpio_0_dev;
+const struct device *gpio_1_dev;
 struct gpio_callback callback;
 struct k_work interrupt_work_item;    ///< interrupt work item
 static uint8_t sampleNum = 0;
@@ -58,7 +59,7 @@ void main(void)
         //LOG_INF("GPIOs Int'd!");        
     }
 
-    adc.init(5, 4, 7, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 2MHz SPI bus
+    adc.init(15, 5, 13, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 2MHz SPI bus
 
     Bluetooth::SetupBLE();
 
@@ -144,9 +145,14 @@ static int gpio_init(void){
 
     gpio_0_dev = device_get_binding("GPIO_0");
 	if (gpio_0_dev == NULL) {
-		LOG_ERR("***ERROR: GPIO device binding!");
+		LOG_ERR("***ERROR: GPIO_0 device binding!");
         return -1;
-	}    
+	}  
+    gpio_1_dev = device_get_binding("GPIO_1");
+	if (gpio_0_dev == NULL) {
+		LOG_ERR("***ERROR: GPIO_1 device binding!");
+        return -1;
+	}        
 #if 0
     ret += gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
     ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
@@ -156,7 +162,7 @@ static int gpio_init(void){
         LOG_ERR("***ERROR: GPIO initialization\n");
     }
 #endif
-
+    //activate_irq_on_data_ready();
     //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
     
     ret = gpio_pin_configure(gpio_0_dev, DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
@@ -174,10 +180,10 @@ static int gpio_init(void){
 static int activate_irq_on_data_ready(void){
     int ret = 0;
 
-    ret += gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
+    ret += gpio_pin_configure(gpio_1_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
+    ret += gpio_pin_interrupt_configure(gpio_1_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
     gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO));    
-    ret += gpio_add_callback(gpio_0_dev, &callback);
+    ret += gpio_add_callback(gpio_1_dev, &callback);
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
