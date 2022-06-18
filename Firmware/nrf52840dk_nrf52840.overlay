@@ -1,0 +1,20 @@
+// To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
+// For more help, browse the DeviceTree documentation at https://docs.zephyrproject.org/latest/guides/dts/index.html
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	tx-pin = <15>;
+	rx-pin = <14>;
+	rts-pin = <0xFFFFFFFF>;
+	cts-pin = <0xFFFFFFFF>;
+};
+
+&spi0 {
+	compatible = "nordic,nrf-spim";
+    status = "okay";
+	sck-pin = <44>;
+	mosi-pin = <35>; //DIN
+	miso-pin = <34>; //DOUT
+    cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>;
+};

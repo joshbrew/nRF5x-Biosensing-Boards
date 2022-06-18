@@ -5,7 +5,7 @@
     <script>
             class BLE { //This is formatted for the way the HEG sends/receives information. Other BLE devices will likely need changes to this to be interactive.
         constructor(
-            namePrefix  = 'BT832A',
+            namePrefix  = 'BC840M',
             serviceUUID = '0000CAFE-B0BA-8BAD-F00D-DEADBEEF0000', //BLE service ID
             rxUUID      = '0001CAFE-B0BA-8BAD-F00D-DEADBEEF0000',      //WRITE characteristic
             txUUID      = '0002CAFE-B0BA-8BAD-F00D-DEADBEEF0000',      //NOTIFY characteristic
@@ -62,7 +62,7 @@
         this.softwareVersion = "N/A";
         this.latestCompatibleSoftware = "N/A";
     
-        this.characteristicSize = 512; //MTUs //20 byte limit on android   
+        this.characteristicSize = 247; //MTUs //20 byte limit on android   
     
         if(defaultUI === true){
             this.initUI(undefined, buttonId);
@@ -900,7 +900,7 @@ boyerMoore(patternBuffer) {
     <hr>
     <script>
      
-        const ble = new BLE('BT832A');
+        const ble = new BLE('BC840M');
 
         ble.initUI();
 
