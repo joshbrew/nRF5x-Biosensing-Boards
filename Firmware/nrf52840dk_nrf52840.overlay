@@ -18,3 +18,23 @@
 	miso-pin = <34>; //DOUT
     cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>;
 };
+
+&spi1 {
+    status = "disabled";    
+};
+
+&i2c0 {
+    status = "disabled";    
+};
+&i2c1 {
+    status = "okay";
+    sda-pin = <5>;
+	scl-pin = <3>;
+	max30102@57 {
+		compatible = "maxim,max30102";
+		label = "MAX30102";
+		reg = <0x57>;
+        mode = <2>;
+		status = "okay";
+	};    
+};

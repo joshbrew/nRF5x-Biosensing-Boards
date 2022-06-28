@@ -12,10 +12,18 @@ namespace Bluetooth
     int SetupBLE();
 
     /**
-     * @brief Function used to notify connected clients when new Sensor (ADS131M08) data are available
+     * @brief Send BLE notification through ADS131M08 Data Pipe.
      * 
-     * @param data Accelerometer measurement data
+     * @param data pointer to datasource containing ADS131M08 data samples
+     * @param len  the number of samples to transfer
      */
-    void SensorNotify(const uint8_t* data, const uint8_t len);
+    void Ads131m08Notify(const uint8_t* data, const uint8_t len);
 
+    /**
+     * @brief Send BLE notification through MAX30102 Data Pipe.
+     * 
+     * @param data pointer to datasource containing MAX30102 data samples
+     * @param len  the number of samples to transfer
+     */
+    void Max30102Notify(const uint8_t* data, const uint8_t len);
 }

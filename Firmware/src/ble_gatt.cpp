@@ -20,6 +20,7 @@ LOG_MODULE_REGISTER(BleGatt);
 /* BLE connection */
 
 atomic_t ads131m08NotificationsEnable = false;
+atomic_t max30102NotificationsEnable = false;
 
 /* BT832A Custom Service  */
 bt_uuid_128 sensorServiceUUID = BT_UUID_INIT_128(
@@ -30,8 +31,12 @@ bt_uuid_128 sensorCtrlCharUUID = BT_UUID_INIT_128(
 	BT_UUID_128_ENCODE(0x0001cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 
 /* Sensor Data Characteristic */
-bt_uuid_128 sensorDataUUID = BT_UUID_INIT_128(
+// ADS131M08 Data Pipe
+bt_uuid_128 ads131DataUUID = BT_UUID_INIT_128(
 	BT_UUID_128_ENCODE(0x0002cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
+// MAX30102 Data Pipe
+bt_uuid_128 max30102DataUUID = BT_UUID_INIT_128(
+	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 
 /**
  * @brief CCCD handler for ADS131M08 characteristic. Used to get notifications if client enables notifications
@@ -40,14 +45,28 @@ bt_uuid_128 sensorDataUUID = BT_UUID_INIT_128(
  * @param attr Ble Gatt attribute
  * @param value characteristic value
  */
-static void sensorCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+static void ads131CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 {
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&ads131m08NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("Notification %s", ads131m08NotificationsEnable ? "enabled" : "disabled");
+	LOG_INF("ADS131M08 Notification %s", ads131m08NotificationsEnable ? "enabled" : "disabled");
 }
 
+/**
+ * @brief CCCD handler for MAX30102 characteristic. Used to get notifications if client enables notifications
+ *        for MAX30102 characteristic. CCC = Client Characteristic Configuration
+ * 
+ * @param attr Ble Gatt attribute
+ * @param value characteristic value
+ */
+static void max30102CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
+    atomic_set(&max30102NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
+	LOG_INF("Max30102 Notification %s", max30102NotificationsEnable ? "enabled" : "disabled");
+}
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
@@ -81,11 +100,14 @@ static const struct bt_data ad[] = {
 BT_GATT_SERVICE_DEFINE(bt832a_svc,
 BT_GATT_PRIMARY_SERVICE(&sensorServiceUUID),
 BT_GATT_CHARACTERISTIC(&sensorCtrlCharUUID.uuid,
-		       BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-		       BT_GATT_PERM_WRITE, nullptr, nullptr, nullptr),
-BT_GATT_CHARACTERISTIC(&sensorDataUUID.uuid, BT_GATT_CHRC_NOTIFY,
-		       BT_GATT_PERM_READ, nullptr, nullptr, nullptr), //&ble_tx_buff),
-BT_GATT_CCC(sensorCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+		        BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+		        BT_GATT_PERM_WRITE, nullptr, nullptr, nullptr),
+BT_GATT_CHARACTERISTIC(&ads131DataUUID.uuid, BT_GATT_CHRC_NOTIFY,
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr), //&ble_tx_buff),               
+                BT_GATT_CCC(ads131CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+BT_GATT_CHARACTERISTIC(&max30102DataUUID.uuid, BT_GATT_CHRC_NOTIFY,
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
+                BT_GATT_CCC(max30102CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 );
 
 /********************************************************/

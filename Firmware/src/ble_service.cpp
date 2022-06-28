@@ -92,7 +92,8 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
         activeConnection = nullptr;
 
     }
-    atomic_set(&Bluetooth::Gatt::ads131m08NotificationsEnable, false);    
+    atomic_set(&Bluetooth::Gatt::ads131m08NotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
@@ -201,16 +202,25 @@ int SetupBLE()
     return err;
 }
 
-/**
- * @brief Set the Accelerometer datasource.
- * 
- * @param datasource pointer to datasource with accelerometr data
- */
-void SensorNotify(const uint8_t* data, const uint8_t len)
+void Ads131m08Notify(const uint8_t* data, const uint8_t len)
 {
     if (atomic_get(&Gatt::ads131m08NotificationsEnable))
     {
-        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicSensorData], data, len);
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicAds131Data], data, len);
+    }
+}
+
+/**
+ * @brief Send BLE notification through MAX30102 Data Pipe.
+ * 
+ * @param data pointer to datasource containing MAX30102 data samples
+ * @param len  the number of samples to transfer
+ */
+void Max30102Notify(const uint8_t* data, const uint8_t len)
+{    
+    if (atomic_get(&Gatt::max30102NotificationsEnable))    
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicMax30102Data], data, len);
     }
 }
 
