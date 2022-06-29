@@ -38,6 +38,8 @@ bt_uuid_128 ads131DataUUID = BT_UUID_INIT_128(
 bt_uuid_128 max30102DataUUID = BT_UUID_INIT_128(
 	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 
+static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
+
 /**
  * @brief CCCD handler for ADS131M08 characteristic. Used to get notifications if client enables notifications
  *        for ADS131M08 characteristic. CCC = Client Characteristic Configuration
@@ -101,7 +103,7 @@ BT_GATT_SERVICE_DEFINE(bt832a_svc,
 BT_GATT_PRIMARY_SERVICE(&sensorServiceUUID),
 BT_GATT_CHARACTERISTIC(&sensorCtrlCharUUID.uuid,
 		        BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-		        BT_GATT_PERM_WRITE, nullptr, nullptr, nullptr),
+		        BT_GATT_PERM_WRITE, nullptr, ControlCharacteristicWrite, nullptr),
 BT_GATT_CHARACTERISTIC(&ads131DataUUID.uuid, BT_GATT_CHRC_NOTIFY,
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr), //&ble_tx_buff),               
                 BT_GATT_CCC(ads131CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
@@ -139,6 +141,30 @@ void OnBluetoothStarted(int err)
     }
 
     LOG_INF("Configuration mode: waiting connections...");
+}
+
+/**
+ * @brief Callback function called when client(master) sends Gatt characteristic write command
+ * 
+ * @param conn connection
+ * @param attr GATT attribute
+ * @param buf  inbound buffer 
+ * @param len  inbound buffer size
+ * @param offset current transfer offset. used when write was splitted into several BLE packets 
+ * @param flags flags
+ * @return ssize_t number of bytes processed. usually equal to number of received bytes.
+ */
+static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags)
+{
+    uint16_t retval = len;
+    const uint8_t* buffer = static_cast<const uint8_t*>(buf);
+
+    LOG_INF("%d Bytes received!", len);
+    LOG_INF("Offset: %d", offset);
+    LOG_INF("Flags: 0x%X", flags);
+    LOG_INF("Data[0]: 0x%X", *buffer);
+
+    return retval;
 }
 
 } // namespace Bluetooth::Gatt
