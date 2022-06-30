@@ -69,9 +69,14 @@ void main(void)
 
     adc.init(15, 5, 13, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 2MHz SPI bus
     max30102.Initialize();
-    max30102.Configure(max30102_default_config);
-    max30102.StartSampling();
-    max30102.InitiateTemperatureReading();
+    if(max30102.IsOnI2cBus()){
+        LOG_INF("MAX30102 is on I2C bus!");
+        max30102.Configure(max30102_default_config);
+        max30102.StartSampling();
+    } else {
+        LOG_WRN("***WARNING: MAX30102 is not connected or properly initialized!");
+    }
+
 
     Bluetooth::SetupBLE();
 

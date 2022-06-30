@@ -20,14 +20,17 @@ int Max30102::Initialize() {
 
     int ret = 0;
     uint8_t part_id;
-
+    
     LOG_INF("Starting Max30102 Initialization..."); 
     transport.Initialize();   
     
+    max30102_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
+
     part_id = transport.ReadRegister(MAX30102_REG_PART_ID);
 
     if(part_id == max30102_id){
         LOG_INF("SUCCESS: Max30102 ID match!");
+        max30102_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
     } else {
         LOG_ERR("Wrong ID: 0x%X", part_id);
         return -1;
@@ -137,4 +140,10 @@ void Max30102::TemperatureRead(){
     //LOG_INF("Temperature: %d, %d", tint, tfrac);
     tx_buf[192] = tint;
     tx_buf[193] = tfrac;
+}
+
+bool Max30102::IsOnI2cBus(){
+    bool status;
+    status = max30102_is_on_i2c_bus_.load(std::memory_order_relaxed);
+    return status;
 }

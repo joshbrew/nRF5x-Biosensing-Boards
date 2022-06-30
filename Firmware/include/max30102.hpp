@@ -186,6 +186,11 @@ public:
      */
     void HandleInterrupt(); 
 
+    /**
+     * @brief Check if MAX30102 device is connected to I2C bus
+     */
+    bool IsOnI2cBus(); 
+
 private:
     /**
      * @brief Reset Max30102 device
@@ -206,7 +211,7 @@ private:
      * @brief Read Temperature Registers
      */
     void TemperatureRead();
-
+    std::atomic<bool> max30102_is_on_i2c_bus_; ///< Device status
     I2CTransport<I2C_1DeviceName, max30102_i2c_address> transport; ///< I2C transport for device
 
 };
