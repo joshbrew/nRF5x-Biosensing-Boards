@@ -477,6 +477,8 @@ private:
      * @brief Read Temperature Registers
      */
     void TemperatureRead();
+    uint8_t sample_cnt;
+    uint8_t packet_cnt;
     std::atomic<bool> mpu6050_is_on_i2c_bus_; ///< Device status
     I2CTransport<I2C_1DeviceName, MPU6050_DEFAULT_ADDRESS> transport; ///< I2C transport for device
 

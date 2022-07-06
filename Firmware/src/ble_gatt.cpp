@@ -21,6 +21,7 @@ LOG_MODULE_REGISTER(BleGatt);
 
 atomic_t ads131m08NotificationsEnable = false;
 atomic_t max30102NotificationsEnable = false;
+atomic_t mpu6050NotificationsEnable = false;
 
 /* BT832A Custom Service  */
 bt_uuid_128 sensorServiceUUID = BT_UUID_INIT_128(
@@ -36,7 +37,10 @@ bt_uuid_128 ads131DataUUID = BT_UUID_INIT_128(
 	BT_UUID_128_ENCODE(0x0002cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 // MAX30102 Data Pipe
 bt_uuid_128 max30102DataUUID = BT_UUID_INIT_128(
-	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
+	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));    
+
+bt_uuid_128 mpu6050DataUUID = BT_UUID_INIT_128(
+        BT_UUID_128_ENCODE(0x0004cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 
 static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
@@ -70,6 +74,21 @@ static void max30102CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	LOG_INF("Max30102 Notification %s", max30102NotificationsEnable ? "enabled" : "disabled");
 }
 
+/**
+ * @brief CCCD handler for MPU6050 characteristic. Used to get notifications if client enables notifications
+ *        for MPU6050 characteristic. CCC = Client Characteristic Configuration
+ * 
+ * @param attr Ble Gatt attribute
+ * @param value characteristic value
+ */
+static void mpu6050CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
+    atomic_set(&mpu6050NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
+	LOG_INF("MPU6050 Notification %s", mpu6050NotificationsEnable ? "enabled" : "disabled");
+}
+
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 #define ADV_LEN 12
@@ -100,16 +119,19 @@ static const struct bt_data ad[] = {
  * @brief Gatt Service definition
  */
 BT_GATT_SERVICE_DEFINE(bt832a_svc,
-BT_GATT_PRIMARY_SERVICE(&sensorServiceUUID),
-BT_GATT_CHARACTERISTIC(&sensorCtrlCharUUID.uuid,
-		        BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+BT_GATT_PRIMARY_SERVICE(&sensorServiceUUID),                                            // 0
+BT_GATT_CHARACTERISTIC(&sensorCtrlCharUUID.uuid,                                        // 1    
+		        BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP,                    // 2, 3
 		        BT_GATT_PERM_WRITE, nullptr, ControlCharacteristicWrite, nullptr),
-BT_GATT_CHARACTERISTIC(&ads131DataUUID.uuid, BT_GATT_CHRC_NOTIFY,
+BT_GATT_CHARACTERISTIC(&ads131DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                       // 4, 5
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr), //&ble_tx_buff),               
-                BT_GATT_CCC(ads131CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-BT_GATT_CHARACTERISTIC(&max30102DataUUID.uuid, BT_GATT_CHRC_NOTIFY,
+BT_GATT_CCC(ads131CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                  // 6
+BT_GATT_CHARACTERISTIC(&max30102DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                     // 7,8    
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
-                BT_GATT_CCC(max30102CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+BT_GATT_CCC(max30102CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                // 9
+BT_GATT_CHARACTERISTIC(&mpu6050DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                      // 10, 11
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
+BT_GATT_CCC(mpu6050CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                 // 12
 );
 
 /********************************************************/

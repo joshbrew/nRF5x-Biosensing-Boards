@@ -57,7 +57,7 @@ static mpu6050_config mpu6050_default_config = {
     .gyro_config = (0x01 << 3),     // 500dps Gyro Full Scale. No Self-Tests.
     .accel_config = (0x01 << 3),    // +/-4g Accel Full Scale. No Self-Tests. 
     .fifo_config = 0x00,            // FIFO disabled.
-    .interrupt_pin_config = 0xE0,    // INT active low. Open drain. Keep interrupt pin active until interrupt is cleared. Clear interrupt only by reading INT_STATUS register.
+    .interrupt_pin_config = 0xC0,    // INT active low. Open drain. Keep interrupt pin active until interrupt is cleared. Clear interrupt only by reading INT_STATUS register.
     .interrupt_config = 0x01,       // Enable only Data Ready interrupts.
     .user_control = 0x00,           // Disable FIFO
     .pwr_mgmt_1 = 0x01,             // Use PLL with X axis gyroscope as Clock Source.
@@ -316,6 +316,6 @@ static void max30102_interrupt_workQueue_handler(struct k_work* wrk)
  */
 static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
 {	
-    LOG_INF("MPU6050 Interrupt!");
+    //LOG_INF("MPU6050 Interrupt!");
     mpu6050.HandleInterrupt();
 }

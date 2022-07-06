@@ -26,4 +26,12 @@ namespace Bluetooth
      * @param len  the number of samples to transfer
      */
     void Max30102Notify(const uint8_t* data, const uint8_t len);
+
+    /**
+     * @brief Send BLE notification through MPU6050 Data Pipe.
+     * 
+     * @param data pointer to datasource containing MPU6050 data samples
+     * @param len  the number of samples to transfer
+     */
+    void Mpu6050Notify(const uint8_t* data, const uint8_t len);
 }

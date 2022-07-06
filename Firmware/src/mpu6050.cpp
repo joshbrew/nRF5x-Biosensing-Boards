@@ -22,6 +22,8 @@ int Mpu6050::Initialize() {
     uint8_t part_id;
     
     LOG_INF("Starting Mpu6050 Initialization..."); 
+    sample_cnt = 0;
+    packet_cnt = 0;
     transport.Initialize();   
     
     mpu6050_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
@@ -89,17 +91,15 @@ void Mpu6050::Wakeup() {
 }
 
 void Mpu6050::StartSampling(){
-    // Write 0 into SHDN bit of Mode Configuration register
-    //transport.UpdateRegister(MAX30102_REG_MODE_CFG, MAX30102_MODE_CFG_SHDN_MASK, 0x00);
+
 }   
 
 void Mpu6050::StopSampling(){
-    // Write 1 into SHDN bit of Mode Configuration register
-    //transport.UpdateRegister(MAX30102_REG_MODE_CFG, MAX30102_MODE_CFG_SHDN_MASK, MAX30102_MODE_CFG_SHDN_MASK);
+
 }
 
 void Mpu6050::GetDieTemperature(){
-    //transport.WriteRegister(MAX30102_REG_TEMP_CFG, MAX30102_TEMP_CFG_TEMP_EN);
+
 }   
 
 void Mpu6050::HandleInterrupt(){
@@ -118,19 +118,22 @@ void Mpu6050::HandleInterrupt(){
     }
 
     if(int_reason & BIT(MPU6050_INTERRUPT_DATA_RDY_BIT)){
-        LOG_INF("Data Ready interrupt!");
+        //LOG_INF("Data Ready interrupt!");
+        // Store Accel and Gyro samples
+        transport.ReadRegisters(MPU6050_RA_ACCEL_XOUT_H, (tx_buf + 12*sample_cnt + 1), 6);
+        transport.ReadRegisters(MPU6050_RA_GYRO_XOUT_H, (tx_buf + 12*sample_cnt + 7), 6);
+        sample_cnt++;
+        if(sample_cnt == 20){
+            //Store Temperature reading
+            transport.ReadRegisters(MPU6050_RA_TEMP_OUT_H, (tx_buf + 12*sample_cnt + 1), 2);
+            tx_buf[0] = packet_cnt;            
+            packet_cnt++;
+            sample_cnt = 0;
+            //TODO(bojankoce): Send BLE notification!            
+            Bluetooth::Mpu6050Notify(tx_buf, 243);
+        }
     }
-    
-    //if(int_reason & DIE_TEMP_RDY_MASK){
-        //LOG_INF("Temperature Ready!");
-    //    TemperatureRead();
-    //    Bluetooth::Max30102Notify(tx_buf, 194);
-    //}
 } 
-
-void Mpu6050::TemperatureRead(){
-
-}
 
 bool Mpu6050::IsOnI2cBus(){
     bool status;

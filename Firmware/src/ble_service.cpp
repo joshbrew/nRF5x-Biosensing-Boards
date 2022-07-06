@@ -93,7 +93,8 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
 
     }
     atomic_set(&Bluetooth::Gatt::ads131m08NotificationsEnable, false);
-    atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);    
+    atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);  
+    atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
@@ -112,6 +113,7 @@ bool OnLeParamUpdateRequest(struct bt_conn *conn,
     LOG_INF("LE Connection parameters requested!");
     LOG_INF("Min Connection Interval: %d x 1.25ms", param->interval_min);
     LOG_INF("Max Connection Interval: %d x 1.25ms", param->interval_max);
+    return true;
 }
 
 /** @brief The parameters for an LE connection have been updated.
@@ -221,6 +223,20 @@ void Max30102Notify(const uint8_t* data, const uint8_t len)
     if (atomic_get(&Gatt::max30102NotificationsEnable))    
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicMax30102Data], data, len);
+    }
+}
+
+/**
+ * @brief Send BLE notification through MPU6050 Data Pipe.
+ * 
+ * @param data pointer to datasource containing MAX30102 data samples
+ * @param len  the number of samples to transfer
+ */
+void Mpu6050Notify(const uint8_t* data, const uint8_t len)
+{    
+    if (atomic_get(&Gatt::mpu6050NotificationsEnable))    
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicMpu6050Data], data, len);
     }
 }
 
