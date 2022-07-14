@@ -7,15 +7,10 @@
 #include <sys/printk.h>
 
 #include "ADS131M08_zephyr.hpp"
+#include "max30102.hpp"
+#include "mpu6050.hpp"
 
 #include "ble_service.hpp"
-
-// Bluetooth part
-//#include <bluetooth/bluetooth.h>
-//#include <bluetooth/hci.h>
-//#include <bluetooth/conn.h>
-//#include <bluetooth/uuid.h>
-//#include <bluetooth/gatt.h>
 
 #define DATA_READY_GPIO     ((uint8_t)5)
 #define DBG_LED             ((uint8_t)16)
@@ -26,21 +21,52 @@ LOG_MODULE_REGISTER(main);
 static int gpio_init(void);
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void interrupt_workQueue_handler(struct k_work* wrk);
+static void max30102_interrupt_workQueue_handler(struct k_work* wrk);
+static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk);
 static int activate_irq_on_data_ready(void);
-
+static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 
 /* Global variables */
 const struct device *gpio_0_dev;
 const struct device *gpio_1_dev;
 struct gpio_callback callback;
+struct gpio_callback max30102_callback;
+struct gpio_callback mpu6050_callback;
 struct k_work interrupt_work_item;    ///< interrupt work item
+struct k_work max30102_interrupt_work_item;    ///< interrupt work item
+struct k_work mpu6050_interrupt_work_item;    ///< interrupt work item
 static uint8_t sampleNum = 0;
 static uint8_t i = 0;
 
 static uint8_t ble_tx_buff[247] = {0};
 //static uint8_t adcRawData[27] = {0};
+static max30102_config max30102_default_config = {
+    0x80, // Interrupt Config 1. Enable FIFO_A_FULL interrupt
+    MAX30102_INTR_2_DIE_TEMP_RDY_EN, // Interrupt Config 2. Enable temperature ready interrupt
+    0x10, // FIFO Config. No Sample averaging, FIFO Rollover Enabled, FFIO_A_FULL = 32
+    0x87, // Mode config. Keep Max30102 shutdown. Multi LED mode .
+    0x07, // Sp02 config. 100sps rate, 2048 full scale, 18-bit ADC resolution.
+    {0x7F, 0x7F}, // LED1/LED2 config. 25.4mA typical LED current
+    {0x11, 0x22}  // SLOT config. SLOT1/2 for LED1, SLOT3/4 for LED2.
+};
+
+static mpu6050_config mpu6050_default_config = {
+    .sample_rate_config = 0x09,     // Sample rate = 100Hz
+    .config_reg = 0x01,             // FSYNC disabled. Digital Low Pass filter enabled. 
+    .gyro_config = (0x01 << 3),     // 500dps Gyro Full Scale. No Self-Tests.
+    .accel_config = (0x01 << 3),    // +/-4g Accel Full Scale. No Self-Tests. 
+    .fifo_config = 0x00,            // FIFO disabled.
+    .interrupt_pin_config = 0xC0,    // INT active low. Open drain. Keep interrupt pin active until interrupt is cleared. Clear interrupt only by reading INT_STATUS register.
+    .interrupt_config = 0x01,       // Enable only Data Ready interrupts.
+    .user_control = 0x00,           // Disable FIFO
+    .pwr_mgmt_1 = 0x01,             // Use PLL with X axis gyroscope as Clock Source.
+    .pwr_mgmt_2 = 0x00              // Don't use Accelerometer only Low Power mode. XYZ axes of Gyro and Accel enabled. 
+}; 
 
 ADS131M08 adc;
+Max30102 max30102;
+Mpu6050 mpu6050;
 
 void main(void)
 {
@@ -55,11 +81,30 @@ void main(void)
 
     ret = gpio_init();
     k_work_init(&interrupt_work_item, interrupt_workQueue_handler);
+    k_work_init(&max30102_interrupt_work_item, max30102_interrupt_workQueue_handler);
+    k_work_init(&mpu6050_interrupt_work_item, mpu6050_interrupt_workQueue_handler);
     if (ret == 0){
         //LOG_INF("GPIOs Int'd!");        
     }
 
     adc.init(15, 5, 13, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 2MHz SPI bus
+
+    max30102.Initialize();
+    if(max30102.IsOnI2cBus()){
+        LOG_INF("MAX30102 is on I2C bus!");
+        max30102.Configure(max30102_default_config);
+        max30102.StartSampling();
+    } else {
+        LOG_WRN("***WARNING: MAX30102 is not connected or properly initialized!");
+    }
+
+    mpu6050.Initialize();
+    if(mpu6050.IsOnI2cBus()){
+        LOG_INF("MPU6050 is on I2C bus!");
+        mpu6050.Configure(mpu6050_default_config);
+    } else {
+        LOG_WRN("***WARNING: MPU6050 is not connected or properly initialized!");
+    }
 
     Bluetooth::SetupBLE();
 
@@ -149,7 +194,7 @@ static int gpio_init(void){
         return -1;
 	}  
     gpio_1_dev = device_get_binding("GPIO_1");
-	if (gpio_0_dev == NULL) {
+	if (gpio_1_dev == NULL) {
 		LOG_ERR("***ERROR: GPIO_1 device binding!");
         return -1;
 	}        
@@ -173,6 +218,29 @@ static int gpio_init(void){
     LOG_INF("Waking up...");
     gpio_pin_set(gpio_0_dev, DBG_LED, 1);
 
+/* Max30102 Interrupt */
+//TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
+    ret += gpio_pin_configure(gpio_0_dev, 28, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, 28, GPIO_INT_EDGE_FALLING);
+    gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(28));    
+    ret += gpio_add_callback(gpio_0_dev, &max30102_callback);
+    if (ret != 0){
+        LOG_ERR("***ERROR: GPIO initialization\n");
+    } else {
+        LOG_INF("Max30102 Interrupt pin Int'd!");
+    } 
+
+/* MPU6050 Interrupt */
+//TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
+    ret += gpio_pin_configure(gpio_0_dev, 2, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, 2, GPIO_INT_EDGE_FALLING);
+    gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(2));    
+    ret += gpio_add_callback(gpio_0_dev, &mpu6050_callback);
+    if (ret != 0){
+        LOG_ERR("***ERROR: GPIO initialization\n");
+    } else {
+        LOG_INF("Mpu6050 Interrupt pin Int'd!");
+    } 
 
     return ret;
 }
@@ -197,6 +265,15 @@ static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *c
     k_work_submit(&interrupt_work_item); 
 }
 
+static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
+    k_work_submit(&max30102_interrupt_work_item);     
+}
+
+static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
+    k_work_submit(&mpu6050_interrupt_work_item);     
+}
+
+
 /**
  * @brief IntWorkQueue handler. Used to process interrupts coming from ADS131M08 Data Ready interrupt pin 
  * Because all activity is performed on cooperative level no addition protection against data corruption is required
@@ -215,7 +292,30 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     i++;
     if(i == 9){
         i = 0;
-        Bluetooth::SensorNotify(ble_tx_buff, 227);
+        Bluetooth::Ads131m08Notify(ble_tx_buff, 227);
     }
+}
 
+/**
+ * @brief IntWorkQueue handler. Used to process interrupts coming from MAX30102 interrupt pin 
+ * Because all activity is performed on cooperative level no addition protection against data corruption is required
+ * @param wrk work object
+ * @warning  Called by system scheduled in cooperative level.
+ */
+static void max30102_interrupt_workQueue_handler(struct k_work* wrk)
+{	
+    //LOG_INF("Max30102 Interrupt!");
+    max30102.HandleInterrupt();
+}
+
+/**
+ * @brief IntWorkQueue handler. Used to process interrupts coming from MPU6050 interrupt pin 
+ * Because all activity is performed on cooperative level no addition protection against data corruption is required
+ * @param wrk work object
+ * @warning  Called by system scheduled in cooperative level.
+ */
+static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
+{	
+    //LOG_INF("MPU6050 Interrupt!");
+    mpu6050.HandleInterrupt();
 }

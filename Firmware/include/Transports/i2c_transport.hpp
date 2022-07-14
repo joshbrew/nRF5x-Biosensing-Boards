@@ -1,5 +1,5 @@
 #pragma once
-
+#include <atomic>
 #include <drivers/i2c.h>
 
 /**
@@ -18,7 +18,7 @@ public:
     I2CTransport()
     {
         dev = device_get_binding(DeviceName::c_str());
-        status = 0;
+        deviceStatus.store(0, std::memory_order_relaxed);
     }
 
     /**
@@ -26,7 +26,8 @@ public:
      */
     void Initialize()
     {
-        status = i2c_configure(dev, I2C_SPEED_SET(I2C_SPEED_FAST) | I2C_MODE_MASTER);
+        int status = i2c_configure(dev, I2C_SPEED_SET(I2C_SPEED_FAST) | I2C_MODE_MASTER);
+        deviceStatus.store(status, std::memory_order_relaxed);
     }
 
     /**
@@ -37,7 +38,8 @@ public:
      */
     void WriteRegister(uint8_t registerId, uint8_t value)
     {
-        status = i2c_reg_write_byte(dev, i2c_id, registerId, value);
+        int status = i2c_reg_write_byte(dev, i2c_id, registerId, value);
+        deviceStatus.store(status, std::memory_order_relaxed);
     }
 
     /**
@@ -49,7 +51,8 @@ public:
     uint8_t ReadRegister(uint8_t registerId)
     {
         uint8_t value;
-        status = i2c_reg_read_byte(dev, i2c_id, registerId, &value);
+        int status = i2c_reg_read_byte(dev, i2c_id, registerId, &value);
+        deviceStatus.store(status, std::memory_order_relaxed);
         return value;
     }
 
@@ -63,7 +66,8 @@ public:
      */
     void UpdateRegister(uint8_t registerId, uint8_t mask, uint8_t value)
     {
-        status = i2c_reg_update_byte(dev, i2c_id, registerId, mask, value);
+        int status = i2c_reg_update_byte(dev, i2c_id, registerId, mask, value);
+        deviceStatus.store(status, std::memory_order_relaxed);
     }
 
     /**
@@ -75,10 +79,23 @@ public:
      */
     void ReadRegisters(uint8_t registerId, uint8_t* data, int size)
     {
-        status = i2c_burst_read(dev, i2c_id, registerId, data, size);
+        int status = i2c_burst_read(dev, i2c_id, registerId, data, size);
+        deviceStatus.store(status, std::memory_order_relaxed);
     }
 
-public:
-    int status; ///< Device status
+    /**
+     * @brief Get device status
+     * 
+     * @return Current status, 0 for no errors
+     */
+    uint8_t GetStatus()
+    {
+        int status = deviceStatus.load(std::memory_order_relaxed);
+
+        return static_cast<uint8_t>(-status);
+    }
+
+private:
+    std::atomic<int> deviceStatus; ///< Device status
     const device* dev = nullptr; ///< Logical device
 };
