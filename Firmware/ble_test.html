@@ -991,15 +991,15 @@ boyerMoore(patternBuffer) {
                     output = output.map(v => v*ads.uVperStep);
                     elapsed = (Date.now() - start)*0.001;
                 }
-                //console.log("BLE MSG: ",...output.map(o => o.toFixed(3)));
+                console.log("BLE MSG: ",...output.map(o => o.toFixed(3)));
 
-                // let outputdiv = document.getElementById('output');
-                // outputdiv.innerHTML = ``;
-                // if(outputdiv) output.forEach((o) => {
-                //     outputdiv.innerHTML+= `<tr><td>${o.toFixed(3)}</td><td>uV</td></tr>`;
-                // });
-                // let elapseddiv = document.getElementById('elapsed');
-                // if(elapseddiv) elapseddiv.innerHTML = `${elapsed[elapsed.length-1]}`;
+                let outputdiv = document.getElementById('output');
+                outputdiv.innerHTML = ``;
+                if(outputdiv) output.forEach((o) => {
+                    outputdiv.innerHTML+= `<tr><td>${o.toFixed(3)}</td><td>uV</td></tr>`;
+                });
+                let elapseddiv = document.getElementById('elapsed');
+                if(elapseddiv) elapseddiv.innerHTML = `${elapsed[elapsed.length-1]}`;
 
                 outputTimestamps.push(...elapsed);
                 //console.log(ch0);
@@ -1017,11 +1017,11 @@ boyerMoore(patternBuffer) {
         let n = 0;
         ble.onNotificationCallback = (e) => {
             let output = Array.from(new Uint8Array(e.target.value.buffer));
-            console.log(n++);
+            //console.log(n++);
             
-            //ads.onReceive([...output]);
-            let elapseddiv = document.getElementById('elapsed');
-            if(elapseddiv) elapseddiv.innerHTML = `${n}`;
+            ads.onReceive([...output]);
+            // let elapseddiv = document.getElementById('elapsed');
+            // if(elapseddiv) elapseddiv.innerHTML = `${n}`;
 
         } 
         //*********************************************
