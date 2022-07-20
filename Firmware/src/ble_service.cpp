@@ -93,6 +93,7 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
 
     }
     atomic_set(&Bluetooth::Gatt::ads131m08NotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::ads131m08_1_NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);  
     atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
@@ -209,6 +210,14 @@ void Ads131m08Notify(const uint8_t* data, const uint8_t len)
     if (atomic_get(&Gatt::ads131m08NotificationsEnable))
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicAds131Data], data, len);
+    }
+}
+
+void Ads131m08_1_Notify(const uint8_t* data, const uint8_t len)
+{
+    if (atomic_get(&Gatt::ads131m08_1_NotificationsEnable))
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicAds131_1_Data], data, len);
     }
 }
 

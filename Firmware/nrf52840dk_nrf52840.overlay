@@ -1,40 +1,52 @@
 // To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
-// For more help, browse the DeviceTree documentation at https://docs.zephyrproject.org/latest/guides/dts/index.html
+// For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
 &uart0 {
-	status = "okay";
-	current-speed = <115200>;
-	tx-pin = <15>;
-	rx-pin = <14>;
-	rts-pin = <0xFFFFFFFF>;
-	cts-pin = <0xFFFFFFFF>;
+    status = "okay";
+    current-speed = <115200>;
+    tx-pin = <15>;
+    rx-pin = <14>;
+    rts-pin = <0xFFFFFFFF>;
+    cts-pin = <0xFFFFFFFF>;
 };
 
 &spi0 {
-	compatible = "nordic,nrf-spim";
+    compatible = "nordic,nrf-spim";
     status = "okay";
-	sck-pin = <44>;
-	mosi-pin = <35>; //DIN
-	miso-pin = <34>; //DOUT
-    cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>;
+    sck-pin = <44>;
+    mosi-pin = <35>; //DIN
+    miso-pin = <34>; //DOUT
+    cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>, <&gpio1 10 GPIO_ACTIVE_LOW>;
+
+    ads131m08_0: ads131m08@0 {
+        status = "okay";
+        reg = <0>;
+        label = "ADS131M08_0";
+    };
+
+    ads131m08_1: ads131m08@1 {
+        status = "okay";
+        reg = <1>;
+        label = "ADS131M08_1";
+    };
 };
 
 &spi1 {
-    status = "disabled";    
+    status = "disabled";
 };
 
 &i2c0 {
-    status = "disabled";    
+    status = "disabled";
 };
 &i2c1 {
     status = "okay";
     sda-pin = <5>;
-	scl-pin = <3>;
-	max30102@57 {
-		compatible = "maxim,max30102";
-		label = "MAX30102";
-		reg = <0x57>;
+    scl-pin = <3>;
+    max30102@57 {
+        compatible = "maxim,max30102";
+        label = "MAX30102";
+        reg = <0x57>;
         mode = <2>;
-		status = "okay";
-	};    
+        status = "okay";
+    };
 };

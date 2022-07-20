@@ -20,6 +20,7 @@ LOG_MODULE_REGISTER(BleGatt);
 /* BLE connection */
 
 atomic_t ads131m08NotificationsEnable = false;
+atomic_t ads131m08_1_NotificationsEnable = false;
 atomic_t max30102NotificationsEnable = false;
 atomic_t mpu6050NotificationsEnable = false;
 
@@ -42,6 +43,9 @@ bt_uuid_128 max30102DataUUID = BT_UUID_INIT_128(
 bt_uuid_128 mpu6050DataUUID = BT_UUID_INIT_128(
         BT_UUID_128_ENCODE(0x0004cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 
+bt_uuid_128 ads131_1_DataUUID = BT_UUID_INIT_128(
+        BT_UUID_128_ENCODE(0x0005cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
+
 static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
 /**
@@ -57,6 +61,21 @@ static void ads131CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&ads131m08NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
 	LOG_INF("ADS131M08 Notification %s", ads131m08NotificationsEnable ? "enabled" : "disabled");
+}
+
+/**
+ * @brief CCCD handler for ADS131M08_1 characteristic. Used to get notifications if client enables notifications
+ *        for ADS131M08 characteristic. CCC = Client Characteristic Configuration
+ * 
+ * @param attr Ble Gatt attribute
+ * @param value characteristic value
+ */
+static void ads131_1_CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
+    atomic_set(&ads131m08_1_NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
+	LOG_INF("ADS131M08_1 Notification %s", ads131m08_1_NotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -132,6 +151,9 @@ BT_GATT_CCC(max30102CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),        
 BT_GATT_CHARACTERISTIC(&mpu6050DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                      // 10, 11
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
 BT_GATT_CCC(mpu6050CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                 // 12
+BT_GATT_CHARACTERISTIC(&ads131_1_DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                    // 13, 14
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
+BT_GATT_CCC(ads131_1_CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),               // 15
 );
 
 /********************************************************/
