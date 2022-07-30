@@ -9,10 +9,11 @@
 
 #include "mpu6050.hpp"
 #include "ble_service.hpp"
+#include "usb_comm_handler.hpp"
 
 LOG_MODULE_REGISTER(mpu6050);
 
-Mpu6050::Mpu6050() {
+Mpu6050::Mpu6050(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_INF("Mpu6050 Constructor!");
 }
 
@@ -131,6 +132,7 @@ void Mpu6050::HandleInterrupt(){
             sample_cnt = 0;
             //TODO(bojankoce): Send BLE notification!            
             Bluetooth::Mpu6050Notify(tx_buf, 243);
+            serialHandler.SendAccelSamples(tx_buf, 243);
         }
     }
 } 

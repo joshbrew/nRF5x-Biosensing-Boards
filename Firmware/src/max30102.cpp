@@ -9,10 +9,11 @@
 
 #include "max30102.hpp"
 #include "ble_service.hpp"
+#include "usb_comm_handler.hpp"
 
 LOG_MODULE_REGISTER(max30102);
 
-Max30102::Max30102() {
+Max30102::Max30102(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_INF("Max30102 Constructor!");
 }
 
@@ -129,6 +130,7 @@ void Max30102::HandleInterrupt(){
         //LOG_INF("Temperature Ready!");
         TemperatureRead();
         Bluetooth::Max30102Notify(tx_buf, 194);
+        serialHandler.SendMax30102Samples(tx_buf, 194);
     }
 } 
 

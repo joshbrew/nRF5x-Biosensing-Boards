@@ -9,6 +9,7 @@
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
 
+class UsbCommHandler;
 //#define DT_DRV_COMPAT maxim_max30102
 
 #define MAX30102_REG_INT_STS1 0x00
@@ -149,7 +150,7 @@ public:
     /**
      * @brief Construct a new Max30102 object
      */
-    Max30102();
+    Max30102(UsbCommHandler &controller);
 
     /**
      * @brief Initialization function. Used to perform actual initialization. Because of software stack initialization
@@ -213,5 +214,6 @@ private:
     void TemperatureRead();
     std::atomic<bool> max30102_is_on_i2c_bus_; ///< Device status
     I2CTransport<I2C_1DeviceName, max30102_i2c_address> transport; ///< I2C transport for device
+    UsbCommHandler &serialHandler; ///< USB communication controller
 
 };

@@ -9,6 +9,8 @@
 #include "ADS131M08_zephyr.hpp"
 #include "max30102.hpp"
 #include "mpu6050.hpp"
+#include "serial_controller.hpp"
+#include "usb_comm_handler.hpp"
 
 #include "ble_service.hpp"
 
@@ -74,8 +76,10 @@ static mpu6050_config mpu6050_default_config = {
 
 ADS131M08 adc;
 ADS131M08 adc_1;
-Max30102 max30102;
-Mpu6050 mpu6050;
+SerialController serial;
+UsbCommHandler usbCommHandler(serial);
+Max30102 max30102(usbCommHandler);
+Mpu6050 mpu6050(usbCommHandler);
 
 void main(void)
 {
@@ -97,6 +101,8 @@ void main(void)
         //LOG_INF("GPIOs Int'd!");        
     }
 
+    serial.Initialize();
+    usbCommHandler.Initialize();
     adc.init(15, 5, 13, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
     adc_1.init(10, 24, 29, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
 
@@ -368,6 +374,7 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     if(i == 9){
         i = 0;
         Bluetooth::Ads131m08Notify(ble_tx_buff, 227);
+        usbCommHandler.SendAds131m08Samples(ble_tx_buff, 227, 0);
     }
 }
 
@@ -391,6 +398,7 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     if(j == 9){
         j = 0;
         Bluetooth::Ads131m08_1_Notify(ads131m08_1_ble_tx_buff, 227);
+        usbCommHandler.SendAds131m08Samples(ads131m08_1_ble_tx_buff, 227, 0);
     }
 }
 

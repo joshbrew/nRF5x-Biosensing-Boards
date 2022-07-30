@@ -9,6 +9,8 @@
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
 
+class UsbCommHandler;
+
 #define MPU6050_ADDRESS_AD0_LOW     0x68 // address pin low (GND), default for InvenSense evaluation board
 #define MPU6050_ADDRESS_AD0_HIGH    0x69 // address pin high (VCC)
 #define MPU6050_DEFAULT_ADDRESS     MPU6050_ADDRESS_AD0_LOW
@@ -415,7 +417,7 @@ public:
     /**
      * @brief Construct a new Mpu6050 object
      */
-    Mpu6050();
+    Mpu6050(UsbCommHandler &controller);
 
     /**
      * @brief Initialization function. Used to perform actual initialization. Because of software stack initialization
@@ -481,6 +483,7 @@ private:
     uint8_t packet_cnt;
     std::atomic<bool> mpu6050_is_on_i2c_bus_; ///< Device status
     I2CTransport<I2C_1DeviceName, MPU6050_DEFAULT_ADDRESS> transport; ///< I2C transport for device
+    UsbCommHandler &serialHandler; ///< USB communication controller
 
 };
 
