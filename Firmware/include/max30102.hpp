@@ -133,7 +133,7 @@ class Max30102 {
 
     constexpr static uint8_t max30102_i2c_address = 0x57; //I2C Address
     constexpr static uint8_t max30102_id = 0x15; // Part ID
-    uint8_t tx_buf[194] = {};
+    uint8_t tx_buf[195] = {};
 
     struct max30102_data {
         const struct device *i2c;
@@ -212,6 +212,7 @@ private:
      * @brief Read Temperature Registers
      */
     void TemperatureRead();
+    uint8_t packet_cnt;
     std::atomic<bool> max30102_is_on_i2c_bus_; ///< Device status
     I2CTransport<I2C_1DeviceName, max30102_i2c_address> transport; ///< I2C transport for device
     UsbCommHandler &serialHandler; ///< USB communication controller

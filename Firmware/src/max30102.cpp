@@ -23,6 +23,7 @@ int Max30102::Initialize() {
     uint8_t part_id;
     
     LOG_INF("Starting Max30102 Initialization..."); 
+    packet_cnt = 0;
     transport.Initialize();   
     
     max30102_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
@@ -107,7 +108,7 @@ void Max30102::HandleInterrupt(){
     int_reason = transport.ReadRegister(MAX30102_REG_INT_STS1);
     
     if(int_reason & FIFO_A_FULL_MASK){
-        transport.ReadRegisters(MAX30102_REG_FIFO_DATA, tx_buf, 192);
+        transport.ReadRegisters(MAX30102_REG_FIFO_DATA, (tx_buf + 1), 192);
         //LOG_INF("tx_buf: 0x%X 0x%X 0x%X", tx_buf[0], tx_buf[1], tx_buf[2]);
         InitiateTemperatureReading();
     }
@@ -129,8 +130,8 @@ void Max30102::HandleInterrupt(){
     if(int_reason & DIE_TEMP_RDY_MASK){
         //LOG_INF("Temperature Ready!");
         TemperatureRead();
-        Bluetooth::Max30102Notify(tx_buf, 194);
-        serialHandler.SendMax30102Samples(tx_buf, 194);
+        Bluetooth::Max30102Notify(tx_buf, 195);
+        serialHandler.SendMax30102Samples(tx_buf, 195);
     }
 } 
 
@@ -140,8 +141,10 @@ void Max30102::TemperatureRead(){
     tint = transport.ReadRegister(MAX30102_REG_TINT);
     tfrac = transport.ReadRegister(MAX30102_REG_TFRAC);
     //LOG_INF("Temperature: %d, %d", tint, tfrac);
-    tx_buf[192] = tint;
-    tx_buf[193] = tfrac;
+    tx_buf[193] = tint;
+    tx_buf[194] = tfrac;
+    tx_buf[0] = packet_cnt;            
+    packet_cnt++;
 }
 
 bool Max30102::IsOnI2cBus(){
