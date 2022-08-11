@@ -54,10 +54,10 @@ static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
 static max30102_config max30102_default_config = {
     0x80, // Interrupt Config 1. Enable FIFO_A_FULL interrupt
     MAX30102_INTR_2_DIE_TEMP_RDY_EN, // Interrupt Config 2. Enable temperature ready interrupt
-    0x10, // FIFO Config. No Sample averaging, FIFO Rollover Enabled, FFIO_A_FULL = 32
+    0b01110000, // FIFO Config. Average 16 samples, FIFO Rollover Enabled, FFIO_A_FULL = 32
     0x87, // Mode config. Keep Max30102 shutdown. Multi LED mode .
-    0x07, // Sp02 config. 100sps rate, 2048 full scale, 18-bit ADC resolution.
-    {0x7F, 0x7F}, // LED1/LED2 config. 25.4mA typical LED current
+    0b01110011, // Sp02 config. 800sps rate, 2048 full scale, 18-bit ADC resolution.
+    {50, 50}, // LED1/LED2 config. 25.4mA typical LED current
     {0x11, 0x22}  // SLOT config. SLOT1/2 for LED1, SLOT3/4 for LED2.
 };
 
@@ -87,8 +87,8 @@ void main(void)
     LOG_WRN("This is a warning message!");
     LOG_INF("This is a information message!");
     LOG_DBG("This is a debugging message!");
-    ble_tx_buff[225] = 0x0D;
-    ble_tx_buff[226] = 0x0A;
+    // ble_tx_buff[225] = 0x0D;
+    // ble_tx_buff[226] = 0x0A;
     int ret = 0;
     uint16_t reg_value = 0;
 
