@@ -65,6 +65,7 @@ SerialController::SerialController()
     k_sem_init(&txSem, 0, 1);
 
     serialStatus.store(TransferStatus::Ok, std::memory_order_relaxed);
+    serial_is_initialized_.store(false, std::memory_order_relaxed);
 }
 
 /**
@@ -94,50 +95,6 @@ void SerialController::Initialize()
 		LOG_ERR("Failed to enable USB");
 		return;
 	}
-
-	//ring_buf_init(&ringbuf, sizeof(ring_buffer), ring_buffer);
-
-	LOG_INF("Wait for DTR");
-
-	while (true) {
-		uart_line_ctrl_get(dev, UART_LINE_CTRL_DTR, &dtr);
-		if (dtr) {
-			break;
-		} else {
-			/* Give CPU resources to low priority threads. */
-			k_sleep(K_MSEC(100));
-		}
-	}
-
-	LOG_INF("DTR set");
-
-	/* They are optional, we use them to test the interrupt endpoint */
-	ret = uart_line_ctrl_set(dev, UART_LINE_CTRL_DCD, 1);
-	if (ret) {
-		LOG_WRN("Failed to set DCD, ret code %d", ret);
-	}
-
-	ret = uart_line_ctrl_set(dev, UART_LINE_CTRL_DSR, 1);
-	if (ret) {
-		LOG_WRN("Failed to set DSR, ret code %d", ret);
-	}
-
-	/* Wait 1 sec for the host to do all settings */
-	k_busy_wait(1000000);
-
-	ret = uart_line_ctrl_get(dev, UART_LINE_CTRL_BAUD_RATE, &baudrate);
-	if (ret) {
-		LOG_WRN("Failed to get baudrate, ret code %d", ret);
-	} else {
-		LOG_INF("Baudrate detected: %d", baudrate);
-	}
-
-	//uart_irq_callback_set(dev, interrupt_handler);
-    //uart_irq_callback_user_data_set(dev, interrupt_handler, self);
-
-	/* Enable rx interrupts */
-	//uart_irq_rx_enable(dev);
-
 }
 
 /**
@@ -174,6 +131,9 @@ uint8_t SerialController::GetStatus()
  */
 void SerialController::WorkingThread(void *data, void *, void *)
 {
+    uint32_t baudrate, dtr = 0U;
+	int ret;
+
     SerialController *self = static_cast<SerialController *>(data);
 
     //uart_callback_set(self->uartDevice, &SerialController::SerialPortCallback, self);
@@ -184,6 +144,42 @@ void SerialController::WorkingThread(void *data, void *, void *)
 	//uart_irq_rx_enable(self->dev);
 
     SerialTransfer *currentTask;
+
+	LOG_INF("Wait for DTR");
+
+	while (true) {
+		uart_line_ctrl_get(self->dev, UART_LINE_CTRL_DTR, &dtr);
+		if (dtr) {
+			break;
+		} else {
+			/* Give CPU resources to low priority threads. */
+			k_sleep(K_MSEC(500));
+		}
+	}
+
+	LOG_INF("DTR set");
+
+	/* They are optional, we use them to test the interrupt endpoint */
+	ret = uart_line_ctrl_set(self->dev, UART_LINE_CTRL_DCD, 1);
+	if (ret) {
+		LOG_WRN("Failed to set DCD, ret code %d", ret);
+	}
+
+	ret = uart_line_ctrl_set(self->dev, UART_LINE_CTRL_DSR, 1);
+	if (ret) {
+		LOG_WRN("Failed to set DSR, ret code %d", ret);
+	}
+
+	/* Wait 1 sec for the host to do all settings */
+	k_busy_wait(1000000);
+
+	ret = uart_line_ctrl_get(self->dev, UART_LINE_CTRL_BAUD_RATE, &baudrate);
+	if (ret) {
+		LOG_WRN("Failed to get baudrate, ret code %d", ret);
+	} else {
+		LOG_INF("Baudrate detected: %d", baudrate);
+	}
+    self->serial_is_initialized_.store(true, std::memory_order_relaxed);    
 
     for (;;)
     {
@@ -422,4 +418,10 @@ void SerialController::interrupt_handler(const struct device *dev, void *user_da
         }
 
 	}
+}
+
+bool SerialController::IsInitialized(){
+    bool status;
+    status = serial_is_initialized_.load(std::memory_order_relaxed);
+    return status;
 }

@@ -63,33 +63,39 @@ void UsbCommHandler::CommandCompletedCallback(k_work *work)
 
 void UsbCommHandler::SendAccelSamples(const uint8_t *buffer, size_t length){
     
-    LOG_INF(".");
-    SerialTransfer *transfer = CreateTransferFrom(SensorId::Mpu6050, buffer, length, 0);
+    if(serial.IsInitialized()){
+        LOG_INF(".");
+        SerialTransfer *transfer = CreateTransferFrom(SensorId::Mpu6050, buffer, length, 0);
 
-    QueueTransfer(transfer);    
+        QueueTransfer(transfer);   
+    } 
 }
 
 void UsbCommHandler::SendMax30102Samples(const uint8_t *buffer, size_t length){
     
-    LOG_INF("*");
-    SerialTransfer *transfer = CreateTransferFrom(SensorId::Max30102, buffer, length, 0);
+    if(serial.IsInitialized()){
+        LOG_INF("*");
+        SerialTransfer *transfer = CreateTransferFrom(SensorId::Max30102, buffer, length, 0);
 
-    QueueTransfer(transfer);    
+        QueueTransfer(transfer);   
+    } 
 }
 
 void UsbCommHandler::SendAds131m08Samples(const uint8_t *buffer, size_t length, uint8_t sensor_id){
-    
-    LOG_INF("-");
+        
     SensorId ads131m08_id;
     
-    if(sensor_id == 0){
-        ads131m08_id = SensorId::Ads131m08_0;
-    } else {
-        ads131m08_id = SensorId::Ads131m08_1;
-    }          
-    SerialTransfer *transfer = CreateTransferFrom(ads131m08_id, buffer, length, 0);
-    
-    QueueTransfer(transfer);    
+    if(serial.IsInitialized()){    
+        LOG_INF("-");
+        if(sensor_id == 0){
+            ads131m08_id = SensorId::Ads131m08_0;
+        } else {
+            ads131m08_id = SensorId::Ads131m08_1;
+        }          
+        SerialTransfer *transfer = CreateTransferFrom(ads131m08_id, buffer, length, 0);
+        
+        QueueTransfer(transfer);    
+    }
 }
 
 /**

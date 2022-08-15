@@ -75,6 +75,13 @@ public:
     bool QueueTransfer(SerialTransfer *task);
 
     /**
+     * @brief Check if SerialController is initialized
+     *      
+     * @return true if initialized, false owtherwise
+     */
+    bool IsInitialized();
+
+    /**
      * @brief Get status of last operation
      * 
      * @return Status, 0 for no errors
@@ -160,4 +167,5 @@ private:
 
     k_msgq messageQueue;                   ///< Serial port task queue
     SerialTransfer *buffer[MaxEntryCount]; ///< Serial port task buffer
+    std::atomic<bool> serial_is_initialized_; ///< Device status
 };
