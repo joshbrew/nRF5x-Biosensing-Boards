@@ -9,9 +9,14 @@ namespace Bluetooth::Gatt
 {
 
     /**
-     * @brief State of the accelerometerNotifications.
+     * @brief State of the ADS131M08 Notifications.
      */
     extern atomic_t ads131m08NotificationsEnable;
+
+    /**
+     * @brief State of the ADS131M08_1 Notifications.
+     */
+    extern atomic_t ads131m08_1_NotificationsEnable;
 
     /**
      * @brief State of the MAX30102 Notifications.
@@ -42,6 +47,11 @@ namespace Bluetooth::Gatt
      * @brief Index of the Gatt MPU6050 Data characteristic in service characteristic table
      */
     constexpr static int CharacteristicMpu6050Data = 10;
+
+    /**
+     * @brief Index of the Gatt ADS131M08 Data characteristic in service characteristic table
+     */
+    constexpr static int CharacteristicAds131_1_Data = 13;
 
     /**
      * @brief Callback called when Bluetooth is initialized. Starts BLE server

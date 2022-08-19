@@ -15,7 +15,7 @@ namespace
 {
 
 constexpr static uint16_t connectionIntervalMin = 6; ///< Minimal connection interval in 1.25 milliseconds intervals
-constexpr static uint16_t connectionIntervalMax = 8; ///< Maximum connection interval in 1.25 milliseconds intervals
+constexpr static uint16_t connectionIntervalMax = 12; ///< Maximum connection interval in 1.25 milliseconds intervals //500/9 = 56.25 packets + 5 + 3 = 60 packets/sec.  1000/60 = 16.67 ms/packet. 16.67 / 1.25 = 12.5 connectionIntervalMax
 constexpr static uint16_t connectionLatency = 0;     ///< Connection latancy
 constexpr static uint16_t connectionTimeout = 400;   ///< Connection timeout in 10 msec intervals
 
@@ -93,6 +93,7 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
 
     }
     atomic_set(&Bluetooth::Gatt::ads131m08NotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::ads131m08_1_NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);  
     atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
@@ -209,6 +210,14 @@ void Ads131m08Notify(const uint8_t* data, const uint8_t len)
     if (atomic_get(&Gatt::ads131m08NotificationsEnable))
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicAds131Data], data, len);
+    }
+}
+
+void Ads131m08_1_Notify(const uint8_t* data, const uint8_t len)
+{
+    if (atomic_get(&Gatt::ads131m08_1_NotificationsEnable))
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicAds131_1_Data], data, len);
     }
 }
 
