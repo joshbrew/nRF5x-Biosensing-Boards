@@ -96,6 +96,7 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
     atomic_set(&Bluetooth::Gatt::ads131m08_1_NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);  
     atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);    
+    atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
@@ -246,6 +247,21 @@ void Mpu6050Notify(const uint8_t* data, const uint8_t len)
     if (atomic_get(&Gatt::mpu6050NotificationsEnable))    
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicMpu6050Data], data, len);
+    }
+}
+
+/**
+ * @brief Send BLE notification through BME280 Data Pipe.
+ * 
+ * @param data pointer to datasource containing BME280 data samples
+ * @param len  the number of samples to transfer
+ */
+void Bme280Notify(const uint8_t* data, const uint8_t len)
+{   
+    LOG_HEXDUMP_INF(data, len, "bme280");
+    if (atomic_get(&Gatt::bme280NotificationsEnable))    
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicBme280Data], data, len);
     }
 }
 

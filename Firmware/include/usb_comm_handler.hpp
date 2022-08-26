@@ -58,6 +58,14 @@ public:
      */    
     void SendAds131m08Samples(const uint8_t *buffer, size_t length, uint8_t sensor_id);
 
+    /**
+     * @brief API function for sending BME280 Data over USB. Prepares command that contains samples from the BME280 sensor
+     * 
+     * @param buffer buffer with message data. Data should be copied before use
+     * @param length current data chunk length.
+     */    
+    void SendBme280Samples(const uint8_t *buffer, size_t length); 
+
 private:
     /**
      * @brief Callback called by serial controller when command is completed. Releases acuired command resources.

@@ -23,6 +23,7 @@ atomic_t ads131m08NotificationsEnable = false;
 atomic_t ads131m08_1_NotificationsEnable = false;
 atomic_t max30102NotificationsEnable = false;
 atomic_t mpu6050NotificationsEnable = false;
+atomic_t bme280NotificationsEnable = false;
 
 /* BT832A Custom Service  */
 bt_uuid_128 sensorServiceUUID = BT_UUID_INIT_128(
@@ -39,12 +40,15 @@ bt_uuid_128 ads131DataUUID = BT_UUID_INIT_128(
 // MAX30102 Data Pipe
 bt_uuid_128 max30102DataUUID = BT_UUID_INIT_128(
 	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));    
-
+// MPU6050 Data Pipe
 bt_uuid_128 mpu6050DataUUID = BT_UUID_INIT_128(
         BT_UUID_128_ENCODE(0x0004cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
-
+// ADS131M08_1 Data Pipe
 bt_uuid_128 ads131_1_DataUUID = BT_UUID_INIT_128(
         BT_UUID_128_ENCODE(0x0005cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
+// BME280 Data Pipe
+bt_uuid_128 bme280DataUUID = BT_UUID_INIT_128(
+        BT_UUID_128_ENCODE(0x0006cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));        
 
 static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
@@ -108,6 +112,21 @@ static void mpu6050CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	LOG_INF("MPU6050 Notification %s", mpu6050NotificationsEnable ? "enabled" : "disabled");
 }
 
+/**
+ * @brief CCCD handler for BME280 characteristic. Used to get notifications if client enables notifications
+ *        for BME280 characteristic. CCC = Client Characteristic Configuration
+ * 
+ * @param attr Ble Gatt attribute
+ * @param value characteristic value
+ */
+static void bme280CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
+    atomic_set(&bme280NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
+	LOG_INF("BME280 Notification %s", bme280NotificationsEnable ? "enabled" : "disabled");
+}
+
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
 #define ADV_LEN 12
@@ -154,6 +173,9 @@ BT_GATT_CCC(mpu6050CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),         
 BT_GATT_CHARACTERISTIC(&ads131_1_DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                    // 13, 14
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
 BT_GATT_CCC(ads131_1_CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),               // 15
+BT_GATT_CHARACTERISTIC(&bme280DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                       // 16, 17
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
+BT_GATT_CCC(bme280CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                  // 18
 );
 
 /********************************************************/

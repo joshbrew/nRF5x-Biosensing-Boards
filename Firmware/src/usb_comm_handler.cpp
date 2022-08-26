@@ -81,6 +81,17 @@ void UsbCommHandler::SendMax30102Samples(const uint8_t *buffer, size_t length){
     } 
 }
 
+void UsbCommHandler::SendBme280Samples(const uint8_t *buffer, size_t length){
+    
+    if(serial.IsInitialized()){
+        LOG_INF("/");
+        
+        SerialTransfer *transfer = CreateTransferFrom(SensorId::Bme280, buffer, length, 0);
+
+        QueueTransfer(transfer);   
+    } 
+}
+
 void UsbCommHandler::SendAds131m08Samples(const uint8_t *buffer, size_t length, uint8_t sensor_id){
         
     SensorId ads131m08_id;

@@ -42,4 +42,12 @@ namespace Bluetooth
      * @param len  the number of samples to transfer
      */
     void Mpu6050Notify(const uint8_t* data, const uint8_t len);
+
+    /**
+     * @brief Send BLE notification through BME280 Data Pipe.
+     * 
+     * @param data pointer to datasource containing BME280 data samples
+     * @param len  the number of samples to transfer
+     */
+    void Bme280Notify(const uint8_t* data, const uint8_t len);
 }

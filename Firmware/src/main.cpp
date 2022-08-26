@@ -9,6 +9,7 @@
 #include "ADS131M08_zephyr.hpp"
 #include "max30102.hpp"
 #include "mpu6050.hpp"
+#include "bme280.hpp"
 #include "serial_controller.hpp"
 #include "usb_comm_handler.hpp"
 
@@ -80,6 +81,7 @@ SerialController serial;
 UsbCommHandler usbCommHandler(serial);
 Max30102 max30102(usbCommHandler);
 Mpu6050 mpu6050(usbCommHandler);
+Bme280 bme280(usbCommHandler);
 
 void main(void)
 {
@@ -121,6 +123,14 @@ void main(void)
         mpu6050.Configure(mpu6050_default_config);
     } else {
         LOG_WRN("***WARNING: MPU6050 is not connected or properly initialized!");
+    }
+
+    bme280.Initialize();
+    if(bme280.IsOnI2cBus()){
+        LOG_INF("Start BME280 sampling...");
+        bme280.StartSampling();
+    } else {
+        LOG_WRN("***WARNING: BME280 is not connected or properly initialized!");
     }
 
     Bluetooth::SetupBLE();
