@@ -19,4 +19,5 @@ Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich
 Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce](https://github.com/myalyce/myalyce) wearables for neurofeedback and treatment recovery monitoring.
 
 Related:
-[Firmware for BT832A prototype](https://github.com/joshbrew/BT832_Zephyr)
+- [BLE & USB Web Debugger with supported drivers](https://github.com/joshbrew/device-debugger)
+- [Firmware for BT832A prototype](https://github.com/joshbrew/BT832_Zephyr)
