@@ -6,9 +6,11 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic. BC840M config is
 
 The current prototypes here are breakout boards, they are pin compatible with several different modules while it's easy to spin up new designs with similar products. Next versions will be further miniaturized.
 
-The goal will be to have enough designs and versatility here to create any LOW COST biosensor combinations we want with the same hardware/firmware base. We need enough designs flowing to outmaneuver shortages and obsolescence, too. This keeps development overhead to a minimum for creating a wide array of products. Who wants to crash the market?
+Supports an ADS131M08 (8 channel sigma delta converter), and additionally detects for MPU6050 accelerometer, MAX30102 pulse oximeter, BME280 environmental sensor, and an additional 8 channel ADS131M08. 
 
 ![breakout](Capture.PNG)
+
+![supported](supported.png)
 
 License: AGPL v3.0
 

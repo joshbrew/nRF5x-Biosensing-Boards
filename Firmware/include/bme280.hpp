@@ -57,8 +57,8 @@ public:
 
 private:
     /**
-     * @brief Main working thread. Used to perform accelerometer polling.
-     * Due possible blocking during accelerometer measurments reading
+     * @brief Main working thread. Used to perform Bme280 polling.
+     * Due possible blocking during Bme280 measurments reading
      * it required a separate stack to not break main BLE stack state machine
      * 
      * @param data pointer to this
