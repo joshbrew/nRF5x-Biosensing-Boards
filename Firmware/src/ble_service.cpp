@@ -258,7 +258,7 @@ void Mpu6050Notify(const uint8_t* data, const uint8_t len)
  */
 void Bme280Notify(const uint8_t* data, const uint8_t len)
 {   
-    LOG_HEXDUMP_INF(data, len, "bme280");
+    //LOG_HEXDUMP_INF(data, len, "bme280");
     if (atomic_get(&Gatt::bme280NotificationsEnable))    
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicBme280Data], data, len);
