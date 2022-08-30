@@ -11698,10 +11698,12 @@ W = angled&lt;p&gt;
 <part name="C18" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="C0402" package3d_urn="urn:adsk.eagle:package:6240340/1" value="1.0uF"/>
 <part name="C19" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="C0402" package3d_urn="urn:adsk.eagle:package:6240340/1" value="0.1uF"/>
 <part name="P+6" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
-<part name="P+7" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+5V" device=""/>
 <part name="SUPPLY17" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 <part name="C20" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="C0402" package3d_urn="urn:adsk.eagle:package:6240340/1" value="0.1uF"/>
 <part name="SUPPLY18" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
+<part name="R7" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="R-US_" device="R0402" package3d_urn="urn:adsk.eagle:package:6240564/1" value="24kΩ"/>
+<part name="R8" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="R-US_" device="R0402" package3d_urn="urn:adsk.eagle:package:6240564/1" value="47kΩ"/>
+<part name="SUPPLY2" library="supply2" library_urn="urn:adsk.eagle:library:372" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -11737,6 +11739,9 @@ Hook up USB-UART (break out UART pins too)
 Indicators
 Battery/Power Management
 Power Switches</text>
+<text x="53.848" y="-7.874" size="2.1844" layer="97">This did not work last we checked</text>
+<text x="252.984" y="80.264" size="1.6764" layer="97">Page 20 (oops)
+https://www.silabs.com/documents/public/data-sheets/CP2102-9.pdf</text>
 </plain>
 <instances>
 <instance part="U2" gate="G$1" x="177.8" y="124.46" smashed="yes">
@@ -11952,9 +11957,6 @@ Power Switches</text>
 <instance part="P+6" gate="1" x="247.142" y="63.5" smashed="yes" rot="MR90">
 <attribute name="VALUE" x="242.062" y="60.96" size="1.778" layer="96" rot="MR180"/>
 </instance>
-<instance part="P+7" gate="1" x="222.25" y="66.04" smashed="yes" rot="MR90">
-<attribute name="VALUE" x="223.52" y="66.802" size="1.778" layer="96" rot="MR180"/>
-</instance>
 <instance part="SUPPLY17" gate="GND" x="230.632" y="46.736" smashed="yes" rot="MR0">
 <attribute name="VALUE" x="232.537" y="43.561" size="1.778" layer="96" rot="MR0"/>
 </instance>
@@ -11964,6 +11966,17 @@ Power Switches</text>
 </instance>
 <instance part="SUPPLY18" gate="GND" x="221.234" y="84.074" smashed="yes" rot="R180">
 <attribute name="VALUE" x="223.139" y="87.249" size="1.778" layer="96" rot="R180"/>
+</instance>
+<instance part="R7" gate="G$1" x="264.16" y="67.31" smashed="yes" rot="R90">
+<attribute name="NAME" x="261.8994" y="65.532" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="267.462" y="63.5" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R8" gate="G$1" x="255.27" y="67.056" smashed="yes" rot="R90">
+<attribute name="NAME" x="253.0094" y="65.278" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="258.572" y="63.246" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="SUPPLY2" gate="GND" x="255.27" y="57.404" smashed="yes">
+<attribute name="VALUE" x="253.365" y="54.229" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -12171,6 +12184,12 @@ Power Switches</text>
 <pinref part="C20" gate="G$1" pin="1"/>
 <wire x1="221.234" y1="79.756" x2="221.234" y2="81.534" width="0.1524" layer="91"/>
 <pinref part="SUPPLY18" gate="GND" pin="GND"/>
+</segment>
+<segment>
+<pinref part="R8" gate="G$1" pin="1"/>
+<wire x1="255.27" y1="61.976" x2="255.27" y2="59.944" width="0.1524" layer="91"/>
+<label x="255.778" y="58.928" size="1.778" layer="95"/>
+<pinref part="SUPPLY2" gate="GND" pin="GND"/>
 </segment>
 </net>
 <net name="XTAL2_2" class="0">
@@ -12629,9 +12648,9 @@ Power Switches</text>
 <label x="235.966" y="65.024" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U7" gate="G$1" pin="VBUS"/>
-<wire x1="211.074" y1="66.04" x2="219.71" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="P+7" gate="1" pin="+5V"/>
+<pinref part="R7" gate="G$1" pin="1"/>
+<wire x1="264.16" y1="62.23" x2="264.16" y2="59.69" width="0.1524" layer="91"/>
+<label x="265.176" y="59.436" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="D-" class="0">
@@ -13116,6 +13135,23 @@ Power Switches</text>
 <pinref part="C20" gate="G$1" pin="2"/>
 <wire x1="211.074" y1="68.58" x2="221.234" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="221.234" y1="68.58" x2="221.234" y2="72.136" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VBUS" class="0">
+<segment>
+<pinref part="R7" gate="G$1" pin="2"/>
+<wire x1="264.16" y1="72.39" x2="264.16" y2="75.184" width="0.1524" layer="91"/>
+<label x="264.16" y="77.216" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U7" gate="G$1" pin="VBUS"/>
+<wire x1="211.074" y1="66.04" x2="219.71" y2="66.04" width="0.1524" layer="91"/>
+<label x="220.98" y="65.532" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R8" gate="G$1" pin="2"/>
+<wire x1="255.27" y1="72.136" x2="255.27" y2="74.93" width="0.1524" layer="91"/>
+<label x="254.254" y="76.962" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
