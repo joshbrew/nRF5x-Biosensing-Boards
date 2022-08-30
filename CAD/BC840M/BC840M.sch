@@ -5868,11 +5868,6 @@ Source: &lt;a href="http://www.jst-mfg.com/product/pdf/eng/eSH.pdf"&gt; Datashee
 <label x="29.337" y="91.821" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U5" gate="G$1" pin="REFIN"/>
-<wire x1="393.319" y1="111.4298" x2="395.859" y2="111.4298" width="0.1524" layer="91"/>
-<label x="396.621" y="111.1758" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="C27" gate="G$1" pin="1"/>
 <wire x1="153.7716" y1="113.157" x2="153.7716" y2="111.4298" width="0.1524" layer="91"/>
 <label x="153.2382" y="112.268" size="1.778" layer="95" rot="R180"/>
