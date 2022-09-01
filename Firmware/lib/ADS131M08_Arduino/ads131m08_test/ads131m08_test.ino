@@ -107,7 +107,7 @@ void loop() {
     int32_t channelArr[8];
     adc.readAllChannels(channelArr);
     currentMicros = esp_timer_get_time();
-    sprintf(outputarr, "%d|%d|%d|%d|%d|%d|%d|%d|%lu\r\n", 
+    sprintf(outputarr, "%d,%d,%d,%d,%d,%d,%d,%d,%u\r\n", 
               channelArr[0], 
               channelArr[1], 
               channelArr[2],
