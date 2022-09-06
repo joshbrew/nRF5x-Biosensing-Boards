@@ -161,6 +161,22 @@ void main(void)
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
     }
     k_msleep(10);
+
+// Write 0 to RESET bit
+    if(adc.writeReg(ADS131_MODE,0x0110)){  
+        //LOG_INF("ADS131_MODE register successfully configured");
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_MODE register.");
+    }
+    k_msleep(10);
+  
+//DC Block Filter settings:
+    if(adc.writeReg(ADS131_THRSHLD_LSB,0x04)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
+        //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
+    }  
+
     reg_value = adc.readReg(ADS131_CLOCK);
     //LOG_INF("ADS131_CLOCK: 0x%X", reg_value);
     k_msleep(10); 
@@ -208,6 +224,21 @@ void main(void)
         LOG_ERR("***ERROR: Writing ADS131_1_THRSHLD_LSB register.");
     }
     k_msleep(10);
+    
+// Write 0 to RESET bit
+    if(adc_1.writeReg(ADS131_MODE,0x0110)){  
+        //LOG_INF("ADS131_MODE register successfully configured");
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_1_MODE register.");
+    }
+    k_msleep(10);
+//DC Block Filter settings:
+    if(adc_1.writeReg(ADS131_THRSHLD_LSB,0x04)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
+        //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_1_THRSHLD_LSB register.");
+    }  
+
     reg_value = adc_1.readReg(ADS131_CLOCK);
     //LOG_INF("ADS131_CLOCK: 0x%X", reg_value);
     k_msleep(10); 
