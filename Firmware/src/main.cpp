@@ -126,7 +126,7 @@ void main(void)
     }
 
     bme280.Initialize();
-    if(bme280.IsOnI2cBus()){
+    if(bme280.BmX280IsOnI2cBus()){
         LOG_INF("Start BME280 sampling...");
         bme280.StartSampling();
     } else {
