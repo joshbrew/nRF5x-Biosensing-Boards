@@ -12,7 +12,7 @@ Supports an ADS131M08 (8 channel sigma delta converter), and additionally detect
 
 ![supported](supported.png)
 
-License: AGPL v3.0
+License: AGPL v3.0 copyleft (public domain)
 
 Version 3 (BC840M R2 && BC40M incoming designs and PDF) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster.
 
