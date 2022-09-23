@@ -6,7 +6,7 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic. BC840M config is
 
 The current prototypes here are breakout boards, they are pin compatible with several different modules while it's easy to spin up new designs with similar products. Next versions will be further miniaturized.
 
-Supports an ADS131M08 (8 channel sigma delta converter), and additionally detects for MPU6050 accelerometer, MAX30102 pulse oximeter, BME280 environmental sensor, and an additional 8 channel ADS131M08. 
+Supports an ADS131M08 (8 channel sigma delta converter), and additionally detects for MPU6050 accelerometer, MAX30102 pulse oximeter, BME280 environmental sensor, and an additional 8 channel ADS131M08 for up to 16 raw data channels, each individually configurable. 
 
 ![breakout](Capture.PNG)
 
