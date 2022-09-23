@@ -20,18 +20,32 @@ int Bme280::Initialize() {
     bme280_dev = get_bme280_device();
 
     if (bme280_dev != nullptr){
-        bme280_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
+        GetChipId(bme280_dev);
         // Start working thread
         k_thread_create(&worker, pollStackArea, K_THREAD_STACK_SIZEOF(pollStackArea),
                         &WorkingThread, this, nullptr, nullptr, taskPriority, 0, K_NO_WAIT);        
     } else {
         bme280_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
-        return -1;
+        bmp280_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
+        bmx_id = 0x00;
+        return -1;        
     }
 
     return ret;
 }
 
+void Bme280::GetChipId(const struct device *dev){
+    struct bme280_data *data = ToData(dev);
+
+    bmx_id = data->chip_id;
+    if(data->chip_id == bme280_id){
+        LOG_INF("BME280 on I2C bus!");
+        bme280_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
+    } else if (data->chip_id == bmp280_id_sample_1 || data->chip_id == bmp280_id_mp){
+        LOG_INF("BMP280 on I2C bus!");
+        bmp280_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
+    }
+}
 const struct device * Bme280::get_bme280_device(void){
 	
     const struct device *dev = DEVICE_DT_GET_ANY(bosch_bme280);
@@ -45,12 +59,16 @@ const struct device * Bme280::get_bme280_device(void){
 	if (!device_is_ready(dev)) {
 		LOG_ERR("\nError: Device \"%s\" is not ready; "
 		       "check the driver initialization logs for errors.\n",
-		       dev->name);
+		       dev->name);        
 		return nullptr;
 	}
 
 	LOG_INF("Found device \"%s\", getting sensor data\n", dev->name);
 	return dev;    
+}
+
+struct bme280_data * Bme280::ToData(const struct device *dev){
+    return static_cast<bme280_data *>(dev->data);
 }
 
 void Bme280::StartSampling(){
@@ -62,8 +80,16 @@ void Bme280::StopSampling(){
     k_timer_stop(&timer);
 }
 
-bool Bme280::IsOnI2cBus(){
+bool Bme280::BmX280IsOnI2cBus(){
     bool status;
+    // Return TRUE if either of BMP280 or BME280 is on I2C bus
+    status = (bme280_is_on_i2c_bus_.load(std::memory_order_relaxed) || bmp280_is_on_i2c_bus_.load(std::memory_order_relaxed));
+    return status;
+}
+
+bool Bme280::Bme280IsOnI2cBus(){
+    bool status;
+    // Return TRUE if BME280 is on I2C bus
     status = bme280_is_on_i2c_bus_.load(std::memory_order_relaxed);
     return status;
 }
