@@ -14,10 +14,12 @@ Supports an ADS131M08 (8 channel sigma delta converter), and additionally detect
 
 License: AGPL v3.0
 
-Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich
+Version 3 (BC840M R2 && BC40M incoming designs and PDF) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster.
 
-Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce](https://github.com/myalyce/myalyce) wearables for neurofeedback and treatment recovery monitoring.
+Versions 1 (BT832A) and 2 (BC840M R1) by Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich.Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. Testing and early design phase included Jacob Tinkhauser. 
+
+Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce (WIP)](https://github.com/myalyce/myalyce) wearables for neurofeedback and treatment recovery monitoring.
 
 Related:
-- [BLE & USB Web Debugger with supported drivers](https://github.com/joshbrew/device-debugger)
+- [BLE & USB Web Debugger with supported drivers](https://github.com/joshbrew/device_debugger)
 - [Firmware for BT832A prototype](https://github.com/joshbrew/BT832_Zephyr)
