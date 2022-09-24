@@ -171,7 +171,7 @@ void main(void)
     k_msleep(10);
   
 //DC Block Filter settings:
-    if(adc.writeReg(ADS131_THRSHLD_LSB,0x04)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
+    if(adc.writeReg(ADS131_THRSHLD_LSB, 0x0C)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
     } else {
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
