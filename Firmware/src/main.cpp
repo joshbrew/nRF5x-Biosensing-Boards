@@ -171,7 +171,7 @@ void main(void)
     k_msleep(10);
   
 //DC Block Filter settings:
-    if(adc.writeReg(ADS131_THRSHLD_LSB, 0x0C)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
+    if(adc.writeReg(ADS131_THRSHLD_LSB, 0x0C)){  // Enable DC Block Filter. Write 0x0C to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
     } else {
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
@@ -233,7 +233,7 @@ void main(void)
     }
     k_msleep(10);
 //DC Block Filter settings:
-    if(adc_1.writeReg(ADS131_THRSHLD_LSB,0x04)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
+    if(adc_1.writeReg(ADS131_THRSHLD_LSB,0x0C)){  // Enable DC Block Filter. Write 0x0C to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
     } else {
         LOG_ERR("***ERROR: Writing ADS131_1_THRSHLD_LSB register.");
@@ -414,8 +414,8 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     i++;
     if(i == 9){
         i = 0;
-        Bluetooth::Ads131m08Notify(ble_tx_buff, 227);
-        usbCommHandler.SendAds131m08Samples(ble_tx_buff, 227, 0);
+        Bluetooth::Ads131m08Notify(ble_tx_buff, 225);
+        usbCommHandler.SendAds131m08Samples(ble_tx_buff, 225, 0);
     }
 }
 
