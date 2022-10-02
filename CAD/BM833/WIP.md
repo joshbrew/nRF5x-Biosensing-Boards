@@ -1,0 +1,1 @@
+Just need to wire the GPIO, use the pin-compatible I/O for everything, not the extras that the BM833 has, so we can still use the BM840, BM832, etc.

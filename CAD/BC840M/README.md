@@ -1,0 +1,3 @@
+We tested the BC840M successfully and made a bunch more versions now that we can be confident in it. We will continue testing these designs so expect more iterations.
+
+Note the previous version had 1MOhm resistors on the signal inputs, this was found to generate too much noise while removing those granted us crystal clear ECG and EEG data, measuring wrist ECG and FP1 alpha waves. Photodiodes work on the default ADS131M08 configuration we provided as well, and we got PPG signal using the BPW34S photodiodes and a transimpedance amplifier.
