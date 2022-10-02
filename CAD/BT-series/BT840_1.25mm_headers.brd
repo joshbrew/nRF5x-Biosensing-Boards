@@ -8,7 +8,7 @@
 </settings>
 <grid distance="0.01" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
 <layer number="3" name="Route3" color="17" fill="1" visible="no" active="no"/>
 <layer number="4" name="Route4" color="18" fill="1" visible="no" active="no"/>
@@ -28,11 +28,11 @@
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
 <layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="yes"/>
 <layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="no" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="27" name="tValues" color="7" fill="1" visible="no" active="yes"/>
 <layer number="28" name="bValues" color="7" fill="1" visible="no" active="yes"/>
@@ -46,9 +46,9 @@
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
 <layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
 <layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
-<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="yes"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
-<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="yes"/>
 <layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
@@ -58,7 +58,7 @@
 <layer number="48" name="Document" color="7" fill="1" visible="no" active="yes"/>
 <layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="no" active="yes"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="yes"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
 <layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
@@ -191,7 +191,6 @@
    JOSHUA BREWSTER
    BOJAN JOVANOVICH
      AGPL v3 LICENSE</text>
-<text x="25.880315625" y="58.8586625" size="0.3048" layer="22" rot="MR0">TOP</text>
 <hole x="9.16685625" y="65.585340625" drill="2"/>
 <hole x="38.940740625" y="65.234821875" drill="2"/>
 <hole x="9.15161875" y="43.5483" drill="2"/>
@@ -1189,7 +1188,7 @@ design rules under a new name.</description>
 <attribute name="DESCRIPTION" value=" 24-bit 32-kSPS 8-channelsimultaneous-sampling delta-sigma ADC 32-TQFP -40 to 125 " x="-25.17419375" y="63.21298125" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="MF" value="Texas Instruments" x="-25.17419375" y="63.21298125" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="MP" value="ADS131M08IPBS" x="-25.17419375" y="63.21298125" size="1.778" layer="28" rot="MR180" display="off"/>
-<attribute name="NAME" x="22.193509375" y="51.23574375" size="1.27" layer="26" rot="MR0"/>
+<attribute name="NAME" x="22.50846875" y="51.180115625" size="1.27" layer="26" rot="MR0"/>
 <attribute name="PACKAGE" value="TQFP-32 Texas Instruments" x="-25.17419375" y="63.21298125" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="PRICE" value="None" x="-25.17419375" y="63.21298125" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/ADS131M08IPBS/?ref=eda" x="-25.17419375" y="63.21298125" size="1.778" layer="28" rot="MR180" display="off"/>
@@ -1286,7 +1285,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="30.08274375" y="56.313578125" size="0.4064" layer="28" font="vector" rot="MR270"/>
 </element>
 <element name="R2" library="standardparts" package="0201" value="100kΩ" x="31.005271875" y="55.15483125" smashed="yes" rot="MR270">
-<attribute name="NAME" x="30.497271875" y="55.78983125" size="0.4064" layer="26" font="vector" rot="MR270"/>
+<attribute name="NAME" x="31.99409375" y="55.380634375" size="0.4064" layer="26" font="vector" rot="MR270"/>
 <attribute name="VALUE" x="31.894271875" y="55.78983125" size="0.4064" layer="28" font="vector" rot="MR270"/>
 </element>
 <element name="I1" library="spkfncoils" package="0402_COILCRAFT" value="120Ω/500mAh" x="30.935421875" y="44.79111875" smashed="yes">
@@ -2778,16 +2777,14 @@ design rules under a new name.</description>
 <wire x1="28.210890625" y1="55.9054" x2="27.6199625" y2="55.9054" width="0.1524" layer="1"/>
 <wire x1="26.4206625" y1="55.311040625" x2="27.025603125" y2="55.311040625" width="0.1524" layer="1"/>
 <wire x1="27.6199625" y1="55.9054" x2="27.025603125" y2="55.311040625" width="0.1524" layer="1"/>
-<wire x1="31.157475" y1="57.51974375" x2="29.77641875" y2="57.51974375" width="0.1524" layer="16"/>
+<wire x1="31.16445" y1="57.51276875" x2="29.052925" y2="57.51276875" width="0.1524" layer="16"/>
 <wire x1="37.525196875" y1="52.9844" x2="37.525196875" y2="52.986825" width="0.1524" layer="16"/>
-<wire x1="29.77641875" y1="57.51974375" x2="29.76944375" y2="57.51276875" width="0.1524" layer="16"/>
-<wire x1="29.76944375" y1="57.51276875" x2="29.052925" y2="57.51276875" width="0.1524" layer="16"/>
 <wire x1="29.052925" y1="57.51276875" x2="28.64269375" y2="57.1025375" width="0.1524" layer="16"/>
 <wire x1="28.64269375" y1="56.4929375" x2="28.232959375" y2="56.083203125" width="0.1524" layer="16"/>
 <wire x1="28.64269375" y1="57.1025375" x2="28.64269375" y2="56.4929375" width="0.1524" layer="16"/>
 <wire x1="28.64269375" y1="56.4929375" x2="28.64269375" y2="56.38139375" width="0.1524" layer="16"/>
 <wire x1="28.38869375" y1="56.083203125" x2="28.232959375" y2="56.083203125" width="0.1524" layer="16"/>
-<wire x1="31.157475" y1="57.51974375" x2="34.72489375" y2="53.952325" width="0.1524" layer="16"/>
+<wire x1="31.16445" y1="57.51276875" x2="34.72489375" y2="53.952325" width="0.1524" layer="16"/>
 <wire x1="37.525196875" y1="52.986825" x2="37.321996875" y2="52.986825" width="0.1524" layer="16"/>
 <wire x1="37.321996875" y1="52.986825" x2="36.3564875" y2="53.952334375" width="0.1524" layer="16"/>
 <wire x1="36.3564875" y1="53.952334375" x2="34.72489375" y2="53.952325" width="0.1524" layer="16"/>
