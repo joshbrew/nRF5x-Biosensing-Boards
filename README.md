@@ -8,7 +8,7 @@ The current prototypes here are working breakout boards. They are pin compatible
 
 Supports an ADS131M08 (8 channel sigma delta converter), and additionally detects for MPU6050 accelerometer, MAX30102 pulse oximeter, BME280 environmental sensor, and an additional 8 channel ADS131M08 for up to 16 raw data channels, each individually configurable. 
 
-![breakout](Capture.PNG)
+![breakout](Revs.PNG)
 
 ![supported](supported.png)
 
