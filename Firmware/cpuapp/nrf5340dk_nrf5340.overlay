@@ -2,6 +2,14 @@
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
 &uart0 {
+    status = "disabled";
+};
+
+&uart1 {
+    status = "disabled";
+};
+
+&uart2 {
     status = "okay";
     current-speed = <115200>;
     tx-pin = <15>;
@@ -35,6 +43,10 @@
     status = "disabled";
 };
 
+&spi2 {
+    status = "disabled";
+};
+
 &i2c0 {
     status = "disabled";
 };
@@ -59,7 +71,7 @@
 };
 
 &zephyr_udc0 {
-    cdc_acm_uart0 {
+    cdc_acm_uart2 {
         compatible = "zephyr,cdc-acm-uart";
         label = "CDC_ACM_0";
     };
