@@ -15,9 +15,11 @@
 
 #include "ble_service.hpp"
 
-#define DATA_READY_GPIO     ((uint8_t)5)
-#define DATA_READY_1_GPIO   ((uint8_t)24)
-#define DBG_LED             ((uint8_t)16)
+#define DATA_READY_GPIO     ((uint8_t)6)
+#define DATA_READY_1_GPIO   ((uint8_t)4)
+#define DBG_LED             ((uint8_t)25)
+#define MAX_INT             ((uint8_t)7)
+#define MPU_INT             ((uint8_t)38)
 
 LOG_MODULE_REGISTER(main);
 
@@ -105,8 +107,8 @@ void main(void)
 
     serial.Initialize();
     usbCommHandler.Initialize();
-    adc.init(15, 5, 13, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
-    adc_1.init(10, 24, 29, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    adc.init(33, 6, 8, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    adc_1.init(45, 4, 46, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
 
     max30102.Initialize();
     if(max30102.IsOnI2cBus()){
@@ -326,9 +328,9 @@ static int gpio_init(void){
 
 /* Max30102 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
-    ret += gpio_pin_configure(gpio_0_dev, 28, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, 28, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(28));    
+    ret += gpio_pin_configure(gpio_0_dev, MAX_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, MAX_INT, GPIO_INT_EDGE_FALLING);
+    gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(MAX_INT));    
     ret += gpio_add_callback(gpio_0_dev, &max30102_callback);
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
@@ -338,9 +340,9 @@ static int gpio_init(void){
 
 /* MPU6050 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
-    ret += gpio_pin_configure(gpio_0_dev, 2, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, 2, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(2));    
+    ret += gpio_pin_configure(gpio_0_dev, MPU_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, MPU_INT, GPIO_INT_EDGE_FALLING);
+    gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(MPU_INT));    
     ret += gpio_add_callback(gpio_0_dev, &mpu6050_callback);
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
