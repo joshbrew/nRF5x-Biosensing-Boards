@@ -16,19 +16,19 @@
 #include "ble_service.hpp"
 
 
-#define ADS_CS              ((uint8_t)33) //p1.01
-#define DATA_READY_GPIO     ((uint8_t)6)  //p0.06
-#define ADS_RESET           ((uint8_t)8)  //p0.08
+#define ADS_CS              ((uint8_t)22) //p1.01
+#define DATA_READY_GPIO     ((uint8_t)15)  //p0.06
+#define ADS_RESET           ((uint8_t)12)  //p0.08
 
-#define ADS_1_CS            ((uint8_t)31) //p0.31
-#define DATA_READY_1_GPIO   ((uint8_t)42) //p1.10
-#define ADS_1_RESET         ((uint8_t)7)  //p0.07
+#define ADS_1_CS            ((uint8_t)30) //p0.31
+#define DATA_READY_1_GPIO   ((uint8_t)11) //p1.10
+#define ADS_1_RESET         ((uint8_t)9)  //p0.07
 
-#define DBG_LED             ((uint8_t)20) //top left LED of the 3
+#define DBG_LED             ((uint8_t)19) //top left LED of the 3
 
-#define MAX_INT             ((uint8_t)45) //p1.13
+#define MAX_INT             ((uint8_t)4) //p1.13
 
-#define MPU_INT             ((uint8_t)46) //p1.14
+#define MPU_INT             ((uint8_t)5) //p1.14
 
 LOG_MODULE_REGISTER(main);
 
