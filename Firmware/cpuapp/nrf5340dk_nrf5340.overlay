@@ -12,8 +12,8 @@
 &uart2 {
     status = "okay";
     current-speed = <115200>;
-    tx-pin = <15>;
-    rx-pin = <14>;
+    tx-pin = <43>;
+    rx-pin = <44>;
     rts-pin = <0xFFFFFFFF>;
     cts-pin = <0xFFFFFFFF>;
 };
@@ -21,10 +21,10 @@
 &spi0 {
     compatible = "nordic,nrf-spim";
     status = "okay";
-    sck-pin = <44>;
-    mosi-pin = <35>; //DIN
+    sck-pin = <15>;
+    mosi-pin = <14>; //DIN
     miso-pin = <34>; //DOUT
-    cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>, <&gpio1 10 GPIO_ACTIVE_LOW>;
+    cs-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>, <&gpio1 10 GPIO_ACTIVE_LOW>;
 
     ads131m08_0: ads131m08@0 {
         status = "okay";
@@ -52,8 +52,8 @@
 };
 &i2c1 {
     status = "okay";
-    sda-pin = <5>;
-    scl-pin = <3>;
+    sda-pin = <26>;
+    scl-pin = <27>;
     max30102@57 {
         compatible = "maxim,max30102";
         label = "MAX30102";
