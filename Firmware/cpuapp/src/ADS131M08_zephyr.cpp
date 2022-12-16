@@ -45,7 +45,7 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
     gpio_pin_set(gpioDevice, sync_rst_pin, 1);
 
     // Try to bind chip select device
-    csConfig.gpio_dev = device_get_binding("GPIO_1");
+    csConfig.gpio_dev = device_get_binding("GPIO_0");
     csConfig.delay = 0;
     csConfig.gpio_pin = cs_pin;
     csConfig.gpio_dt_flags = GPIO_ACTIVE_LOW;

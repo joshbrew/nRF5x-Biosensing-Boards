@@ -366,10 +366,10 @@ static int activate_irq_on_data_ready(void){
     int ret = 0;
 
 //ADS131M08_0
-    ret += gpio_pin_configure(gpio_1_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-    ret += gpio_pin_interrupt_configure(gpio_1_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
+    ret += gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
     gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO));    
-    ret += gpio_add_callback(gpio_1_dev, &callback);
+    ret += gpio_add_callback(gpio_0_dev, &callback);
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
