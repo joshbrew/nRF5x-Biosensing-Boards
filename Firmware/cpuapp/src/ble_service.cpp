@@ -2,6 +2,10 @@
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/conn.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/hci_vs.h>
+#include <sys/util.h>
+#include <sys/byteorder.h>
 #include <logging/log.h>
 #include <sys/atomic.h>
 
@@ -14,6 +18,7 @@ LOG_MODULE_REGISTER(bluetooth);
 namespace
 {
 
+constexpr static auto RssiPollPeriod = 333;              ///< RSSI polling period in milliseconds
 constexpr static uint16_t connectionIntervalMin = 6; ///< Minimal connection interval in 1.25 milliseconds intervals
 constexpr static uint16_t connectionIntervalMax = 12; ///< Maximum connection interval in 1.25 milliseconds intervals //500/9 = 56.25 packets + 5 + 3 = 60 packets/sec.  1000/60 = 16.67 ms/packet. 16.67 / 1.25 = 12.5 connectionIntervalMax
 constexpr static uint16_t connectionLatency = 0;     ///< Connection latancy
@@ -21,6 +26,7 @@ constexpr static uint16_t connectionTimeout = 400;   ///< Connection timeout in 
 
 //Bluetooth::Gatt::BleOutputWorker worker;   ///< Ble output characteristic worker
 bt_conn *activeConnection = nullptr;       ///< Active connection
+static uint16_t default_conn_handle = 0;
 
 /**
  * @brief Callback called when MTU paramter is updated with bt_gatt_exchange_mtu() function
@@ -45,6 +51,8 @@ void exchange_func(struct bt_conn *conn, uint8_t err, struct bt_gatt_exchange_pa
  */
 void OnClientConnected(bt_conn *connected, uint8_t err)
 {
+    int ret;
+
     if (err)
     {
         LOG_ERR("Connection failed (err %u)", err);
@@ -56,7 +64,10 @@ void OnClientConnected(bt_conn *connected, uint8_t err)
         if ((!activeConnection) && err == 0)
         {
             activeConnection = bt_conn_ref(connected);
-            
+            ret = bt_hci_get_conn_handle(activeConnection, &default_conn_handle);
+            if(ret){
+                LOG_ERR("No connection handle. Err: %d", ret);
+            }
             /* Set MTU parameter. NOTE: It's allowed to do it only once during a connection */
             static struct bt_gatt_exchange_params exchange_params;
             exchange_params.func = exchange_func;
@@ -74,7 +85,7 @@ void OnClientConnected(bt_conn *connected, uint8_t err)
             } else {
                 LOG_INF("BLE PHY updated!");
             }
-        }
+        }        
     }
 }
 
@@ -96,7 +107,8 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
     atomic_set(&Bluetooth::Gatt::ads131m08_1_NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);  
     atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);    
-    atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false);    
+    atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false); 
+    atomic_set(&Bluetooth::Gatt::rssiNotificationsEnable, false);        
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
@@ -187,6 +199,43 @@ bt_conn_cb connectionCallbacks =
 namespace Bluetooth
 {
 
+    constexpr static int stackSize = 1024;           ///< Worker thread size
+    constexpr static int taskPriority = 7;           ///< Worker thread priority
+    K_THREAD_STACK_DEFINE(pollStackArea, stackSize); ///< Worker thread stack
+    k_sem rssiPollSemaphore;    ///< Semaphore used for RSSI polling
+    k_thread worker;            ///< Worker thread
+    k_timer rssiPollTimer;      ///< Timer object
+
+    static void RssiNotify(const int8_t* data, const uint8_t len);
+    static void WorkingThread(void *, void *, void *);
+    static void RssiPollTimerHandler(k_timer *tmr);
+    
+    /**
+     * @brief Main working thread. Used to perform RSSI polling.
+     * 
+     */
+    static void WorkingThread(void *, void *, void *){
+        int8_t rssi[1] = {};
+
+        for (;;)
+        {
+            k_sem_take(&rssiPollSemaphore, K_FOREVER);
+            //LOG_INF("Time to get RSSI!");
+            Bluetooth::read_conn_rssi(rssi);
+            Bluetooth::RssiNotify(rssi, 1);
+        }
+    }
+
+    /**
+     * @brief Timer handler. Used to queue Reading of the signal strength (RSSI) data.
+     * 
+     * @param tmr timer object
+     * @warning Called at ISR Level, no actual workload should be implemented here
+     */
+    static void RssiPollTimerHandler(k_timer *tmr){
+        k_sem_give(&rssiPollSemaphore);
+    }
+
 /**
  * @brief Function used to setup BLE Service
  * 
@@ -203,7 +252,21 @@ int SetupBLE()
     {
         LOG_INF("enable Bluetooth with status %d", err);
     }
+    k_timer_init(&rssiPollTimer, RssiPollTimerHandler, nullptr);
+    k_sem_init(&rssiPollSemaphore, 0, 1); 
+    k_thread_create(&worker, pollStackArea, K_THREAD_STACK_SIZEOF(pollStackArea),
+                &WorkingThread, nullptr, nullptr, nullptr, taskPriority, 0, K_NO_WAIT); 
+
     return err;
+}
+
+void RssiStartSampling(){
+    // Start BME280 polling
+    k_timer_start(&rssiPollTimer, K_MSEC(RssiPollPeriod), K_MSEC(RssiPollPeriod));
+}   
+
+void RssiStopSampling(){
+    k_timer_stop(&rssiPollTimer);
 }
 
 void Ads131m08Notify(const uint8_t* data, const uint8_t len)
@@ -263,6 +326,52 @@ void Bme280Notify(const uint8_t* data, const uint8_t len)
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicBme280Data], data, len);
     }
+}
+
+/**
+ * @brief Send BLE notification through RSSI Data Pipe.
+ * 
+ * @param data pointer to datasource containing RSSI data
+ * @param len  the number of samples to transfer
+ */
+static void RssiNotify(const int8_t* data, const uint8_t len)
+{       
+    if (atomic_get(&Gatt::rssiNotificationsEnable))    
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicRssiData], data, len);
+    }
+}
+
+void read_conn_rssi(int8_t *rssi)
+{
+	struct net_buf *buf, *rsp = NULL;
+	struct bt_hci_cp_read_rssi *cp;
+	struct bt_hci_rp_read_rssi *rp;
+
+	int err;
+
+	buf = bt_hci_cmd_create(BT_HCI_OP_READ_RSSI, sizeof(*cp));
+	if (!buf) {
+		LOG_ERR("Unable to allocate command buffer\n");
+		return;
+	}
+
+	cp = (bt_hci_cp_read_rssi *) (net_buf_add(buf, sizeof(*cp)));
+	cp->handle = default_conn_handle; //activeConnection->handle; //sys_cpu_to_le16(activeConnection->handle);
+
+	err = bt_hci_cmd_send_sync(BT_HCI_OP_READ_RSSI, buf, &rsp);
+	if (err) {
+		uint8_t reason = rsp ?
+			((struct bt_hci_rp_read_rssi *)rsp->data)->status : 0;
+		LOG_ERR("Read RSSI err: %d reason 0x%02x\n", err, reason);
+		return;
+	}
+
+	rp = (bt_hci_rp_read_rssi *)rsp->data;
+	*rssi = rp->rssi;
+    //LOG_INF("Connected (%d) - RSSI = %d", default_conn_handle, *rssi);
+
+	net_buf_unref(rsp);
 }
 
 } // namespace Bluetooth

@@ -34,6 +34,11 @@ namespace Bluetooth::Gatt
     extern atomic_t bme280NotificationsEnable;
 
     /**
+     * @brief State of the RSSI Notifications.
+     */
+    extern atomic_t rssiNotificationsEnable;
+
+    /**
      * @brief GATT service
      */
     extern const bt_gatt_service_static bt832a_svc;
@@ -62,6 +67,11 @@ namespace Bluetooth::Gatt
      * @brief Index of the Gatt ADS131M08 Data characteristic in service characteristic table
      */
     constexpr static int CharacteristicBme280Data = 16;
+
+    /**
+     * @brief Index of the Gatt RSSI Data characteristic in service characteristic table
+     */
+    constexpr static int CharacteristicRssiData = 19;    
 
     /**
      * @brief Callback called when Bluetooth is initialized. Starts BLE server

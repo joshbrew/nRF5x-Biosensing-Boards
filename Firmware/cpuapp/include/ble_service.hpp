@@ -50,4 +50,20 @@ namespace Bluetooth
      * @param len  the number of samples to transfer
      */
     void Bme280Notify(const uint8_t* data, const uint8_t len);
+
+    /**
+     * @brief Start taking signal strength (RSSI) values
+     * @param rssi pointer to signal strength value
+     */
+    void read_conn_rssi(int8_t *rssi);
+
+    /**
+     * @brief Start taking signal strength (RSSI) values
+     */
+    void RssiStartSampling();
+    
+    /**
+     * @brief Stop taking signal strength (RSSI) values
+     */
+    void RssiStopSampling();
 }
