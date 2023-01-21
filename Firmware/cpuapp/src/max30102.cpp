@@ -21,12 +21,18 @@ int Max30102::Initialize() {
 
     int ret = 0;
     uint8_t part_id;
+    uint8_t interrupt_status_reg;
     
     LOG_INF("Starting Max30102 Initialization..."); 
     packet_cnt = 0;
     transport.Initialize();   
     
     max30102_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
+
+    // Read Interrupt Status Register to clear the interrupt, as recommended in datasheet (page 28)
+    // https://www.analog.com/media/en/technical-documentation/data-sheets/max30102.pdf
+    interrupt_status_reg = transport.ReadRegister(MAX30102_REG_INT_STS1);
+    k_msleep(10);
 
     part_id = transport.ReadRegister(MAX30102_REG_PART_ID);
 
