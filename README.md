@@ -2,11 +2,24 @@
 
 This contains our working prototypes for using nRF52 microcontrollers (ARM + BLE5) with low cost sensors. [Doc](https://docs.google.com/document/d/1gOrWiBDynYziCYDMF4r1Rw85PXo9JbuBrYJEEkW2U-c/edit?usp=sharing). 
 
-License: AGPL v3.0 copyleft (public domain). You may do whatever you want with our designs, but you are obligated to share your modifications and advancements publicly. This is in hopes of creating a better community model around useful hardware designs.
+License: AGPL v3.0 copyleft (public domain). You may do whatever you want with our designs, but you are obligated to share your modifications and advancements publicly. This is in hopes of facilitating a better community around useful wearable medical hardware designs.
 
-Features Zephyr RTOS test firmware, which is hardware-agnostic. BC840M config is in the Firmware folder incl ADS131 drivers.
+The current prototypes here are working breakout boards. They are pin compatible with several different modules while it's easy to spin up new designs with similar products by Fanstel.
 
-The current prototypes here are working breakout boards. They are pin compatible with several different modules while it's easy to spin up new designs with similar products. Next versions will be further miniaturized.
+Features Zephyr RTOS test firmware, which is hardware-agnostic. 
+
+### Designs included
+
+- BT40/BT840, pin compatible with any Fanstel BT-series but mind the pinouts as not all will work without modification, but most should.
+- BC840M
+- BC40M
+- BT832A (do not use, this was our first attempt)
+
+### Firmware included
+
+- nRF5340
+- nRF52840
+- nRF52810 (for the nRF52832A prototype)
 
 ### Sensor Support 
 - ADS131M08 (8 channel sigma delta converter), there is one on-board 
@@ -23,11 +36,13 @@ You can fairly easily add more sensor modules, which are all plug-and-play so th
 
 ![bt40](BT40_pinout.PNG)
 
-Version 3 (BT40/BT840, BC840M R2 & BC40M R1 designs and PDF) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. Incoming minified BC840M revision for the [Open Source Smart Glasses](https://github.com/TeamOpenSmartGlasses/OpenSourceSmartGlasses) project 
+Version 3 (BT40/BT840, BC840M R2 & BC40M R1 designs and PDF) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. 
 
-Versions 1 (BT832A) and 2 (BC840M R1) by Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich. Firmware by Bojan, drawings and frontend software by Josh Brewster. Testing and early design phase included Jacob Tinkhauser. 
+- Incoming minified BC840M revision for the [Open Source Smart Glasses](https://github.com/TeamOpenSmartGlasses/OpenSourceSmartGlasses) project 
 
-Version 0 (BT832A) by Joshua Brewster, Jacob Tinkhauser, and Bojan Jovanovich. Firmware by Bojan and Jacob, drawings and frontend by Joshua Brewster
+Versions 2 (BC840M R1) by Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich. Firmware by Bojan, drawings and frontend software by Josh Brewster. Testing and early design phase included Jacob Tinkhauser. 
+
+Version 0 (BT832A) by Joshua Brewster, Jacob Tinkhauser, and Bojan Jovanovich. Firmware by Bojan and Jacob, drawings and frontend by Joshua Brewster.
 
 Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce (WIP)](https://github.com/myalyce/myalyce) wearables for biofeedback and treatment recovery monitoring.
 
