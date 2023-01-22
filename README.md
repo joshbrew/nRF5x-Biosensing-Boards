@@ -1,4 +1,4 @@
-# nRF52 Biosensing Boards
+# nRF52/53 Biosensing Boards
 
 This contains our working prototypes for using nRF52 microcontrollers (ARM + BLE5) with low cost sensors. [Doc](https://docs.google.com/document/d/1gOrWiBDynYziCYDMF4r1Rw85PXo9JbuBrYJEEkW2U-c/edit?usp=sharing). 
 
