@@ -19,7 +19,7 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic.
 
 - nRF5340
 - nRF52840
-- nRF52810 (for the nRF52832A prototype)
+- nRF52810 (for the BT832A prototype)
 
 ### Sensor Support 
 - ADS131M08 (8 channel sigma delta converter), there is one on-board 
