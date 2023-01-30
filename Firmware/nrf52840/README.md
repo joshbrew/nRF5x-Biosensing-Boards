@@ -1,4 +1,4 @@
-# BC840M Zephyr
+# nRF52840 Zephyr
 Working repository for the nRF52 Zephyr firmware, made for a [BC840M prototype](https://github.com/moothyknight/nRF52-Biosensing-Boards)
 
 Recommended build tools: nRFConnect with VSCode. 
