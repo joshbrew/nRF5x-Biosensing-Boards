@@ -20,9 +20,9 @@ For cpunet do the same thing, but without the overlay file.
 
 You may need to manually install gnu-arm-embedded software. 
 
-We used the nRF52 development board which is a J-LINK device for flashing. 
+We used the nRF53 (53! The nRF52DK did not work for us) development board which is a J-LINK device for flashing. 
 
-Was also able to use a 1 dollar STM32 blue pill to flash a built hex file manually. 
+Was also able to use a 1 dollar STM32 blue pill to flash a built hex file manually.
 
 Device sensor test: http://modules.brainsatplay.com/
 
