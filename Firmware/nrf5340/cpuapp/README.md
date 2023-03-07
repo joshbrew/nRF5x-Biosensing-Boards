@@ -5,8 +5,8 @@ Recommended build tools: nRFConnect with VSCode.
 
 Instructions:
 - [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode
-- Open this repo in VSCode
-- In VSCode, in the nRFConnect extension under the APPLICATIONS tab, select the "Add Build Configuration" button to the right of the main folder name (cpuapp). Select the correct board, nrf5340dk_nrf5340, and click Build Configuration. Make sure prj.conf is selected as the configuration below it.
+- Open this repo in VSCode and launch the nRFConnect menu within VSCode
+- In VSCode, in the nRFConnect extension under the APPLICATIONS tab, select the "Add Build Configuration" button to the right of the main folder name (cpuapp). Select the correct board, nrf5340dk_nrf5340_cpuapp, and click Build Configuration. Make sure prj.conf is selected as the configuration below it.
 - Connect the nRF52-dk via usb with the flash pins wired to the custom PCB. Note: wire VTG to VDD on the DK, then VDDnRF to the custom PCB's VDD pin, then the rest of the SW/Reset/Gnd pins.
 - In VSCode, in the nRFConnect extension under the ACTIONS tab, select "Flash" to build and flash the code
 
