@@ -1,40 +1,25 @@
-.. _bluetooth-hci-rpmsg-sample:
+# nrf5340 Zephyr
+Working repository for the nRF52 Zephyr firmware, made for a [BT40/BC40M prototype](https://github.com/moothyknight/nRF52-Biosensing-Boards)
 
-Bluetooth: HCI RPMsg
-####################
+Recommended build tools: nRFConnect with VSCode. 
 
-Overview
-********
+Instructions:
+- [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode
+- Open this repo in VSCode
+- In VSCode, in the nRFConnect extension under the APPLICATIONS tab, select the "Add Build Configuration" button to the right of the main folder name (cpuapp). Select the correct board, nrf5340dk_nrf5340, and click Build Configuration. Make sure prj.conf is selected as the configuration below it.
+- Connect the nRF52-dk via usb with the flash pins wired to the custom PCB. Note: wire VTG to VDD on the DK, then VDDnRF to the custom PCB's VDD pin, then the rest of the SW/Reset/Gnd pins.
+- In VSCode, in the nRFConnect extension under the ACTIONS tab, select "Flash" to build and flash the code
 
-This sample exposes :ref:`bluetooth_controller` support
-to another device or CPU using RPMsg transport which is
-a part of `OpenAMP <https://github.com/OpenAMP/open-amp/>`__.
+You do not need to include the overlay file in `cpunet`, only in `cpuapp`. Each must be compiled and flashed independently.
 
-Requirements
-************
+- You may edit pinouts in the main.cpp and overlay files.
 
-* A board with :ref:`ipm_api` driver and Bluetooth LE support
+You may need to manually install gnu-arm-embedded software. 
 
-Building and Running
-********************
+We used the nRF53 (53! The nRF52DK did not work for us) development board which is a J-LINK device for flashing. 
 
-This sample can be found under :zephyr_file:`samples/bluetooth/hci_rpmsg`
-in the Zephyr tree.
+Was also able to use a 1 dollar STM32 blue pill to flash a built hex file manually.
 
-To use this application, you need a board with a Bluetooth controller
-and IPM drivers.
-You can then build this application and flash it onto your board in
-the usual way. See :ref:`boards` for board-specific building and
-programming information.
+Device sensor test: http://modules.brainsatplay.com/
 
-To test this sample, you need a separate device/CPU that acts as Bluetooth
-HCI RPMsg peer.
-This sample is compatible with the HCI RPMsg driver provided by
-Zephyr's Bluetooth :ref:`bt_hci_drivers` core. See the
-:kconfig:`CONFIG_BT_RPMSG` configuration option for more information.
-
-You might need to adjust the Kconfig configuration of this sample to make it
-compatible with the peer application. For example, :kconfig:`CONFIG_BT_MAX_CONN`
-must be equal to the maximum number of connections supported by the peer application.
-
-Refer to :ref:`bluetooth-samples` for general information about Bluetooth samples.
+Debugger demo: https://devicedebugger.netlify.app/ 
