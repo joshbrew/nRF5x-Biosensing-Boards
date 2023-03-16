@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="10" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -6200,7 +6200,7 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <segment>
 <pinref part="X3" gate="-5" pin="S"/>
 <wire x1="192.0494" y1="53.594" x2="190.5" y2="53.594" width="0.1524" layer="91"/>
-<label x="180.848" y="52.832" size="1.778" layer="95"/>
+<label x="185.928" y="52.832" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P12" class="0">
@@ -6406,7 +6406,7 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <segment>
 <pinref part="X3" gate="-3" pin="S"/>
 <wire x1="192.0494" y1="56.134" x2="190.5" y2="56.134" width="0.1524" layer="91"/>
-<label x="179.324" y="56.388" size="1.778" layer="95"/>
+<label x="184.404" y="56.388" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="TS" class="0">
@@ -6630,6 +6630,11 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <wire x1="507.365" y1="135.001" x2="507.365" y2="139.3698" width="0.1524" layer="91"/>
 <label x="507.365" y="139.3698" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="X3" gate="-19" pin="S"/>
+<wire x1="192.0494" y1="35.814" x2="190.5" y2="35.814" width="0.1524" layer="91"/>
+<label x="180.594" y="35.052" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="TMR" class="0">
 <segment>
@@ -6773,11 +6778,6 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <pinref part="U2" gate="G$1" pin="P1.05"/>
 <wire x1="282.702" y1="147.32" x2="284.48" y2="147.32" width="0.1524" layer="91"/>
 <label x="284.988" y="146.304" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="X3" gate="-19" pin="S"/>
-<wire x1="192.0494" y1="35.814" x2="190.5" y2="35.814" width="0.1524" layer="91"/>
-<label x="185.674" y="35.052" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P103" class="0">

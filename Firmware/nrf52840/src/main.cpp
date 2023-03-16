@@ -468,3 +468,14 @@ static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("MPU6050 Interrupt!");
     mpu6050.HandleInterrupt();
 }
+
+#define LED_ON 17 //which gpio are we using
+
+#define LED_1 0
+#define LED_2 1
+#define LED_3 2
+#define LED_4 3
+
+static void alternateLEDs(struct k_work* wrk) {
+
+}
