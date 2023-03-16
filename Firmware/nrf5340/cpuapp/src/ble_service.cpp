@@ -20,7 +20,7 @@ namespace
 
 constexpr static auto RssiPollPeriod = 333;              ///< RSSI polling period in milliseconds
 constexpr static uint16_t connectionIntervalMin = 6; ///< Minimal connection interval in 1.25 milliseconds intervals
-constexpr static uint16_t connectionIntervalMax = 12; ///< Maximum connection interval in 1.25 milliseconds intervals //500/9 = 56.25 packets + 5 + 3 = 60 packets/sec.  1000/60 = 16.67 ms/packet. 16.67 / 1.25 = 12.5 connectionIntervalMax
+constexpr static uint16_t connectionIntervalMax = 6; ///< Maximum connection interval in 1.25 milliseconds intervals //500/9 = 56.25 packets + 5 + 3 = 60 packets/sec.  1000/60 = 16.67 ms/packet. 16.67 / 1.25 = 12.5 connectionIntervalMax
 constexpr static uint16_t connectionLatency = 0;     ///< Connection latancy
 constexpr static uint16_t connectionTimeout = 400;   ///< Connection timeout in 10 msec intervals
 
