@@ -1,4 +1,4 @@
-# nRF52 Biosensing Boards
+# nRF52/53 Biosensing Boards
 
 This contains our working prototypes for using nRF52 microcontrollers (ARM + BLE5) with low cost sensors. [Doc](https://docs.google.com/document/d/1gOrWiBDynYziCYDMF4r1Rw85PXo9JbuBrYJEEkW2U-c/edit?usp=sharing). 
 
@@ -19,7 +19,7 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic.
 
 - nRF5340
 - nRF52840
-- nRF52810 (for the nRF52832A prototype)
+- nRF52810 (for the BT832A prototype)
 
 ### Sensor Support 
 - ADS131M08 (8 channel sigma delta converter), there is one on-board 
@@ -36,7 +36,7 @@ You can fairly easily add more sensor modules, which are all plug-and-play so th
 
 ![bt40](BT40_pinout.PNG)
 
-Version 3 (BT40/BT840, BC840M R2 & BC40M R1 designs and PDF) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. 
+Version 3 (BT40/BT840, BC840M R2 & BC40M R1 designs) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. 
 
 - Incoming minified BC840M revision for the [Open Source Smart Glasses](https://github.com/TeamOpenSmartGlasses/OpenSourceSmartGlasses) project 
 
@@ -64,3 +64,8 @@ Below results with the ADS131M08 doing quick tests. Noise floor was around 350 n
 ![PPG](./PPG_photodiode.png)
 
 Note the ADS131M08 is pretty much completely useless on USB power as we do not have digital or power isolators. We recommend sticking with the Bluetooth 5 and battery support except for when debugging.
+
+
+Todos:
+- PDFs, but the free EAGLE version works for these simple boards.
+- Make the firmware more API-like for adding sensors and easier to cross-compile.
