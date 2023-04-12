@@ -15,8 +15,14 @@
 
 #include "ble_service.hpp"
 
-#define DATA_READY_GPIO     ((uint8_t)6)
-#define DATA_READY_1_GPIO   ((uint8_t)4)
+#define ADS_CS              ((uint8_t)33)
+#define DATA_READY_GPIO     ((uint8_t)6)  
+#define ADS_RESET           ((uint8_t)8)  
+
+#define ADS_1_CS            ((uint8_t)45)
+#define DATA_READY_1_GPIO   ((uint8_t)4) 
+#define ADS_1_RESET         ((uint8_t)46)
+
 #define DBG_LED             ((uint8_t)25)
 #define MAX_INT             ((uint8_t)7)
 #define MPU_INT             ((uint8_t)38)
@@ -85,6 +91,21 @@ Max30102 max30102(usbCommHandler);
 Mpu6050 mpu6050(usbCommHandler);
 Bme280 bme280(usbCommHandler);
 
+
+
+#define LED_ON 17 //which gpio are we using
+
+#define LED_1 0
+#define LED_2 1
+#define LED_3 2
+#define LED_4 3
+
+static void alternateLEDs(struct k_work* wrk) {
+
+}
+
+
+
 void main(void)
 {
     LOG_ERR("This is a error message!");
@@ -107,8 +128,8 @@ void main(void)
 
     serial.Initialize();
     usbCommHandler.Initialize();
-    adc.init(33, 6, 8, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
-    adc_1.init(45, 4, 46, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    adc.init(ADS_CS, DATA_READY_GPIO, ADS_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    adc_1.init(ADS_1_CS, DATA_READY_1_GPIO, ADS_1_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
 
     max30102.Initialize();
     if(max30102.IsOnI2cBus()){
