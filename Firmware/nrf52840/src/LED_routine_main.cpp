@@ -61,6 +61,50 @@ static uint8_t j = 0;
 static uint8_t ble_tx_buff[247] = {0};
 static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
 
+/* size of stack area used by each thread */
+#define SSIZE 1024
+
+/* scheduling priority used by each thread */
+#define TPRIORITY 7
+
+static uint8_t LEDn = 0;
+
+static const uint8_t nLEDs = 2;
+
+//list the GPIO in the order we want to flash
+static uint8_t LED_gpio[nLEDs] = { 
+    15, 25//, 15, 25, 
+    //15, 25, 15, 25, 
+    //15, 25, 15, 25, 
+    //15, 25, 15, 25, 
+    //15, 25
+};
+
+
+static void alternateLEDs(uint32_t sleep_ms) {
+
+    for(uint8_t i = 0; i < nLEDs; i++) {
+        int ret = gpio_pin_configure(gpio_0_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); 
+        gpio_pin_set(gpio_0_dev, LED_gpio[i], 0);
+    }
+    
+    while(1) {
+        gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
+        LEDn++;
+        if(LEDn > nLEDs) LEDn = 0;
+        gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
+        k_msleep(sleep_ms);
+    }
+}
+
+void blink(void) {
+	alternateLEDs(100);
+}
+
+K_THREAD_DEFINE(blink0_id, SSIZE, blink, NULL, NULL, NULL,
+		TPRIORITY, 0, 0);
+
+
 //static uint8_t adcRawData[27] = {0};
 static max30102_config max30102_default_config = {
     0x80, // Interrupt Config 1. Enable FIFO_A_FULL interrupt
@@ -92,49 +136,6 @@ UsbCommHandler usbCommHandler(serial);
 Max30102 max30102(usbCommHandler);
 Mpu6050 mpu6050(usbCommHandler);
 Bme280 bme280(usbCommHandler);
-
-
-/* size of stack area used by each thread */
-#define STACKSIZE 1024
-
-/* scheduling priority used by each thread */
-#define PRIORITY 7
-
-uint8_t LEDn = 0;
-
-#define nLEDs = 18;
-
-//list the GPIO in the order we want to flash
-uint8_t LED_gpio [nLEDs] = { 
-    0, 1, 2, 3, 
-    4, 5, 6, 7, 
-    8, 9, 10, 11, 
-    12, 13, 14, 15, 
-    16, 17, 18 
-};
-
-
-void alternateLEDs(uint32_t sleep_ms) {
-
-    for(uint8_t i = 0; i < nLEDs; i++) {
-        ret = gpio_pin_configure(gpio_0_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
-    }
-    
-    while(1) {
-        gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
-        LEDn++;
-        if(LEDn >= nLEDs) LEDn = 0;
-        gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
-        k_msleep(sleep_ms);
-    }
-}
-
-void blink0(void) {
-	blink(100);
-}
-
-K_THREAD_DEFINE(blink0_id, STACKSIZE, alternateLEDs, NULL, NULL, NULL,
-		PRIORITY, 0, 0);
 
 
 void main(void)
@@ -464,7 +465,7 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     ble_tx_buff[25*i + 24] = sampleNum;
     memcpy((ble_tx_buff + 25*i), (adcBuffer + 3), 24);
 
-    ble_tx_buff[225+LEDn] = LED_gpio[LEDn];
+    ble_tx_buff[225+i] = LED_gpio[LEDn];
 
     sampleNum++;
     i++;
@@ -489,7 +490,7 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     ads131m08_1_ble_tx_buff[25*j + 24] = ads131m08_1_sampleNum;
     memcpy((ads131m08_1_ble_tx_buff + 25*j), (adcBuffer + 3), 24);
 
-    ble_tx_buff[225+LEDn] = LED_gpio[LEDn];
+    ble_tx_buff[225+j] = LED_gpio[LEDn];
 
     ads131m08_1_sampleNum++;
     //LOG_INF("ADS131M08_1 Sample: %d", ads131m08_1_sampleNum);
