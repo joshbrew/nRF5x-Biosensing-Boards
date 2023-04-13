@@ -4,7 +4,7 @@ Working repository for the nRF52 Zephyr firmware, made for a [BT40/BC40M prototy
 Recommended build tools: nRFConnect with VSCode. 
 
 Instructions:
-- [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode
+- [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode.  We used SDK version 1.9.1 in the toolchain manager.
 - Open this repo in VSCode and launch the nRFConnect menu within VSCode
 - In VSCode, in the nRFConnect extension under the APPLICATIONS tab, select the "Add Build Configuration" button to the right of the main folder name (cpunet). Select the correct board, nrf5340dk_nrf5340_cpunet, and click Build Configuration. Make sure prj.conf is selected as the configuration below it.
 - Connect the nRF52-dk via usb with the flash pins wired to the custom PCB. Note: wire VTG to VDD on the DK, then VDDnRF to the custom PCB's VDD pin, then the rest of the SW/Reset/Gnd pins.
