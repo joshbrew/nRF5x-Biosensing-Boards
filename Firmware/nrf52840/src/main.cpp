@@ -442,7 +442,6 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     }
 }
 
-uint8_t LEDn = 0;
 /**
  * @brief IntWorkQueue handler. Used to process interrupts coming from ADS131M08_1 Data Ready interrupt pin 
  * Because all activity is performed on cooperative level no addition protection against data corruption is required
@@ -455,8 +454,6 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     adc_1.readAllChannels(adcBuffer);
     
     ads131m08_1_ble_tx_buff[25*j + 24] = ads131m08_1_sampleNum;
-    ads131m08_1_ble_tx_buff[227] = LEDn;
-
     memcpy((ads131m08_1_ble_tx_buff + 25*j), (adcBuffer + 3), 24);
 
     ads131m08_1_sampleNum++;
@@ -501,6 +498,5 @@ static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
 #define LED_4 3
 
 static void alternateLEDs(struct k_work* wrk) {
-
 
 }
