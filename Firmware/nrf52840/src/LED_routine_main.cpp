@@ -465,7 +465,7 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     ble_tx_buff[25*i + 24] = sampleNum;
     memcpy((ble_tx_buff + 25*i), (adcBuffer + 3), 24);
 
-    ble_tx_buff[225+i] = LED_gpio[LEDn];
+    ble_tx_buff[226+i] = LED_gpio[LEDn];
 
     sampleNum++;
     i++;
@@ -490,7 +490,7 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     ads131m08_1_ble_tx_buff[25*j + 24] = ads131m08_1_sampleNum;
     memcpy((ads131m08_1_ble_tx_buff + 25*j), (adcBuffer + 3), 24);
 
-    ble_tx_buff[225+j] = LED_gpio[LEDn];
+    ble_tx_buff[226+j] = LED_gpio[LEDn];
 
     ads131m08_1_sampleNum++;
     //LOG_INF("ADS131M08_1 Sample: %d", ads131m08_1_sampleNum);
