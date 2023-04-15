@@ -71,6 +71,8 @@ static uint8_t LEDn = 0;
 
 static const uint8_t nLEDs = 2;
 
+static bool getAmbient = true;
+
 //list the GPIO in the order we want to flash
 static uint8_t LED_gpio[nLEDs] = { 
     15, 25//, 15, 25, 
@@ -91,8 +93,15 @@ static void alternateLEDs(uint32_t sleep_ms) {
     while(1) {
         gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
         LEDn++;
-        if(LEDn > nLEDs) LEDn = 0;
-        gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
+        if(getAmbient) {
+            if(LEDn == nLEDs) {
+                LEDn = 255;
+            } else if (LEDn > nLEDs) {
+                LEDn = 0;
+            }
+        }
+        else if(LEDn == nLEDs) LEDn = 0;
+        if(LEDn != 255) gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
         k_msleep(sleep_ms);
     }
 }
