@@ -82,6 +82,8 @@ static uint8_t LED_gpio[nLEDs] = {
     //15, 25
 };
 
+//LEDs 1.01, 1.11 etc are 32 + the number after the decimal. 1.00 is pin 32 (pretty sure)
+
 
 static void alternateLEDs(uint32_t sleep_ms) {
 
