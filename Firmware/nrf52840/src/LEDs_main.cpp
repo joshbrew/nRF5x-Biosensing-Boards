@@ -86,22 +86,38 @@ static uint8_t LED_gpio[nLEDs] = {
 static void alternateLEDs(uint32_t sleep_ms) {
 
     for(uint8_t i = 0; i < nLEDs; i++) {
-        int ret = gpio_pin_configure(gpio_0_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); 
-        gpio_pin_set(gpio_0_dev, LED_gpio[i], 0);
+        if(LED_gpio[i] < 32) {
+            int ret = gpio_pin_configure(gpio_0_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); 
+            gpio_pin_set(gpio_0_dev, LED_gpio[i], 0);
+        } else {
+            int ret = gpio_pin_configure(gpio_1_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); 
+            gpio_pin_set(gpio_1_dev, LED_gpio[i], 0);
+        }
+        
     }
     
     while(1) {
-        gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
+        if(LED_gpio[i] < 32) {
+            gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
+        } else {
+            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 0);
+        }
         LEDn++;
         if(getAmbient) {
             if(LEDn == nLEDs) {
-                LEDn = 255;
+                LEDn = 255; //ambient 
             } else if (LEDn > nLEDs) {
                 LEDn = 0;
             }
         }
         else if(LEDn == nLEDs) LEDn = 0;
-        if(LEDn != 255) gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
+        if(LEDn != 255) { //ambient
+            if(LED_gpio[i] < 32) {
+                gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
+            } else {
+                gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 1);
+            }
+        }
         k_msleep(sleep_ms);
     }
 }
