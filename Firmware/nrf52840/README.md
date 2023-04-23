@@ -13,6 +13,8 @@ Instructions:
 Include the extra Cmake argument:
 - `-DDTC_OVERLAY_FILE:STRING="path/to/nrf52840dk_nrf52840.overlay"`
 
+
+
 - You may edit pinouts in the main.cpp and overlay files.
 
 You may need to manually install gnu-arm-embedded software. 
