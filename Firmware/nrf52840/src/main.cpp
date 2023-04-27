@@ -111,15 +111,13 @@ static uint8_t j = 0;
 static uint8_t ble_tx_buff[247] = {0};
 static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
 
-/* size of stack area used by each thread */
+// /* size of stack area used by each thread */
 #define SSIZE 1024
 
-/* scheduling priority used by each thread */
-#define TPRIORITY 8
+// /* scheduling priority used by each thread */
+#define TPRIORITY 7
 
-
-static void alternateLEDs(uint32_t sleep_ms) {
-
+static void setupLEDS() {
     for(uint8_t i = 0; i < nLEDs; i++) {
         if(LED_gpio[i] == 255) continue;
         else if(LED_gpio[i] < 32) {
@@ -131,35 +129,44 @@ static void alternateLEDs(uint32_t sleep_ms) {
         }
         
     }
-    
-    while(1) {
-        if(LED_gpio[i] < 32) {
+}
+
+static void alternateLEDs() {
+    if(LED_gpio[LEDn] != 255) {
+        if(LED_gpio[LEDn] < 32) {
             gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
         } else {
             gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 0);
         }
-        LEDn++;
-        if (LEDn > nLEDs) {
-            LEDn = 0;
+    }
+    
+    LEDn++;
+    if (LEDn > nLEDs) {
+        LEDn = 0;
+    }
+    
+    if(LED_gpio[LEDn] != 255) {
+        if(LED_gpio[LEDn] < 32) {
+            gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
+        } else {
+            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 1);
         }
-        if(LEDn != 255) { //ambient
-            if(LED_gpio[i] == 255) continue;
-            else if(LED_gpio[i] < 32) {
-                gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
-            } else {
-                gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 1);
-            }
-        }
-        k_msleep(sleep_ms);
     }
 }
 
+
 void blink(void) {
-	alternateLEDs(LEDt_ms);
+    setupLEDS();
+    while(1) {
+	    alternateLEDs();
+        k_msleep(LEDt_ms);
+    }
 }
 
-K_THREAD_DEFINE(blink0_id, SSIZE, blink, NULL, NULL, NULL,
-		TPRIORITY, 0, 0);
+// does not synchronize correctly
+// K_THREAD_DEFINE(blink0_id, SSIZE, blink, NULL, NULL, NULL,
+//         TPRIORITY, 0, 0);
+
 
 
 //static uint8_t adcRawData[27] = {0};
@@ -207,6 +214,9 @@ void main(void)
     uint16_t reg_value = 0;
 
     ret = gpio_init();
+
+    setupLEDS();
+
     k_work_init(&interrupt_work_item, interrupt_workQueue_handler);
     k_work_init(&ads131m08_1_interrupt_work_item, ads131m08_1_interrupt_workQueue_handler);
     k_work_init(&max30102_interrupt_work_item, max30102_interrupt_workQueue_handler);
@@ -386,17 +396,17 @@ void main(void)
     while(1){
 
 #if 0        
-        if(gpio_pin_get(gpio_0_dev, DATA_READY_GPIO)) {           
-            adc.readAllChannels(adcRawData);
+    if(gpio_pin_get(gpio_1_dev, DATA_READY_GPIO)) {           
+        adc.readAllChannels(adcRawData);
 
-            sampleNum++;
-            //LOG_INF("Sample: %d", sampleNum);
-            if (sampleNum == 100){
-                LOG_INF("ADC[0]: %d", ((adcRawData[3] << 16) | (adcRawData[4] << 8) | adcRawData[5]));
-            }
+        sampleNum++;
+        //LOG_INF("Sample: %d", sampleNum);
+        if (sampleNum == 100){
+            LOG_INF("ADC[0]: %d", ((adcRawData[3] << 16) | (adcRawData[4] << 8) | adcRawData[5]));
         }
-        else {
-        }        
+    }
+    else {
+    }        
 #endif
     LOG_INF("Hi");
     k_msleep(10000);
@@ -438,9 +448,9 @@ static int gpio_init(void){
 
 /* Max30102 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
-    ret += gpio_pin_configure(gpio_0_dev, 28, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, 28, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(28));    
+    ret += gpio_pin_configure(gpio_0_dev, MAX_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, MAX_INT, GPIO_INT_EDGE_FALLING);
+    gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(MAX_INT));    
     ret += gpio_add_callback(gpio_0_dev, &max30102_callback);
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
@@ -450,9 +460,9 @@ static int gpio_init(void){
 
 /* MPU6050 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
-    ret += gpio_pin_configure(gpio_0_dev, 2, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, 2, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(2));    
+    ret += gpio_pin_configure(gpio_0_dev, MPU_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
+    ret += gpio_pin_interrupt_configure(gpio_0_dev, MPU_INT, GPIO_INT_EDGE_FALLING);
+    gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(MPU_INT));    
     ret += gpio_add_callback(gpio_0_dev, &mpu6050_callback);
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
@@ -527,6 +537,9 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     sampleNum++;
     i++;
     if(i == 9){
+
+        alternateLEDs(); //temp, since threads won't synchronize
+
         i = 0;
         Bluetooth::Ads131m08Notify(ble_tx_buff, 234); //225
         usbCommHandler.SendAds131m08Samples(ble_tx_buff, 234, 0);
