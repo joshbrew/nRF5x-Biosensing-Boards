@@ -60,13 +60,13 @@ static uint8_t LEDn = 0;
 
 static uint32_t LEDt_ms = 100;
 
-static const uint8_t nLEDs = 2;
+static const uint8_t nLEDs = 3;
 
 static bool getAmbient = true;
 
 //list the GPIO in the order we want to flash
 static uint8_t LED_gpio[nLEDs] = { 
-    22, 25//, 15, 25, 
+    22, 25, 255//, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
@@ -115,13 +115,14 @@ static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
 #define SSIZE 1024
 
 /* scheduling priority used by each thread */
-#define TPRIORITY 7
+#define TPRIORITY 8
 
 
 static void alternateLEDs(uint32_t sleep_ms) {
 
     for(uint8_t i = 0; i < nLEDs; i++) {
-        if(LED_gpio[i] < 32) {
+        if(LED_gpio[i] == 255) continue;
+        else if(LED_gpio[i] < 32) {
             int ret = gpio_pin_configure(gpio_0_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); 
             gpio_pin_set(gpio_0_dev, LED_gpio[i], 0);
         } else {
@@ -138,16 +139,12 @@ static void alternateLEDs(uint32_t sleep_ms) {
             gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 0);
         }
         LEDn++;
-        if(getAmbient) {
-            if(LEDn == nLEDs) {
-                LEDn = 255; //ambient 
-            } else if (LEDn > nLEDs) {
-                LEDn = 0;
-            }
+        if (LEDn > nLEDs) {
+            LEDn = 0;
         }
-        else if(LEDn == nLEDs) LEDn = 0;
         if(LEDn != 255) { //ambient
-            if(LED_gpio[i] < 32) {
+            if(LED_gpio[i] == 255) continue;
+            else if(LED_gpio[i] < 32) {
                 gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
             } else {
                 gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 1);
@@ -525,7 +522,7 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     ble_tx_buff[25*i + 24] = sampleNum;
     memcpy((ble_tx_buff + 25*i), (adcBuffer + 3), 24);
 
-    ble_tx_buff[226+i] = LED_gpio[LEDn];
+    ble_tx_buff[225+i] = LED_gpio[LEDn];
 
     sampleNum++;
     i++;
