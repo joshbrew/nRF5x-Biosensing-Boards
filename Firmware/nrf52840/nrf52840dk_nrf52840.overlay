@@ -14,7 +14,6 @@
     rx-pin = <14>; //14 (BC840M), 17 (BT840)
     rts-pin = <0xFFFFFFFF>;
     cts-pin = <0xFFFFFFFF>;
-    label="uart";
 };
 
 &spi0 {
@@ -23,7 +22,6 @@
     sck-pin = <44>;         //44 (BC840M), 15 (BT840)
     mosi-pin = <35>; //DIN  //35 (BC840M), 14 (BT840)
     miso-pin = <34>; //DOUT //34 (BC840M), 34 (BT840)
-    label="spi0";
     cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>, <&gpio1 10 GPIO_ACTIVE_LOW>; //1.15 and 1.10 (BC840M), 1.01 and 1.15 (BT840)
 
     ads131m08_0: ads131m08@0 {
