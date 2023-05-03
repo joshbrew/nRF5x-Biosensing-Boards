@@ -15,17 +15,19 @@
 
 #include "ble_service.hpp"
 
-#define ADS_CS              ((uint8_t)15) // 15 (BC840M), 33 (BT840)
-#define DATA_READY_GPIO     ((uint8_t)5)  // 5 (BC840M), 6 (BT840)
-#define ADS_RESET           ((uint8_t)13)  // 13 (BC840M), 8 (BC840M)
+//FIX: set the 1.x pins as 32+x, currently is mishmashed
 
-#define ADS_1_CS            ((uint8_t)10) // 10 (BC840M), 36 (BT840)
-#define DATA_READY_1_GPIO   ((uint8_t)24)  // 24 (BC840M), 47 (BT840)
-#define ADS_1_RESET         ((uint8_t)29) // 29 (BC840M), 35 (BT840)
+#define ADS_CS              ((uint8_t)47) //  47 (BC840M),   33 (BT840)
+#define DATA_READY_GPIO     ((uint8_t)37)  // 37 (BC840M),    6 (BT840)
+#define ADS_RESET           ((uint8_t)45)  // 45 (BC840M),    8 (BC840M)
 
-#define DBG_LED             ((uint8_t)20) // 20 (BC840), 25 (BT840)     
-#define MAX_INT             ((uint8_t)28)  // 28 (BC840M), 7 (BT840)
-#define MPU_INT             ((uint8_t)2) // 2 (BC840M), 38 (BT840)
+#define ADS_1_CS            ((uint8_t)42) //  42 (BC840M),   36 (BT840)
+#define DATA_READY_1_GPIO   ((uint8_t)24)  // 24 (BC840M),   40 (BT840)
+#define ADS_1_RESET         ((uint8_t)29) //  29 (BC840M),   35 (BT840)
+
+#define DBG_LED             ((uint8_t)20) //  20 (BC840),    25 (BT840)     
+#define MAX_INT             ((uint8_t)28)  // 28 (BC840M),    7 (BT840)
+#define MPU_INT             ((uint8_t)2) //    2 (BC840M),   38 (BT840)
 
 
 
@@ -136,7 +138,7 @@ static void alternateLEDs() {
         if(LED_gpio[LEDn] < 32) {
             gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
         } else {
-            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 0);
+            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn] - 32, 0);
         }
     }
     
@@ -149,7 +151,7 @@ static void alternateLEDs() {
         if(LED_gpio[LEDn] < 32) {
             gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
         } else {
-            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn], 1);
+            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn] - 32, 1);
         }
     }
 }
@@ -396,7 +398,17 @@ void main(void)
     while(1){
 
 #if 0        
-    if(gpio_pin_get(gpio_1_dev, DATA_READY_GPIO)) {           
+    bool drdy = false; 
+    if(DATA_READY_GPIO < 32) {
+        if(gpio_pin_get(gpio_0_dev, DATA_READY_GPIO)) {   
+            drdy = true;
+        }
+    } else {
+        if(gpio_pin_get(gpio_1_dev, DATA_READY_GPIO-32)) {   
+            drdy = true;
+        }
+    }
+    if(drdy) {
         adc.readAllChannels(adcRawData);
 
         sampleNum++;
@@ -404,9 +416,7 @@ void main(void)
         if (sampleNum == 100){
             LOG_INF("ADC[0]: %d", ((adcRawData[3] << 16) | (adcRawData[4] << 8) | adcRawData[5]));
         }
-    }
-    else {
-    }        
+    }      
 #endif
     LOG_INF("Hi");
     k_msleep(10000);
@@ -427,10 +437,17 @@ static int gpio_init(void){
         return -1;
 	}        
 #if 0
-    ret += gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO));    
-    ret += gpio_add_callback(gpio_0_dev, &callback);
+   if(DATA_READY_GPIO < 32) {
+        ret += gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
+        ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO));    
+        ret += gpio_add_callback(gpio_0_dev, &callback);
+    } else {
+        ret += gpio_pin_configure(gpio_1_dev, DATA_READY_GPIO-32, GPIO_INPUT | GPIO_PULL_UP);
+        ret += gpio_pin_interrupt_configure(gpio_1_dev, DATA_READY_GPIO-32, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO-32));    
+        ret += gpio_add_callback(gpio_1_dev, &callback);
+    }
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     }
@@ -438,20 +455,35 @@ static int gpio_init(void){
     //activate_irq_on_data_ready();
     //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
     
-    ret = gpio_pin_configure(gpio_0_dev, DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
-   
-    gpio_pin_set(gpio_0_dev, DBG_LED, 0);
+    if(DBG_LED < 32) {
+        ret = gpio_pin_configure(gpio_0_dev, DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
+        gpio_pin_set(gpio_0_dev, DBG_LED, 0);
+    } else {
+        ret = gpio_pin_configure(gpio_1_dev, DBG_LED-32, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
+        gpio_pin_set(gpio_1_dev, DBG_LED, 0);
+    }
     LOG_INF("Entering sleep...");
     k_sleep(K_MSEC(1000)); // give some time to ADS131 to settle after power on
     LOG_INF("Waking up...");
-    gpio_pin_set(gpio_0_dev, DBG_LED, 1);
+    if(DBG_LED < 32) {
+        gpio_pin_set(gpio_0_dev, DBG_LED, 1);
+    } else {
+        gpio_pin_set(gpio_1_dev, DBG_LED-32, 1);
+    }
 
 /* Max30102 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
-    ret += gpio_pin_configure(gpio_0_dev, MAX_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, MAX_INT, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(MAX_INT));    
-    ret += gpio_add_callback(gpio_0_dev, &max30102_callback);
+     if(MAX_INT < 32) {
+        ret += gpio_pin_configure(gpio_0_dev, MAX_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
+        ret += gpio_pin_interrupt_configure(gpio_0_dev, MAX_INT, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(MAX_INT));    
+        ret += gpio_add_callback(gpio_0_dev, &max30102_callback);
+    } else {
+        ret += gpio_pin_configure(gpio_1_dev, MAX_INT-32, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.28
+        ret += gpio_pin_interrupt_configure(gpio_1_dev, MAX_INT-32, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&max30102_callback, max30102_irq_cb, BIT(MAX_INT-32));    
+        ret += gpio_add_callback(gpio_1_dev, &max30102_callback);
+    }
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
@@ -460,10 +492,17 @@ static int gpio_init(void){
 
 /* MPU6050 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
-    ret += gpio_pin_configure(gpio_0_dev, MPU_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, MPU_INT, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(MPU_INT));    
-    ret += gpio_add_callback(gpio_0_dev, &mpu6050_callback);
+        if(MPU_INT < 32) {
+        ret += gpio_pin_configure(gpio_0_dev, MPU_INT, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
+        ret += gpio_pin_interrupt_configure(gpio_0_dev, MPU_INT, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(MPU_INT));    
+        ret += gpio_add_callback(gpio_0_dev, &mpu6050_callback);
+    } else {
+        ret += gpio_pin_configure(gpio_1_dev, MPU_INT-32, GPIO_INPUT | GPIO_PULL_UP); // Pin P0.2
+        ret += gpio_pin_interrupt_configure(gpio_1_dev, MPU_INT-32, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&mpu6050_callback, mpu6050_irq_cb, BIT(MPU_INT-32));    
+        ret += gpio_add_callback(gpio_1_dev, &mpu6050_callback);
+    }
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
@@ -477,10 +516,17 @@ static int activate_irq_on_data_ready(void){
     int ret = 0;
 
 //ADS131M08_0
-    ret += gpio_pin_configure(gpio_1_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-    ret += gpio_pin_interrupt_configure(gpio_1_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO));    
-    ret += gpio_add_callback(gpio_1_dev, &callback);
+    if(DATA_READY_GPIO < 32) {
+        ret += gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
+        ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO));    
+        ret += gpio_add_callback(gpio_0_dev, &callback);
+    } else {
+        ret += gpio_pin_configure(gpio_1_dev, DATA_READY_GPIO-32, GPIO_INPUT | GPIO_PULL_UP);
+        ret += gpio_pin_interrupt_configure(gpio_1_dev, DATA_READY_GPIO-32, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(DATA_READY_GPIO-32));    
+        ret += gpio_add_callback(gpio_1_dev, &callback);
+    }
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
@@ -488,10 +534,17 @@ static int activate_irq_on_data_ready(void){
     } 
 
 //ADS131M08_1
-    ret += gpio_pin_configure(gpio_0_dev, DATA_READY_1_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-    ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_1_GPIO, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&ads131m08_1_callback, ads131m08_1_drdy_cb, BIT(DATA_READY_1_GPIO));    
-    ret += gpio_add_callback(gpio_0_dev, &ads131m08_1_callback);
+    if(DATA_READY_1_GPIO < 32) {
+        ret += gpio_pin_configure(gpio_0_dev, DATA_READY_1_GPIO, GPIO_INPUT | GPIO_PULL_UP);
+        ret += gpio_pin_interrupt_configure(gpio_0_dev, DATA_READY_1_GPIO, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&ads131m08_1_callback, ads131m08_1_drdy_cb, BIT(DATA_READY_1_GPIO));    
+        ret += gpio_add_callback(gpio_0_dev, &ads131m08_1_callback);
+    } else {
+        ret += gpio_pin_configure(gpio_1_dev, DATA_READY_1_GPIO-32, GPIO_INPUT | GPIO_PULL_UP);
+        ret += gpio_pin_interrupt_configure(gpio_1_dev, DATA_READY_1_GPIO-32, GPIO_INT_EDGE_FALLING);
+        gpio_init_callback(&ads131m08_1_callback, ads131m08_1_drdy_cb, BIT(DATA_READY_1_GPIO-32));    
+        ret += gpio_add_callback(gpio_1_dev, &ads131m08_1_callback);
+    }
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
