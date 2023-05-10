@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2022-05-19T16:19:19Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.6.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "lightamp"
+        },
+        "Owner": "Joshua Brewster <brewster.joshua1@gmail.com>",
+        "Size": {
+            "X": 17.015459,
+            "Y": 13.007341
+        }
+    }
+}

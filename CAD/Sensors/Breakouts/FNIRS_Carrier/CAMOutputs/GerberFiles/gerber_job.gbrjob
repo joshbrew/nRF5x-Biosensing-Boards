@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2023-05-03T18:05:50Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.6.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "FNIRS_Carrier_BT_Series"
+        },
+        "Owner": "Garrett Flynn <gflynn@usc.edu>",
+        "Size": {
+            "X": 103.886,
+            "Y": 55.372
+        }
+    }
+}

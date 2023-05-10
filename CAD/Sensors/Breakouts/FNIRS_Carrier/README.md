@@ -1,0 +1,3 @@
+- Use the BT-series boards. The pinouts are defined for the BT840 specifically.
+- ADS131M08 breakout for 8+ more channels at https://github.com/joshbrew/ADS131M08_Arduino
+- DOT Headset at https://github.com/joshbrew/DIY_DOT
