@@ -42,6 +42,14 @@ public:
     void SendAccelSamples(const uint8_t *buffer, size_t length);
 
     /**
+     * @brief API function for sending Magnetometer Data over USB. Prepares command that contains samples from the Accelerometer sensor
+     * 
+     * @param buffer buffer with message data. Data should be copied before use
+     * @param length current data chunk length.
+     */
+    void SendMagnetometerSamples(const uint8_t *buffer, size_t length);
+
+    /**
      * @brief API function for sending MAX30102 Data over USB. Prepares command that contains samples from the MAX30102 sensor
      * 
      * @param buffer buffer with message data. Data should be copied before use

@@ -10,7 +10,7 @@
 #include <sys/atomic.h>
 
 #include "ble_gatt.hpp"
-
+#include "qmc5883l.hpp"
 
 namespace Bluetooth::Gatt
 {
@@ -26,6 +26,7 @@ atomic_t max30102NotificationsEnable = false;
 atomic_t mpu6050NotificationsEnable = false;
 atomic_t bme280NotificationsEnable = false;
 atomic_t rssiNotificationsEnable = false;
+atomic_t qmc5883lNotificationsEnable = false;
 
 /* BT832A Custom Service  */
 bt_uuid_128 sensorServiceUUID = BT_UUID_INIT_128(
@@ -41,7 +42,7 @@ bt_uuid_128 ads131DataUUID = BT_UUID_INIT_128(
 	BT_UUID_128_ENCODE(0x0002cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 // MAX30102 Data Pipe
 bt_uuid_128 max30102DataUUID = BT_UUID_INIT_128(
-	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));    
+	BT_UUID_128_ENCODE(0x0003cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 // MPU6050 Data Pipe
 bt_uuid_128 mpu6050DataUUID = BT_UUID_INIT_128(
         BT_UUID_128_ENCODE(0x0004cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
@@ -50,11 +51,13 @@ bt_uuid_128 ads131_1_DataUUID = BT_UUID_INIT_128(
         BT_UUID_128_ENCODE(0x0005cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 // BME280 Data Pipe
 bt_uuid_128 bme280DataUUID = BT_UUID_INIT_128(
-        BT_UUID_128_ENCODE(0x0006cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));        
-
+        BT_UUID_128_ENCODE(0x0006cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 // RSSI Data Pipe
 bt_uuid_128 rssiDataUUID = BT_UUID_INIT_128(
-        BT_UUID_128_ENCODE(0x0007cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));  
+        BT_UUID_128_ENCODE(0x0007cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
+// QMC5883L Data Pipe
+bt_uuid_128 qmc5883lDataUUID = BT_UUID_INIT_128(
+        BT_UUID_128_ENCODE(0x0008cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));  
 
 static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
@@ -91,7 +94,7 @@ static void ads131_1_CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 /**
  * @brief CCCD handler for MAX30102 characteristic. Used to get notifications if client enables notifications
  *        for MAX30102 characteristic. CCC = Client Characteristic Configuration
- * 
+ *
  * @param attr Ble Gatt attribute
  * @param value characteristic value
  */
@@ -106,7 +109,7 @@ static void max30102CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 /**
  * @brief CCCD handler for MPU6050 characteristic. Used to get notifications if client enables notifications
  *        for MPU6050 characteristic. CCC = Client Characteristic Configuration
- * 
+ *
  * @param attr Ble Gatt attribute
  * @param value characteristic value
  */
@@ -119,9 +122,24 @@ static void mpu6050CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 }
 
 /**
+ * @brief CCCD handler for QMC5883L characteristic. Used to get notifications if client enables notifications
+ *        for QMC5883L characteristic. CCC = Client Characteristic Configuration
+ *
+ * @param attr Ble Gatt attribute
+ * @param value characteristic value
+ */
+static void qmc5883lCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
+    atomic_set(&qmc5883lNotificationsEnable, value == BT_GATT_CCC_NOTIFY);
+	LOG_INF("QMC5883L Notification %s", qmc5883lNotificationsEnable ? "enabled" : "disabled");
+}
+
+/**
  * @brief CCCD handler for BME280 characteristic. Used to get notifications if client enables notifications
  *        for BME280 characteristic. CCC = Client Characteristic Configuration
- * 
+ *
  * @param attr Ble Gatt attribute
  * @param value characteristic value
  */
@@ -177,13 +195,13 @@ static const struct bt_data ad[] = {
  */
 BT_GATT_SERVICE_DEFINE(bt832a_svc,
 BT_GATT_PRIMARY_SERVICE(&sensorServiceUUID),                                            // 0
-BT_GATT_CHARACTERISTIC(&sensorCtrlCharUUID.uuid,                                        // 1    
+BT_GATT_CHARACTERISTIC(&sensorCtrlCharUUID.uuid,                                        // 1
 		        BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE_WITHOUT_RESP,                    // 2, 3
 		        BT_GATT_PERM_WRITE, nullptr, ControlCharacteristicWrite, nullptr),
 BT_GATT_CHARACTERISTIC(&ads131DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                       // 4, 5
-		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr), //&ble_tx_buff),               
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr), //&ble_tx_buff),
 BT_GATT_CCC(ads131CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                  // 6
-BT_GATT_CHARACTERISTIC(&max30102DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                     // 7,8    
+BT_GATT_CHARACTERISTIC(&max30102DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                     // 7,8
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
 BT_GATT_CCC(max30102CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                // 9
 BT_GATT_CHARACTERISTIC(&mpu6050DataUUID.uuid, BT_GATT_CHRC_NOTIFY,                      // 10, 11
@@ -198,6 +216,9 @@ BT_GATT_CCC(bme280CccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),          
 BT_GATT_CHARACTERISTIC(&rssiDataUUID.uuid, BT_GATT_CHRC_NOTIFY,                         // 19, 20
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
 BT_GATT_CCC(rssiCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                    // 21
+BT_GATT_CHARACTERISTIC(&qmc5883lDataUUID.uuid, BT_GATT_CHRC_NOTIFY,                     // 22, 23
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
+BT_GATT_CCC(qmc5883lCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                // 24
 );
 
 /********************************************************/
@@ -205,7 +226,7 @@ BT_GATT_CCC(rssiCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),            
 
 /**
  * @brief Callback clled when Bluetooth is initialized. Starts BLE server
- * 
+ *
  * @param err bluetooth initialization error code
  */
 void OnBluetoothStarted(int err)
@@ -233,12 +254,12 @@ void OnBluetoothStarted(int err)
 
 /**
  * @brief Callback function called when client(master) sends Gatt characteristic write command
- * 
+ *
  * @param conn connection
  * @param attr GATT attribute
- * @param buf  inbound buffer 
+ * @param buf  inbound buffer
  * @param len  inbound buffer size
- * @param offset current transfer offset. used when write was splitted into several BLE packets 
+ * @param offset current transfer offset. used when write was splitted into several BLE packets
  * @param flags flags
  * @return ssize_t number of bytes processed. usually equal to number of received bytes.
  */

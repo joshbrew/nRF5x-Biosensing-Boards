@@ -45,7 +45,7 @@ void exchange_func(struct bt_conn *conn, uint8_t err, struct bt_gatt_exchange_pa
 
 /**
  * @brief Callback called when new client is connected
- * 
+ *
  * @param connected connected bluetooth connection
  * @param err connection error
  */
@@ -85,13 +85,13 @@ void OnClientConnected(bt_conn *connected, uint8_t err)
             } else {
                 LOG_INF("BLE PHY updated!");
             }
-        }        
+        }
     }
 }
 
 /**
  * @brief Callback called when client is disconnected. Used to stop BLE notification if no clients are connected.
- * 
+ *
  * @param disconn disconnected bluetooth connection
  * @param reason disconnection reason
  */
@@ -105,17 +105,18 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
     }
     atomic_set(&Bluetooth::Gatt::ads131m08NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::ads131m08_1_NotificationsEnable, false);
-    atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);  
-    atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);    
-    atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false); 
-    atomic_set(&Bluetooth::Gatt::rssiNotificationsEnable, false);        
+    atomic_set(&Bluetooth::Gatt::max30102NotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::mpu6050NotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::rssiNotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::qmc5883lNotificationsEnable, false);
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
 /**
  * @brief This callback notifies the application that a remote device
  *        is requesting to update the connection parameters.
- * 
+ *
  *  @param conn Connection object.
  *  @param param Proposed connection parameters.
  *  @return true to accept the parameters, or false to reject them.
@@ -123,7 +124,7 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
 bool OnLeParamUpdateRequest(struct bt_conn *conn,
 			     struct bt_le_conn_param *param)
 {
-  
+
     LOG_INF("LE Connection parameters requested!");
     LOG_INF("Min Connection Interval: %d x 1.25ms", param->interval_min);
     LOG_INF("Max Connection Interval: %d x 1.25ms", param->interval_max);
@@ -150,11 +151,11 @@ void OnLeParamUpdated(struct bt_conn *conn, uint16_t interval,
     if(interval != 6){ /* If connection interval is greater than 6 x 1.25ms = 7.5ms */
         bt_le_conn_param param = BT_LE_CONN_PARAM_INIT(
             connectionIntervalMin,
-            connectionIntervalMax, 
-            connectionLatency, 
+            connectionIntervalMax,
+            connectionLatency,
             connectionTimeout);
         error = bt_conn_le_param_update(conn, &param);
-        
+
         if (error){
             LOG_ERR("Failed to update connection parameters (err = %d)\n", error);
             //return;
@@ -176,7 +177,7 @@ void OnLeParamUpdated(struct bt_conn *conn, uint16_t interval,
 void OnPhyUpdated(struct bt_conn *conn,
 			     struct bt_conn_le_phy_info *param)
 {
-  
+
     LOG_INF("LE PHY Updated!");
     LOG_INF("TX PHY: %d", param->tx_phy);
     LOG_INF("RX PHY: %d", param->rx_phy);
@@ -209,10 +210,10 @@ namespace Bluetooth
     static void RssiNotify(const int8_t* data, const uint8_t len);
     static void WorkingThread(void *, void *, void *);
     static void RssiPollTimerHandler(k_timer *tmr);
-    
+
     /**
      * @brief Main working thread. Used to perform RSSI polling.
-     * 
+     *
      */
     static void WorkingThread(void *, void *, void *){
         int8_t rssi[1] = {};
@@ -228,7 +229,7 @@ namespace Bluetooth
 
     /**
      * @brief Timer handler. Used to queue Reading of the signal strength (RSSI) data.
-     * 
+     *
      * @param tmr timer object
      * @warning Called at ISR Level, no actual workload should be implemented here
      */
@@ -238,24 +239,24 @@ namespace Bluetooth
 
 /**
  * @brief Function used to setup BLE Service
- * 
- * @return BLE error code 
+ *
+ * @return BLE error code
  */
 int SetupBLE()
 {
     //worker.Initialize();
 
     bt_conn_cb_register(&connectionCallbacks);
-     
+
     int err = bt_enable(&Gatt::OnBluetoothStarted);
     if (err)
     {
         LOG_INF("enable Bluetooth with status %d", err);
     }
     k_timer_init(&rssiPollTimer, RssiPollTimerHandler, nullptr);
-    k_sem_init(&rssiPollSemaphore, 0, 1); 
+    k_sem_init(&rssiPollSemaphore, 0, 1);
     k_thread_create(&worker, pollStackArea, K_THREAD_STACK_SIZEOF(pollStackArea),
-                &WorkingThread, nullptr, nullptr, nullptr, taskPriority, 0, K_NO_WAIT); 
+                &WorkingThread, nullptr, nullptr, nullptr, taskPriority, 0, K_NO_WAIT);
 
     return err;
 }
@@ -263,7 +264,7 @@ int SetupBLE()
 void RssiStartSampling(){
     // Start BME280 polling
     k_timer_start(&rssiPollTimer, K_MSEC(RssiPollPeriod), K_MSEC(RssiPollPeriod));
-}   
+}
 
 void RssiStopSampling(){
     k_timer_stop(&rssiPollTimer);
@@ -287,13 +288,13 @@ void Ads131m08_1_Notify(const uint8_t* data, const uint8_t len)
 
 /**
  * @brief Send BLE notification through MAX30102 Data Pipe.
- * 
+ *
  * @param data pointer to datasource containing MAX30102 data samples
  * @param len  the number of samples to transfer
  */
 void Max30102Notify(const uint8_t* data, const uint8_t len)
-{    
-    if (atomic_get(&Gatt::max30102NotificationsEnable))    
+{
+    if (atomic_get(&Gatt::max30102NotificationsEnable))
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicMax30102Data], data, len);
     }
@@ -301,28 +302,42 @@ void Max30102Notify(const uint8_t* data, const uint8_t len)
 
 /**
  * @brief Send BLE notification through MPU6050 Data Pipe.
- * 
+ *
  * @param data pointer to datasource containing MAX30102 data samples
  * @param len  the number of samples to transfer
  */
 void Mpu6050Notify(const uint8_t* data, const uint8_t len)
-{    
-    if (atomic_get(&Gatt::mpu6050NotificationsEnable))    
+{
+    if (atomic_get(&Gatt::mpu6050NotificationsEnable))
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicMpu6050Data], data, len);
     }
 }
 
 /**
+ * @brief Send BLE notification through QMC5883L Data Pipe.
+ *
+ * @param data pointer to datasource containing MAX30102 data samples
+ * @param len  the number of samples to transfer
+ */
+void Qmc5883lNotify(const uint8_t* data, const uint8_t len)
+{
+    if (atomic_get(&Gatt::qmc5883lNotificationsEnable))
+    {
+        bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicQmc5883lData], data, len);
+    }
+}
+
+/**
  * @brief Send BLE notification through BME280 Data Pipe.
- * 
+ *
  * @param data pointer to datasource containing BME280 data samples
  * @param len  the number of samples to transfer
  */
 void Bme280Notify(const uint8_t* data, const uint8_t len)
-{   
+{
     //LOG_HEXDUMP_INF(data, len, "bme280");
-    if (atomic_get(&Gatt::bme280NotificationsEnable))    
+    if (atomic_get(&Gatt::bme280NotificationsEnable))
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicBme280Data], data, len);
     }
@@ -330,13 +345,13 @@ void Bme280Notify(const uint8_t* data, const uint8_t len)
 
 /**
  * @brief Send BLE notification through RSSI Data Pipe.
- * 
+ *
  * @param data pointer to datasource containing RSSI data
  * @param len  the number of samples to transfer
  */
 static void RssiNotify(const int8_t* data, const uint8_t len)
-{       
-    if (atomic_get(&Gatt::rssiNotificationsEnable))    
+{
+    if (atomic_get(&Gatt::rssiNotificationsEnable))
     {
         bt_gatt_notify(nullptr, &Gatt::bt832a_svc.attrs[Gatt::CharacteristicRssiData], data, len);
     }

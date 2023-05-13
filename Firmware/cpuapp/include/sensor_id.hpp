@@ -11,5 +11,6 @@ enum class SensorId : uint8_t
     Ads131m08_1     = 3,
     Mpu6050         = 4,
     Max30102        = 5,
-    Bme280          = 6,        
+    Bme280          = 6,
+    Qmc5883l        = 7
 };
