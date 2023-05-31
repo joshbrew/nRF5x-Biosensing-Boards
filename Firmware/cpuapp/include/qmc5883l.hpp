@@ -9,6 +9,7 @@
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
 #include "ble_types.hpp"
+#include "ble_commands.hpp"
 
 class UsbCommHandler;
 
@@ -60,15 +61,6 @@ class UsbCommHandler;
 struct qmc5883l_config {
     uint8_t ctrl_reg_1;
     uint8_t ctrl_reg_2;
-};
-
-/**
- * @brief BLE commands for the QMC5883l module
- */
-enum class BleCommand : uint8_t
-{
-    StartSampling = 0x01,       ///< Start taking samples from the sensor
-    StopSampling = 0x02,       ///< Stop taking samples from the sensor
 };
 
 /**

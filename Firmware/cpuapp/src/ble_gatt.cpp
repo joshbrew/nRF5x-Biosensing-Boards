@@ -15,7 +15,7 @@
 namespace Bluetooth::Gatt
 {
 
-LOG_MODULE_REGISTER(BleGatt);
+LOG_MODULE_REGISTER(BleGatt, LOG_LEVEL_INF);
 
 constexpr static size_t controlHeaderSize = 3;
 constexpr static size_t maxHandlers = 256;
@@ -286,10 +286,10 @@ ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, cons
     uint16_t retval = len;
     const uint8_t* buffer = static_cast<const uint8_t*>(buf);
 
-    LOG_INF("%d Bytes received!", len);
-    LOG_INF("Offset: %d", offset);
-    LOG_INF("Flags: 0x%X", flags);
-    LOG_INF("Data[0]: 0x%X", *buffer);
+    LOG_DBG("%d Bytes received!", len);
+    LOG_DBG("Offset: %d", offset);
+    LOG_DBG("Flags: 0x%X", flags);
+    LOG_DBG("Data[0]: 0x%X", *buffer);
 
     // new message (could be partial)
     if (offset == 0)
