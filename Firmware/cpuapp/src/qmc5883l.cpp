@@ -10,8 +10,10 @@
 #include "qmc5883l.hpp"
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
+// For registering callback
+#include "ble_service.hpp"
 
-LOG_MODULE_REGISTER(qmc5883l);
+LOG_MODULE_REGISTER(qmc5883l, LOG_LEVEL_INF);
 
 Qmc5883l::Qmc5883l(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_INF("Qmc5883l Constructor!");
@@ -44,6 +46,12 @@ int Qmc5883l::Initialize() {
     k_msleep(5);
 //    Shutdown();
 
+    Bluetooth::GattRegisterControlCallback(CommandId::Qmc5883lCmd,
+        [this](const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset)
+        {
+            return OnBleCommand(buffer, key, length, offset);
+        });
+
     return 0;
 }
 
@@ -59,6 +67,31 @@ int Qmc5883l::Configure(qmc5883l_config config){
 
     status = transport.GetStatus();
     return status;
+}
+
+bool Qmc5883l::OnBleCommand(const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset){
+    if (offset.value != 0 || length.value == 0)
+    {
+        return false;
+    }
+    LOG_DBG("Qmc5883l BLE Command received");
+
+    Bluetooth::CommandKey bleCommand;
+    memcpy(&bleCommand, &key, sizeof(key));
+          
+    switch(bleCommand.key[0]){
+        case static_cast<uint8_t>(BleCommand::StartSampling):
+            StartSampling();
+            break;
+        case static_cast<uint8_t>(BleCommand::StopSampling):
+            StopSampling();
+            break;
+        
+        default:
+            break;
+    }
+    
+    return true;
 }
 
 void Qmc5883l::Reset() {

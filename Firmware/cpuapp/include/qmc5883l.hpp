@@ -8,6 +8,7 @@
 #include <atomic>
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
+#include "ble_types.hpp"
 
 class UsbCommHandler;
 
@@ -59,6 +60,15 @@ class UsbCommHandler;
 struct qmc5883l_config {
     uint8_t ctrl_reg_1;
     uint8_t ctrl_reg_2;
+};
+
+/**
+ * @brief BLE commands for the QMC5883l module
+ */
+enum class BleCommand : uint8_t
+{
+    StartSampling = 0x01,       ///< Start taking samples from the sensor
+    StopSampling = 0x02,       ///< Stop taking samples from the sensor
 };
 
 /**
@@ -136,6 +146,19 @@ private:
      * @brief Read Temperature Registers
      */
     void TemperatureRead();
+
+    /**
+     * @brief Called when trigger mode is received via BLE
+     * 
+     * @param buffer receviced buffer
+     * @param length buffer length
+     * @param offset data offset
+     * 
+     * @return true if command was processed succesfully
+     */
+    bool OnBleCommand(const uint8_t* buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset);
+
+
     uint8_t sample_cnt;
     uint8_t packet_cnt;
     std::atomic<bool> qmc5883l_is_on_i2c_bus_; ///< Device status
