@@ -389,4 +389,15 @@ void read_conn_rssi(int8_t *rssi)
 	net_buf_unref(rsp);
 }
 
+/**
+ * @brief Register Control callback
+ * 
+ * @param commandId command ID
+ * @param action Action to call when command ith commandId is received via BLE
+ */
+void GattRegisterControlCallback(CommandId commandId, BleControlAction&& action)
+{
+    Gatt::GattSetControlCallback(commandId, std::forward<BleControlAction>(action));
+}
+
 } // namespace Bluetooth

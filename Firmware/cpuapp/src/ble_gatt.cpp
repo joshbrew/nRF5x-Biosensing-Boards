@@ -17,6 +17,18 @@ namespace Bluetooth::Gatt
 
 LOG_MODULE_REGISTER(BleGatt);
 
+constexpr static size_t controlHeaderSize = 3;
+constexpr static size_t maxHandlers = 256;
+
+/**
+ * @brief When BLE Performs GATT write it might split transfer into several chunks, and only first byte contains 
+ *        function ID, so this funtion should be stored
+ */
+uint8_t currentFunction = 0;
+CommandKey currentCommandKey; //! In addition to Saving current functionID active command key should be stored too
+
+BleControlAction handlers[maxHandlers];
+
 /********************************************/
 /* BLE connection */
 
@@ -58,6 +70,10 @@ bt_uuid_128 rssiDataUUID = BT_UUID_INIT_128(
 // QMC5883L Data Pipe
 bt_uuid_128 qmc5883lDataUUID = BT_UUID_INIT_128(
         BT_UUID_128_ENCODE(0x0008cafe, 0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));  
+// BLE characteristic reserved for sending Control BLE commands
+bt_uuid_128 controlUUID = BT_UUID_INIT_128(
+    BT_UUID_128_ENCODE(0x0009cafe,  0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
+
 
 static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
@@ -219,6 +235,8 @@ BT_GATT_CCC(rssiCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),            
 BT_GATT_CHARACTERISTIC(&qmc5883lDataUUID.uuid, BT_GATT_CHRC_NOTIFY,                     // 22, 23
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
 BT_GATT_CCC(qmc5883lCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                // 24
+BT_GATT_CHARACTERISTIC(&controlUUID.uuid, BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+    BT_GATT_PERM_WRITE, nullptr, ControlCharacteristicWrite, nullptr),
 );
 
 /********************************************************/
@@ -263,7 +281,7 @@ void OnBluetoothStarted(int err)
  * @param flags flags
  * @return ssize_t number of bytes processed. usually equal to number of received bytes.
  */
-static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags)
+ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags)
 {
     uint16_t retval = len;
     const uint8_t* buffer = static_cast<const uint8_t*>(buf);
@@ -273,7 +291,53 @@ static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *att
     LOG_INF("Flags: 0x%X", flags);
     LOG_INF("Data[0]: 0x%X", *buffer);
 
+    // new message (could be partial)
+    if (offset == 0)
+    {
+        if (len < controlHeaderSize)
+        {
+            return BT_GATT_ERR(BT_ATT_ERR_INVALID_ATTRIBUTE_LEN);
+        }
+
+        // extract command Id and skip BLE frame header
+        currentFunction = *buffer;
+
+        // copy command key into struct directly to avoid possible alignment issues
+        currentCommandKey.key[0] = *(buffer + 1);
+        currentCommandKey.key[1] = *(buffer + 2);
+
+        buffer += controlHeaderSize;
+        len -= controlHeaderSize;
+    }
+    else
+    {
+        offset -= controlHeaderSize;
+    }
+
+    if (handlers[currentFunction] != nullptr)
+    {
+        handlers[currentFunction](buffer, currentCommandKey, BleLength{len}, BleOffset {offset});
+    }
+
     return retval;
+}
+
+/**
+ * @brief Register Control callback
+ * 
+ * @param commandId command ID
+ * @param action Action to call when command ith commandId is received via BLE
+ */
+void GattSetControlCallback(CommandId commandId, BleControlAction&& action)
+{
+    if (handlers[static_cast<size_t>(commandId)] == nullptr)
+    {
+        handlers[static_cast<size_t>(commandId)] = std::move(action);
+    }
+    else
+    {
+        LOG_ERR("Handler with id %d is already registred", static_cast<int>(commandId));
+    }
 }
 
 } // namespace Bluetooth::Gatt

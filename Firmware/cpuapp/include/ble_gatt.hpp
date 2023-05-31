@@ -5,6 +5,9 @@
 #include <bluetooth/gatt.h>
 #include <sys/atomic.h>
 
+#include "ble_types.hpp"
+#include "commandid.hpp"
+
 namespace Bluetooth::Gatt
 {
 
@@ -90,4 +93,11 @@ namespace Bluetooth::Gatt
      */
     void OnBluetoothStarted(int err);
 
+    /**
+     * @brief Register Control callback
+     * 
+     * @param commandId command ID
+     * @param action Action to call when command ith commandId is received via BLE
+     */
+    void GattSetControlCallback(CommandId commandId, BleControlAction&& action);
 }

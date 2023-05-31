@@ -2,6 +2,9 @@
 
 #include <functional>
 
+#include "ble_types.hpp"
+#include "commandid.hpp"
+
 namespace Bluetooth
 {
     /**
@@ -74,4 +77,13 @@ namespace Bluetooth
      * @brief Stop taking signal strength (RSSI) values
      */
     void RssiStopSampling();
+
+    /**
+     * @brief Register Control callback
+     * 
+     * @param commandId command ID
+     * @param action Action to call when command ith commandId is received via BLE
+     */
+    void GattRegisterControlCallback(CommandId commandId, BleControlAction&& action);
+
 }
