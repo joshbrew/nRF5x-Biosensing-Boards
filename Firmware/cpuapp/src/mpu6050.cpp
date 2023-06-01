@@ -11,7 +11,7 @@
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
 
-LOG_MODULE_REGISTER(mpu6050);
+LOG_MODULE_REGISTER(mpu6050, LOG_LEVEL_INF);
 
 Mpu6050::Mpu6050(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_INF("Mpu6050 Constructor!");
