@@ -13,4 +13,5 @@ enum class CommandId : uint8_t
     Mpu6050Cmd = 4,
     Qmc5883lCmd = 5,
     AlarmCmd = 6,  ///< Start/Stop playing Alarm
+    SystemCmd = 7, ///< For sending commands on the app/system level from where we can control every sensor/module
 };

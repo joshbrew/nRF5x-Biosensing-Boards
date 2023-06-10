@@ -13,6 +13,7 @@
 #include "qmc5883l.hpp"
 #include "serial_controller.hpp"
 #include "usb_comm_handler.hpp"
+#include "audio_module.hpp"
 
 #include "ble_service.hpp"
 
@@ -70,6 +71,7 @@ static uint8_t j = 0;
 
 static uint8_t ble_tx_buff[247] = {0};
 static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
+
 //static uint8_t adcRawData[27] = {0};
 static max30102_config max30102_default_config = {
     0x80, // Interrupt Config 1. Enable FIFO_A_FULL interrupt
@@ -107,6 +109,7 @@ Max30102 max30102(usbCommHandler);
 Mpu6050 mpu6050(usbCommHandler);
 Bme280 bme280(usbCommHandler);
 Qmc5883l qmc5883l(usbCommHandler);
+AudioModule audio;
 
 void main(void)
 {
@@ -151,7 +154,7 @@ void main(void)
 
     bme280.Initialize();
     if(bme280.BmX280IsOnI2cBus()){
-        LOG_INF("Start BME280 sampling...");
+        // LOG_INF("Start BME280 sampling...");
         bme280.StartSampling();
     } else {
         LOG_WRN("***WARNING: BME280 is not connected or properly initialized!");
@@ -165,6 +168,9 @@ void main(void)
     } else {
         LOG_WRN("***WARNING: QMC5883L is not connected or properly initialized!");
     }
+
+    ret = audio.Initialize();
+    LOG_INF("audio.Initialize: %d", ret);
 
     Bluetooth::SetupBLE();
 
@@ -301,8 +307,6 @@ void main(void)
 
     activate_irq_on_data_ready();
 
-    //uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
-
     while(1){
 
 #if 0        
@@ -318,6 +322,7 @@ void main(void)
         else {
         }        
 #endif
+    
     LOG_INF("Hi");
     k_msleep(10000);
     }
@@ -525,3 +530,4 @@ static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("QMC5883L Interrupt!");
     qmc5883l.HandleInterrupt();
 }
+
