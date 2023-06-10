@@ -28,6 +28,7 @@ int Bme280::Initialize() {
                         &WorkingThread, this, nullptr, nullptr, taskPriority, 0, K_NO_WAIT);        
     } else {
         bme280_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
+        bmp280_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
         bmx_id = 0x00;
         return -1;        
     }

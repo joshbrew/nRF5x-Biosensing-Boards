@@ -50,6 +50,7 @@
 &i2c0 {
     status = "disabled";
 };
+
 &i2c1 {
     status = "okay";
     sda-pin = <34>;
@@ -75,4 +76,17 @@
         compatible = "zephyr,cdc-acm-uart";
         label = "CDC_ACM_0";
     };
+};
+
+&clock {
+    hfclkaudio-frequency = <11289600>;
+};
+
+i2s_rxtx: &i2s0 {
+    status = "okay";
+    sck-pin = <43>;
+    lrck-pin = <44>;
+    sdout-pin = <42>;
+    sdin-pin = <46>;
+    clock-source = "ACLK";
 };
