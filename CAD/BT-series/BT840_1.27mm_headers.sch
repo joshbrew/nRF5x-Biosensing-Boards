@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="10" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -6342,9 +6342,9 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <label x="125.2982" y="65.0494" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U2" gate="G$1" pin="P0.30/AIN6"/>
-<wire x1="242.062" y1="83.82" x2="239.522" y2="83.82" width="0.1524" layer="91"/>
-<label x="228.346" y="82.804" size="1.778" layer="95"/>
+<pinref part="U2" gate="G$1" pin="P0.29/AIN5"/>
+<wire x1="242.062" y1="86.36" x2="239.522" y2="86.36" width="0.1524" layer="91"/>
+<label x="222.758" y="85.598" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="P24" class="0">
@@ -6710,19 +6710,6 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <label x="204.216" y="49.022" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="P29_AIN5" class="0">
-<segment>
-<pinref part="U2" gate="G$1" pin="P0.29/AIN5"/>
-<wire x1="242.062" y1="86.36" x2="239.522" y2="86.36" width="0.1524" layer="91"/>
-<label x="227.838" y="85.598" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="X4" gate="-14" pin="S"/>
-<wire x1="324.3326" y1="37.8206" x2="322.58" y2="37.8206" width="0.1524" layer="91"/>
-<wire x1="322.58" y1="37.8206" x2="322.58" y2="37.846" width="0.1524" layer="91"/>
-<label x="318.516" y="37.084" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="P31_AIN7" class="0">
 <segment>
 <pinref part="U2" gate="G$1" pin="P0.31/AIN7"/>
@@ -6843,6 +6830,19 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <wire x1="324.3326" y1="45.4406" x2="322.326" y2="45.4406" width="0.1524" layer="91"/>
 <wire x1="322.326" y1="45.4406" x2="322.326" y2="45.466" width="0.1524" layer="91"/>
 <label x="318.77" y="45.72" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="P30_AIN6" class="0">
+<segment>
+<pinref part="U2" gate="G$1" pin="P0.30/AIN6"/>
+<wire x1="242.062" y1="83.82" x2="238.76" y2="83.82" width="0.1524" layer="91"/>
+<label x="227.33" y="83.058" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="X4" gate="-14" pin="S"/>
+<wire x1="324.3326" y1="37.8206" x2="322.58" y2="37.8206" width="0.1524" layer="91"/>
+<wire x1="322.58" y1="37.8206" x2="322.58" y2="37.846" width="0.1524" layer="91"/>
+<label x="318.516" y="37.084" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
