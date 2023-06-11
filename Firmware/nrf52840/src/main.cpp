@@ -17,28 +17,23 @@
 
 //FIX: for gpio 1.xx, use either 100 + the .xx or 32 + .xx (like the overlay)
 
-#define ADS_CS              ((uint8_t)47) //  47 (BC840M),   33 (BT840)
+#define ADS_CS              ((uint8_t)47)  //  47 (BC840M),   33 (BT840)
 #define DATA_READY_GPIO     ((uint8_t)37)  // 37 (BC840M),    6 (BT840)
 #define ADS_RESET           ((uint8_t)45)  // 45 (BC840M),    8 (BC840M)
 
-#define ADS_1_CS            ((uint8_t)42) //  42 (BC840M),   36 (BT840)
+#define ADS_1_CS            ((uint8_t)42)  //  42 (BC840M),   36 (BT840)
 #define DATA_READY_1_GPIO   ((uint8_t)24)  // 24 (BC840M),   40 (BT840)
-#define ADS_1_RESET         ((uint8_t)29) //  29 (BC840M),   35 (BT840)
+#define ADS_1_RESET         ((uint8_t)29)  //  29 (BC840M),   35 (BT840)
 
-#define DBG_LED             ((uint8_t)20) //  20 (BC840),    25 (BT840)     
+#define DBG_LED             ((uint8_t)20)  //  20 (BC840),    25 (BT840)     
 #define MAX_INT             ((uint8_t)28)  // 28 (BC840M),    7 (BT840)
-#define MPU_INT             ((uint8_t)2) //    2 (BC840M),   38 (BT840)
+#define MPU_INT             ((uint8_t)2)   //    2 (BC840M),   38 (BT840)
 
-
-static uint8_t LEDn = 0;
-
-static uint32_t LEDt_ms = 100;
-
-static const uint8_t nLEDs = 3;
 
 static const uint8_t samplesPerLED = 3;
 
-static uint8_t LEDSampleCtr = 0;
+static uint32_t LEDt_ms = 100;
+static const uint8_t nLEDs = 3;
 
 
 //list the GPIO in the order we want to flash. 255 is ambient
@@ -51,6 +46,10 @@ static uint8_t LED_gpio[nLEDs] = {
 };
 
 //LEDs 1.01, 1.11 etc are 32 + the number after the decimal. 1.00 is pin 32 (pretty sure)
+
+static uint8_t LEDn = 0;
+static uint8_t LEDSampleCtr = 0;
+
 
 
 
@@ -600,10 +599,10 @@ void main(void)
 
     setupLEDS();
 
-    k_work_init(&interrupt_work_item, interrupt_workQueue_handler);
-    k_work_init(&ads131m08_1_interrupt_work_item, ads131m08_1_interrupt_workQueue_handler);
-    k_work_init(&max30102_interrupt_work_item, max30102_interrupt_workQueue_handler);
-    k_work_init(&mpu6050_interrupt_work_item, mpu6050_interrupt_workQueue_handler);
+    k_work_init(&interrupt_work_item,               interrupt_workQueue_handler);
+    k_work_init(&ads131m08_1_interrupt_work_item,   ads131m08_1_interrupt_workQueue_handler);
+    k_work_init(&max30102_interrupt_work_item,      max30102_interrupt_workQueue_handler);
+    k_work_init(&mpu6050_interrupt_work_item,       mpu6050_interrupt_workQueue_handler);
     
     if (ret == 0){
         //LOG_INF("GPIOs Int'd!");        
