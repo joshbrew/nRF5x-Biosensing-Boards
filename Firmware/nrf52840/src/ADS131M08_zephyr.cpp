@@ -25,7 +25,15 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
     int ret = 0;
 
 /* Configure DRDY and SYNC/RESET GPIOs */
-    gpioDevice = device_get_binding("GPIO_0");
+    if(sync_rst_pin >= 100) {
+        gpioDevice = device_get_binding("GPIO_1");
+        csConfig.gpio_pin = sync_rst_pin - 100;
+    } else if(sync_rst_pin >= 32) {
+        gpioDevice = device_get_binding("GPIO_1");
+        csConfig.gpio_pin = sync_rst_pin - 32;
+    } else {
+        gpioDevice = device_get_binding("GPIO_0");
+    }
     if(gpioDevice == nullptr){
         deviceStatus.store(-1, std::memory_order_relaxed);
         LOG_ERR("***ERROR: Not able to properly bind GPIO_0 device!");
@@ -45,9 +53,19 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
     gpio_pin_set(gpioDevice, sync_rst_pin, 1);
 
     // Try to bind chip select device
-    csConfig.gpio_dev = device_get_binding("GPIO_1");
+
+    if(cs_pin >= 100) {
+        csConfig.gpio_dev = device_get_binding("GPIO_1");
+        csConfig.gpio_pin = cs_pin - 100;
+    } else if(cs_pin >= 32) {
+        csConfig.gpio_dev = device_get_binding("GPIO_1");
+        csConfig.gpio_pin = cs_pin - 32;
+    } else {
+        csConfig.gpio_dev = device_get_binding("GPIO_0");
+        csConfig.gpio_pin = cs_pin;
+    }
+
     csConfig.delay = 0;
-    csConfig.gpio_pin = cs_pin;
     csConfig.gpio_dt_flags = GPIO_ACTIVE_LOW;
 
     // Bind SPI device only if chip select device successfully binded
