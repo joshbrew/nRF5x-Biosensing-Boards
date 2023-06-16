@@ -160,9 +160,6 @@ Bme280 bme280(usbCommHandler);
 
 
 
-
-
-
 static int configureGPIO(int pin, gpio_flags_t rule) {
     int ret = 0;
     if(pin < 32) {

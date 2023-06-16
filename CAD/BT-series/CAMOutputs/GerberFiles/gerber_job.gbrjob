@@ -1,7 +1,7 @@
 {
     "Header": {
         "Comment": "All values are metric (mm)",
-        "CreationDate": "2022-10-05T18:52:24Z",
+        "CreationDate": "2023-06-16T18:22:06Z",
         "GenerationSoftware": {
             "Application": "EAGLE",
             "Vendor": "Autodesk",
@@ -13,9 +13,9 @@
         "BoardThickness": 1.57,
         "LayerNumber": 2,
         "Name": {
-            "ProjectId": "BT840_1.25mm_headers"
+            "ProjectId": "BT840_1.27mm_headers"
         },
-        "Owner": "Joshua Brewster <brewster.joshua1@gmail.com>",
+        "Owner": "Garrett Flynn <gflynn@usc.edu>",
         "Size": {
             "X": 33.3756,
             "Y": 25.0952
