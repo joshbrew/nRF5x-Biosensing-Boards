@@ -63,7 +63,7 @@ Below results with the ADS131M08 doing quick tests. Noise floor was around 350 n
 - Raw EOG
 ![EOG](./EOG.png)
 
-- Raw PPG wave
+- Raw PPG wave (red LED + Photodiode BPW 34 w/ basic 1MOhm + 200pf lowpass filter)
 ![PPG](./ppgraw.PNG)
 
 Note the ADS131M08 is pretty much completely useless on USB power as we do not have digital or power isolators. We recommend sticking with the Bluetooth 5 and battery support except for when debugging.
