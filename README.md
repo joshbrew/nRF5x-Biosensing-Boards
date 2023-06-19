@@ -52,7 +52,7 @@ Developed for creating open source [Brains@Play](https://brainsatplay.com) and [
 Related:
 - [BLE & USB Web drivers and debugger](https://github.com/joshbrew/device_debugger)
 
-Below results with the ADS131M08 doing quick tests. Noise floor was around 350 nanovolts when shorted.
+Below results with the ADS131M08 doing quick tests. Noise floor was around 350 nanovolts when shorted. These are not final results but show lots of promise.
 
 - EEG alpha waves (spikes are blinks through a digital bandpass filter)
 ![EEG](./eegalpha.png)
@@ -64,7 +64,7 @@ Below results with the ADS131M08 doing quick tests. Noise floor was around 350 n
 ![EOG](./EOG.png)
 
 - Raw PPG wave
-![PPG](./PPG_photodiode.png)
+![PPG](./ppgraw.PNG)
 
 Note the ADS131M08 is pretty much completely useless on USB power as we do not have digital or power isolators. We recommend sticking with the Bluetooth 5 and battery support except for when debugging.
 
