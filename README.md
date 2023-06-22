@@ -23,10 +23,13 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic.
 
 ### Sensor Support 
 - ADS131M08 (8 channel sigma delta converter), there is one on-board 
-- MPU6050 accelerometer 
+- MPU6050 accelerometer
+- QMC5883L magnetometer (for 9-axis movement when combined with MPU6050)
 - MAX30102 pulse oximeter, 
 - BMP/BME280 environmental sensor, 
 - Additional 8 channel ADS131M08 for up to 16 raw data channels, each individually configurable. 
+- MAX98357A Audio output amplifier
+- B079Q8G7N1 PDM MEMS microphone
 
 You can fairly easily add more sensor modules, which are all plug-and-play so the board can run with any combination of sensors. We'll clean this up more as we go for easier customization and feature inclusions. The BT840/BT40, BC840M, and BC40M prototypes include battery chargers with TVS diodes for safety so the boards could be FDA-approved.
 
@@ -49,7 +52,7 @@ Developed for creating open source [Brains@Play](https://brainsatplay.com) and [
 Related:
 - [BLE & USB Web drivers and debugger](https://github.com/joshbrew/device_debugger)
 
-Below results with the ADS131M08 doing quick tests. Noise floor was around 350 nanovolts when shorted.
+Below results with the ADS131M08 doing quick tests. Noise floor was around 350 nanovolts when shorted. These are not final results but show lots of promise.
 
 - EEG alpha waves (spikes are blinks through a digital bandpass filter)
 ![EEG](./eegalpha.png)
@@ -60,8 +63,8 @@ Below results with the ADS131M08 doing quick tests. Noise floor was around 350 n
 - Raw EOG
 ![EOG](./EOG.png)
 
-- Raw PPG wave
-![PPG](./PPG_photodiode.png)
+- Raw PPG wave (red LED + Photodiode BPW 34 w/ basic 1MOhm + 200pf lowpass filter)
+![PPG](./ppgraw.PNG)
 
 Note the ADS131M08 is pretty much completely useless on USB power as we do not have digital or power isolators. We recommend sticking with the Bluetooth 5 and battery support except for when debugging.
 
