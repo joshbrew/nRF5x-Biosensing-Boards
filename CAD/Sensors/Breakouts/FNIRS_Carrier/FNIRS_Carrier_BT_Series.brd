@@ -260,13 +260,13 @@
 <circle x="-76.1238" y="48.8442" radius="0.523634375" width="0.1524" layer="51"/>
 <dimension x1="-60.96" y1="60.2996" x2="-40.9922" y2="60.7584" x3="-50.9761" y3="46.1264" textsize="1.778" layer="47" dtype="horizontal"/>
 <wire x1="-94.996" y1="70.231" x2="-87.122" y2="76.327" width="0.1524" layer="20"/>
-<wire x1="-87.122" y1="76.327" x2="-21.463" y2="76.327" width="0.1524" layer="20"/>
+<wire x1="-87.122" y1="76.327" x2="-29.1084" y2="76.327" width="0.1524" layer="20"/>
 <wire x1="-7.747" y1="67.945" x2="3.302" y2="67.945" width="0.1524" layer="20"/>
 <wire x1="3.302" y1="67.945" x2="3.302" y2="54.356" width="0.1524" layer="20"/>
 <wire x1="-94.996" y1="44.45" x2="-94.996" y2="70.231" width="0.1524" layer="20"/>
 <wire x1="-7.747" y1="67.945" x2="-7.747" y2="52.959" width="0.1524" layer="20"/>
 <wire x1="-7.747" y1="52.959" x2="-21.463" y2="52.959" width="0.1524" layer="20"/>
-<wire x1="-21.463" y1="52.959" x2="-21.463" y2="76.327" width="0.1524" layer="20"/>
+<wire x1="-21.463" y1="52.959" x2="-21.463" y2="68.6816" width="0.1524" layer="20"/>
 <text x="-42.3418" y="74.803" size="0.8128" layer="26" rot="MR0">ADC 2 breakout goes on this side (back)</text>
 <text x="-59.182" y="71.4248" size="0.8128" layer="25">Add resistors on front 
     (do this first)</text>
@@ -323,6 +323,7 @@ and 150Ohm Resistors</text>
 <circle x="3.3782" y="51.7398" radius="0.318259375" width="0.1524" layer="20"/>
 <circle x="3.4036" y="50.8254" radius="0.318259375" width="0.1524" layer="20"/>
 <circle x="3.429" y="49.8856" radius="0.318259375" width="0.1524" layer="20"/>
+<wire x1="-21.463" y1="68.6816" x2="-29.1084" y2="76.327" width="0.1524" layer="20"/>
 </plain>
 <libraries>
 <library name="2x10_1.27mm">
