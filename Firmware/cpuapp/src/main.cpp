@@ -14,6 +14,7 @@
 #include "serial_controller.hpp"
 #include "usb_comm_handler.hpp"
 #include "audio_module.hpp"
+#include "dmic_module.hpp"
 
 #include "ble_service.hpp"
 
@@ -34,6 +35,8 @@
 #define QMC5883L_DRDY       ((uint8_t)6) // P0.12
 
 #define USER_LED_1          ((uint8_t)20) // P0.20
+
+#define USE_ADC_MODULES     (0)
 
 LOG_MODULE_REGISTER(main);
 
@@ -110,6 +113,7 @@ Mpu6050 mpu6050(usbCommHandler);
 Bme280 bme280(usbCommHandler);
 Qmc5883l qmc5883l(usbCommHandler);
 AudioModule audio;
+DmicModule dmic;
 
 void main(void)
 {
@@ -132,8 +136,10 @@ void main(void)
     serial.Initialize();
     usbCommHandler.Initialize();
 
+if (USE_ADC_MODULES != 0){
     adc.init(ADS_CS, DATA_READY_GPIO, ADS_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
     adc_1.init(ADS_1_CS, DATA_READY_1_GPIO, ADS_1_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+}
 
     max30102.Initialize();
     if(max30102.IsOnI2cBus()){
@@ -172,8 +178,12 @@ void main(void)
     ret = audio.Initialize();
     LOG_INF("audio.Initialize: %d", ret);
 
+    ret = dmic.Initialize();
+    LOG_INF("dmic.Initialize: %d", ret);
+
     Bluetooth::SetupBLE();
 
+if (USE_ADC_MODULES != 0){
     if(adc.writeReg(ADS131_CLOCK,0b1111111100011111)){  //< Clock register (page 55 in datasheet)
         //LOG_INF("ADS131_CLOCK register successfully configured");
     } else {
@@ -304,7 +314,7 @@ void main(void)
     k_msleep(1000);
     //LOG_INF("1...");
     k_msleep(1000);
-
+} // if USE_ADC_MODULES
     activate_irq_on_data_ready();
 
     while(1){

@@ -90,3 +90,10 @@ i2s_rxtx: &i2s0 {
     sdin-pin = <46>;
     clock-source = "ACLK";
 };
+
+dmic_dev: &pdm0 {
+	status = "okay";
+	clk-pin = <25>;
+	din-pin = <26>;
+	clock-source = "ACLK";
+};
