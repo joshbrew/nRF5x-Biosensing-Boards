@@ -17,6 +17,9 @@
 #include "dmic_module.hpp"
 
 #include "ble_service.hpp"
+// Needed for OTA
+#include "os_mgmt/os_mgmt.h"
+#include "img_mgmt/img_mgmt.h"
 
 
 #define ADS_CS              ((uint8_t)22)
@@ -122,6 +125,10 @@ void main(void)
     // ble_tx_buff[226] = 0x0A;
     int ret = 0;
     uint16_t reg_value = 0;
+
+    // Needed for OTA
+    os_mgmt_register_group();
+    img_mgmt_register_group();
 
     ret = gpio_init();
     k_work_init(&interrupt_work_item, interrupt_workQueue_handler);

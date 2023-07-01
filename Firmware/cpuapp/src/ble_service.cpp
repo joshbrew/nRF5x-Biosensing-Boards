@@ -11,6 +11,7 @@
 
 #include "ble_gatt.hpp"
 #include "ble_service.hpp"
+#include <mgmt/mcumgr/smp_bt.h>
 
 
 LOG_MODULE_REGISTER(bluetooth);
@@ -253,6 +254,10 @@ int SetupBLE()
     {
         LOG_INF("enable Bluetooth with status %d", err);
     }
+
+	/* Initialize the Bluetooth mcumgr transport. */
+	smp_bt_register();
+
     k_timer_init(&rssiPollTimer, RssiPollTimerHandler, nullptr);
     k_sem_init(&rssiPollSemaphore, 0, 1);
     k_thread_create(&worker, pollStackArea, K_THREAD_STACK_SIZEOF(pollStackArea),
