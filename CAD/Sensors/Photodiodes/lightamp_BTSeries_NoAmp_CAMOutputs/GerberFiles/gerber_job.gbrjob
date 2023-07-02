@@ -1,7 +1,7 @@
 {
     "Header": {
         "Comment": "All values are metric (mm)",
-        "CreationDate": "2023-07-02T07:41:00Z",
+        "CreationDate": "2023-06-27T20:52:38Z",
         "GenerationSoftware": {
             "Application": "EAGLE",
             "Vendor": "Autodesk",
@@ -13,12 +13,12 @@
         "BoardThickness": 1.57,
         "LayerNumber": 2,
         "Name": {
-            "ProjectId": "FNIRS_Carrier_BT_Series"
+            "ProjectId": "LightSensorCircuit_BTSeriesHookup"
         },
         "Owner": "Garrett Flynn <gflynn@usc.edu>",
         "Size": {
-            "X": 119.38,
-            "Y": 37.719
+            "X": 111.0234,
+            "Y": 22.733
         }
     }
 }
