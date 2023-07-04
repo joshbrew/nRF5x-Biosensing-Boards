@@ -1,17 +1,17 @@
 // To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
-// &pwm0 {
-// 	status = "okay";
-// 	ch0-pin = <37>;
-// 	//ch0-inverted;
-// };
+&pwm0 {
+	status = "okay";
+	ch0-pin = <37>;
+	//ch0-inverted;
+};
 
 &uart0 {
     status = "okay";
     current-speed = <115200>;
-    tx-pin = <15>; //15 (BC840M), 22 (BT840)
-    rx-pin = <14>; //14 (BC840M), 17 (BT840)
+    tx-pin = <22>; //15 (BC840M), 22 (BT840)
+    rx-pin = <17>; //14 (BC840M), 17 (BT840)
     rts-pin = <0xFFFFFFFF>;
     cts-pin = <0xFFFFFFFF>;
 };
@@ -19,8 +19,8 @@
 &spi0 {
     compatible = "nordic,nrf-spim";
     status = "okay";
-    sck-pin = <44>;         //44 (BC840M), 15 (BT840)
-    mosi-pin = <35>; //DIN  //35 (BC840M), 14 (BT840)
+    sck-pin = <15>;         //44 (BC840M), 15 (BT840)
+    mosi-pin = <14>; //DIN  //35 (BC840M), 14 (BT840)
     miso-pin = <34>; //DOUT //34 (BC840M), 34 (BT840)
     cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>, <&gpio1 10 GPIO_ACTIVE_LOW>; //1.15 and 1.10 (BC840M), 1.01 and 1.15 (BT840)
 
@@ -47,8 +47,8 @@
 
 &i2c1 {
     status = "okay";
-    sda-pin = <5>; //5 (BC840M), 26 (BT840)
-    scl-pin = <3>; //3 (BC840M), 27 (BT840)
+    sda-pin = <26>; //5 (BC840M), 26 (BT840)
+    scl-pin = <27>; //3 (BC840M), 27 (BT840)
     max30102@57 {
         compatible = "maxim,max30102";
         label = "MAX30102";

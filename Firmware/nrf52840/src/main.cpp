@@ -17,17 +17,17 @@
 
 //FIX: for gpio 1.xx, use either 100 + the .xx or 32 + .xx (like the overlay)
 
-#define ADS_CS              ((uint8_t)47)  //  47 (BC840M),   33 (BT840)
-#define DATA_READY_GPIO     ((uint8_t)37)  // 37 (BC840M),    6 (BT840)
-#define ADS_RESET           ((uint8_t)45)  // 45 (BC840M),    8 (BC840M)
+#define ADS_CS              ((uint8_t)33)  //  47 (BC840M),   33 (BT840)
+#define DATA_READY_GPIO     ((uint8_t)6)  // 37 (BC840M),    6 (BT840)
+#define ADS_RESET           ((uint8_t)8)  // 45 (BC840M),    8 (BC840M)
 
-#define ADS_1_CS            ((uint8_t)42)  //  42 (BC840M),   36 (BT840)
-#define DATA_READY_1_GPIO   ((uint8_t)24)  // 24 (BC840M),   40 (BT840)
-#define ADS_1_RESET         ((uint8_t)29)  //  29 (BC840M),   35 (BT840)
+#define ADS_1_CS            ((uint8_t)36)  //  42 (BC840M),   36 (BT840)
+#define DATA_READY_1_GPIO   ((uint8_t)40)  // 24 (BC840M),   40 (BT840)
+#define ADS_1_RESET         ((uint8_t)35)  //  29 (BC840M),   35 (BT840)
 
-#define DBG_LED             ((uint8_t)20)  //  20 (BC840),    25 (BT840)     
-#define MAX_INT             ((uint8_t)28)  // 28 (BC840M),    7 (BT840)
-#define MPU_INT             ((uint8_t)2)   //    2 (BC840M),   38 (BT840)
+#define DBG_LED             ((uint8_t)25)  //  20 (BC840),    25 (BT840)     
+#define MAX_INT             ((uint8_t)7)  // 28 (BC840M),    7 (BT840)
+#define MPU_INT             ((uint8_t)38)   //    2 (BC840M),   38 (BT840)
 
 
 static const uint8_t samplesPerLED = 3;
@@ -38,7 +38,7 @@ static const uint8_t nLEDs = 3;
 
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
-    22, 25, 255//, 15, 25, 
+    20, 21, 255//, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
@@ -95,32 +95,6 @@ static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
 #define TPRIORITY 7
 
 
-
-// PWM // because we forgot the CLKOUT pin on a draft BT840/BT40 PCB
-
-// #include <drivers/pwm.h>
-
-// #define PWM_CLK     ((uint32_t) 8192000) //Frequency (Hz)
-// #define PWM_PERIOD_NSEC ((uint8_t) 122) //1/Frequency in nanosec
-// #define PWM_PIN     37 //(BT840 draft 1 missing the CLKOUT pin in same position)
-
-// void initPWM(void) {
-
-//     const struct device *pwm;
-
-//     //ERROR
-// 	   pwm = device_get_binding("PWM_0");
-
-//     pwm_pin_set_nsec(
-//         pwm, 
-//         PWM_PIN, 
-//         PWM_PERIOD_NSEC, 
-//         PWM_PERIOD_NSEC / 2U, 
-//         0
-//     );
-// }
-
-// //////////////////////////////
 
 
 
@@ -303,9 +277,6 @@ void blink(void) {
 
 
 
-
-
-
 static int gpio_init(void){
 	int ret = 0;
 
@@ -367,6 +338,34 @@ static int gpio_init(void){
     return ret;
 }
 
+
+
+
+// PWM // because we forgot the CLKOUT pin on a draft BT840/BT40 PCB
+
+#include <drivers/pwm.h>
+
+#define PWM_CLK     ((uint32_t) 8192000) //Frequency (Hz)
+#define PWM_PERIOD_NSEC ((uint8_t) 122) //1/Frequency in nanosec
+#define PWM_PIN     37 //(BT840 draft 1 missing the CLKOUT pin in same position)
+
+void initPWM(void) {
+
+    const struct device *pwm;
+
+    //ERROR
+	   pwm = device_get_binding("PWM_0");
+
+    pwm_pin_set_nsec(
+        pwm, 
+        PWM_PIN, 
+        PWM_PERIOD_NSEC, 
+        PWM_PERIOD_NSEC / 2U, 
+        0
+    );
+}
+
+// //////////////////////////////
 
 
 static int * setupadc(ADS131M08 * adc) {
@@ -593,7 +592,7 @@ void main(void)
     uint16_t reg_value = 0;
 
     ret = gpio_init();
-
+    initPWM();
     setupLEDS();
 
     k_work_init(&interrupt_work_item,               interrupt_workQueue_handler);
