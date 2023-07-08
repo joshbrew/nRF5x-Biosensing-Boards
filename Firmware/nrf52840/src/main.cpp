@@ -15,8 +15,6 @@
 
 #include "ble_service.hpp"
 
-//FIX: for gpio 1.xx, use either 100 + the .xx or 32 + .xx (like the overlay)
-
 #define ADS_CS              ((uint8_t)33)  //   47 (BC840M),   33 (BT840)
 #define DATA_READY_GPIO     ((uint8_t)6)  //   37 (BC840M),    6 (BT840)
 #define ADS_RESET           ((uint8_t)8)  //   45 (BC840M),    8 (BC840M)
@@ -34,12 +32,15 @@
 #define PWM_PERIOD_NSEC ((uint8_t)122) //1/Frequency in nanosec
 #define PWM_PIN         ((uint8_t)37) //(BT840 draft 1 missing the CLKOUT pin in same position)
 
+bool usePWM = true;
 
 static const uint8_t samplesPerLED = 3;
 
 static uint32_t LEDt_ms = 100;
 static const uint8_t nLEDs = 3;
 
+
+bool useLEDS = false;
 
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
@@ -507,7 +508,7 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     sampleNum++;
     i++;
 
-    incrLEDSampleCtr();
+    if(useLEDS) incrLEDSampleCtr();
 
     if(i == 9){
         i = 0;
@@ -592,8 +593,8 @@ void main(void)
     gpio_init();
     ret = sensor_gpio_int();
 
-    initPWM();
-    setupLEDS();
+    if(usePWM) initPWM();
+    if(useLEDS) setupLEDS();
 
     k_work_init(&interrupt_work_item,               interrupt_workQueue_handler);
     k_work_init(&ads131m08_1_interrupt_work_item,   ads131m08_1_interrupt_workQueue_handler);

@@ -1,6 +1,13 @@
 // To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
+&pwm0 {
+	status = "okay";
+	ch0-pin = <33>;
+	//ch0-inverted;
+};
+
+
 &uart0 {
     status = "disabled";
 };
