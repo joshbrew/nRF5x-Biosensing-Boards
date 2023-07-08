@@ -30,6 +30,11 @@
 #define MPU_INT             ((uint8_t)38)   //    2 (BC840M),   38 (BT840)
 
 
+#define PWM_CLK     ((uint32_t) 8192000) //Frequency (Hz)
+#define PWM_PERIOD_NSEC ((uint8_t) 122) //1/Frequency in nanosec
+#define PWM_PIN     ((uint8_t)37) //(BT840 draft 1 missing the CLKOUT pin in same position)
+
+
 static const uint8_t samplesPerLED = 3;
 
 static uint32_t LEDt_ms = 100;
@@ -238,6 +243,7 @@ static void alternateLEDs() {
     }
     
     LEDn++;
+    
     if (LEDn >= nLEDs) {
         LEDn = 0;
     }
@@ -344,10 +350,6 @@ static int gpio_init(void){
 // PWM // because we forgot the CLKOUT pin on a draft BT840/BT40 PCB
 
 #include <drivers/pwm.h>
-
-#define PWM_CLK     ((uint32_t) 8192000) //Frequency (Hz)
-#define PWM_PERIOD_NSEC ((uint8_t) 122) //1/Frequency in nanosec
-#define PWM_PIN     37 //(BT840 draft 1 missing the CLKOUT pin in same position)
 
 void initPWM(void) {
 
