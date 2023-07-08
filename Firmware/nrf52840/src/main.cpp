@@ -61,14 +61,15 @@ static uint8_t LEDSampleCtr = 0;
 LOG_MODULE_REGISTER(main);
 
 /* Static Functions */
-static int  sensor_gpio_init(void);
+static int  gpio_init(void);
+static int  sensor_gpio_int(void);
+static int  setADS131_int(void);
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void interrupt_workQueue_handler(struct k_work* wrk);
 static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk);
 static void max30102_interrupt_workQueue_handler(struct k_work* wrk);
 static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk);
-static int  setADS131GPIO(void);
 static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 
@@ -281,11 +282,8 @@ void blink(void) {
 // K_THREAD_DEFINE(blink0_id, SSIZE, blink, NULL, NULL, NULL,
 //         TPRIORITY, 0, 0);
 
-
-
-static int sensor_gpio_init(void){
-	int ret = 0;
-
+static int gpio_init(void) {
+    
     gpio_0_dev = device_get_binding("GPIO_0");
 	if (gpio_0_dev == NULL) {
 		LOG_ERR("***ERROR: GPIO_0 device binding!");
@@ -296,18 +294,11 @@ static int sensor_gpio_init(void){
 		LOG_ERR("***ERROR: GPIO_1 device binding!");
         return -1;
 	}        
-#if 0
-        ret += configureGPIO(DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-        ret += configureInterrupt(DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
-        ret += addGPIOCallback(DATA_READY_GPIO, &callback, &ads131m08_drdy_cb);
-    if (ret != 0){
-        LOG_ERR("***ERROR: GPIO initialization\n");
-    }
-#endif
-    //setADS131GPIO();
+
+    //setADS131_int();
     //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
     
-    ret = configureGPIO(DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
+    configureGPIO(DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
     setGPIO(DBG_LED, 0);
 
     LOG_INF("Entering sleep...");
@@ -315,6 +306,12 @@ static int sensor_gpio_init(void){
     LOG_INF("Waking up...");
 
     setGPIO(DBG_LED, 1);
+
+}
+
+static int sensor_gpio_int(void){
+	int ret = 0;
+
 
 /* Max30102 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
@@ -346,7 +343,7 @@ static int sensor_gpio_init(void){
 
 
 
-static int setADS131GPIO(void){
+static int setADS131_int(void){
     int ret = 0;
 
 //ADS131M08_0
@@ -368,7 +365,7 @@ static int setADS131GPIO(void){
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("Data Ready Int'd!");
+        LOG_INF("Data Ready 1 Int'd!");
     } 
 
     return ret;
@@ -592,7 +589,9 @@ void main(void)
     int ret = 0;
     uint16_t reg_value = 0;
 
-    ret = sensor_gpio_init();
+    gpio_init();
+    ret = sensor_gpio_int();
+
     initPWM();
     setupLEDS();
 
@@ -658,7 +657,7 @@ void main(void)
     // //LOG_INF("1...");
     // k_msleep(1000);
 
-    setADS131GPIO();
+    setADS131_int();
 
     //uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
 

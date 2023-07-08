@@ -22,7 +22,7 @@
     sck-pin =  <15>;         //44 (BC840M),  15 (BT840)
     mosi-pin = <14>; //DIN   //35 (BC840M),  14 (BT840)
     miso-pin = <34>; //DOUT  //34 (BC840M),  34 (BT840)
-    cs-gpios = <&gpio1 15 GPIO_ACTIVE_LOW>, <&gpio1 1 GPIO_ACTIVE_LOW>; //1.15 and 1.10 (BC840M), 1.01 and 1.15 (BT840)
+    cs-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>, <&gpio1 15 GPIO_ACTIVE_LOW>; //1.15 and 1.10 (BC840M), 1.01 and 1.15 (BT840)
 
     ads131m08_0: ads131m08@0 {
         status = "okay";
