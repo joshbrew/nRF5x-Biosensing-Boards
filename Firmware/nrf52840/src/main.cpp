@@ -47,7 +47,7 @@
 static bool usePWM = true;
 
 static bool useADCs = true;
-static bool useLEDS = false;
+static bool useLEDS = true;
 
 static const uint8_t samplesPerLED = 3;
 
@@ -57,7 +57,7 @@ static const uint8_t nLEDs = 3;
 
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
-    20, 25, 255//, 15, 25, 
+    20, 21, 255//, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
