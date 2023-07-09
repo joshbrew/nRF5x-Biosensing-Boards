@@ -27,7 +27,7 @@
 
 #define ADS_CS              ((uint8_t)33)  //   47 (BC840M),   33 (BT840)
 #define DATA_READY_GPIO     ((uint8_t)6)  //   37 (BC840M),    6 (BT840)
-#define ADS_RESET           ((uint8_t)8)  //   45 (BC840M),    8 (BC840M)
+#define ADS_RESET           ((uint8_t)8)  //   45 (BC840M),    8 (BT840)
 
 #define ADS_1_CS            ((uint8_t)36)  //  42 (BC840M),    36 (BT840)
 #define DATA_READY_1_GPIO   ((uint8_t)40)  //  24 (BC840M),    40 (BT840)
