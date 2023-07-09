@@ -34,6 +34,7 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
         SYNCRST = sync_rst_pin - 32;
     } else {
         gpioDevice = device_get_binding("GPIO_0");
+        SYNCRST = sync_rst_pin;
     }
     if(gpioDevice == nullptr){
         deviceStatus.store(-1, std::memory_order_relaxed);

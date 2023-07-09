@@ -8,6 +8,8 @@
 #include <atomic>
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
+#include "ble_types.hpp"
+#include "ble_commands.hpp"
 
 class UsbCommHandler;
 
@@ -474,7 +476,18 @@ private:
      * @brief Wakeup Mpu6050 device
      */
     void Wakeup();
-    
+
+    /**
+     * @brief Called when trigger mode is received via BLE
+     * 
+     * @param buffer receviced buffer
+     * @param length buffer length
+     * @param offset data offset
+     * 
+     * @return true if command was processed succesfully
+     */
+    bool OnBleCommand(const uint8_t* buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset);
+
     /**
      * @brief Read Temperature Registers
      */

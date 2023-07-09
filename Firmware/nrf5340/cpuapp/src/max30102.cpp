@@ -11,7 +11,7 @@
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
 
-LOG_MODULE_REGISTER(max30102);
+LOG_MODULE_REGISTER(max30102, LOG_LEVEL_INF);
 
 Max30102::Max30102(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_INF("Max30102 Constructor!");
@@ -48,7 +48,38 @@ int Max30102::Initialize() {
     k_msleep(5);
     Shutdown();
 
+    Bluetooth::GattRegisterControlCallback(CommandId::Max30102Cmd,
+        [this](const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset)
+        {
+            return OnBleCommand(buffer, key, length, offset);
+        });
+
     return 0;
+}
+
+bool Max30102::OnBleCommand(const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset){
+    if (offset.value != 0 || length.value == 0)
+    {
+        return false;
+    }
+    LOG_DBG("Max30102 BLE Command received");
+
+    Bluetooth::CommandKey bleCommand;
+    memcpy(&bleCommand, &key, sizeof(key));
+          
+    switch(bleCommand.key[0]){
+        case static_cast<uint8_t>(BleCommand::StartSampling):
+            StartSampling();
+            break;
+        case static_cast<uint8_t>(BleCommand::StopSampling):
+            StopSampling();
+            break;
+        
+        default:
+            break;
+    }
+    
+    return true;
 }
 
 int Max30102::Configure(max30102_config config){

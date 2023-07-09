@@ -2,6 +2,9 @@
 
 #include <functional>
 
+#include "ble_types.hpp"
+#include "commandid.hpp"
+
 namespace Bluetooth
 {
     /**
@@ -44,6 +47,14 @@ namespace Bluetooth
     void Mpu6050Notify(const uint8_t* data, const uint8_t len);
 
     /**
+     * @brief Send BLE notification through QMC5883L Data Pipe.
+     * 
+     * @param data pointer to datasource containing QMC5883L data samples
+     * @param len  the number of samples to transfer
+     */
+    void Qmc5883lNotify(const uint8_t* data, const uint8_t len);
+
+    /**
      * @brief Send BLE notification through BME280 Data Pipe.
      * 
      * @param data pointer to datasource containing BME280 data samples
@@ -66,4 +77,13 @@ namespace Bluetooth
      * @brief Stop taking signal strength (RSSI) values
      */
     void RssiStopSampling();
+
+    /**
+     * @brief Register Control callback
+     * 
+     * @param commandId command ID
+     * @param action Action to call when command ith commandId is received via BLE
+     */
+    void GattRegisterControlCallback(CommandId commandId, BleControlAction&& action);
+
 }

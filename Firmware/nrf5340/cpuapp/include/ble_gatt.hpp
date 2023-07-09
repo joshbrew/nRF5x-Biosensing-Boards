@@ -5,6 +5,9 @@
 #include <bluetooth/gatt.h>
 #include <sys/atomic.h>
 
+#include "ble_types.hpp"
+#include "commandid.hpp"
+
 namespace Bluetooth::Gatt
 {
 
@@ -37,6 +40,11 @@ namespace Bluetooth::Gatt
      * @brief State of the RSSI Notifications.
      */
     extern atomic_t rssiNotificationsEnable;
+
+    /**
+     * @brief State of the Qmc5883l Notifications.
+     */
+    extern atomic_t qmc5883lNotificationsEnable;
 
     /**
      * @brief GATT service
@@ -74,10 +82,22 @@ namespace Bluetooth::Gatt
     constexpr static int CharacteristicRssiData = 19;    
 
     /**
+     * @brief Index of the Gatt Qmc5883l Data characteristic in service characteristic table
+     */
+    constexpr static int CharacteristicQmc5883lData = 22;
+
+    /**
      * @brief Callback called when Bluetooth is initialized. Starts BLE server
      * 
      * @param err bluetooth initialization error code
      */
     void OnBluetoothStarted(int err);
 
+    /**
+     * @brief Register Control callback
+     * 
+     * @param commandId command ID
+     * @param action Action to call when command ith commandId is received via BLE
+     */
+    void GattSetControlCallback(CommandId commandId, BleControlAction&& action);
 }

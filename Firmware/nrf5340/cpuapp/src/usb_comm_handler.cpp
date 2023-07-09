@@ -71,6 +71,16 @@ void UsbCommHandler::SendAccelSamples(const uint8_t *buffer, size_t length){
     } 
 }
 
+void UsbCommHandler::SendMagnetometerSamples(const uint8_t *buffer, size_t length){
+    
+    if(serial.IsInitialized()){
+        LOG_INF("=");
+        SerialTransfer *transfer = CreateTransferFrom(SensorId::Qmc5883l, buffer, length, 0);
+
+        QueueTransfer(transfer);   
+    } 
+}
+
 void UsbCommHandler::SendMax30102Samples(const uint8_t *buffer, size_t length){
     
     if(serial.IsInitialized()){

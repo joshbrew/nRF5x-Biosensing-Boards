@@ -1,6 +1,8 @@
 #include "bme280.hpp"
+// For registering callback
+#include "ble_service.hpp"
 
-LOG_MODULE_REGISTER(bme280);
+LOG_MODULE_REGISTER(bme280, LOG_LEVEL_INF);
 
 Bme280::Bme280(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_INF("Bme280 Constructor!");
@@ -31,7 +33,38 @@ int Bme280::Initialize() {
         return -1;        
     }
 
+    Bluetooth::GattRegisterControlCallback(CommandId::Bme280Cmd,
+        [this](const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset)
+        {
+            return OnBleCommand(buffer, key, length, offset);
+        });
+
     return ret;
+}
+
+bool Bme280::OnBleCommand(const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset){
+    if (offset.value != 0 || length.value == 0)
+    {
+        return false;
+    }
+    LOG_DBG("Bme280 BLE Command received");
+
+    Bluetooth::CommandKey bleCommand;
+    memcpy(&bleCommand, &key, sizeof(key));
+          
+    switch(bleCommand.key[0]){
+        case static_cast<uint8_t>(BleCommand::StartSampling):
+            StartSampling();
+            break;
+        case static_cast<uint8_t>(BleCommand::StopSampling):
+            StopSampling();
+            break;
+        
+        default:
+            break;
+    }
+    
+    return true;
 }
 
 void Bme280::GetChipId(const struct device *dev){

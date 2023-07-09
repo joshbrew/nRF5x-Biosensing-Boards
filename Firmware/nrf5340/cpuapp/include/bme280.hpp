@@ -10,6 +10,8 @@
 
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
+#include "ble_types.hpp"
+#include "ble_commands.hpp"
 
 class UsbCommHandler;
 
@@ -186,6 +188,17 @@ private:
      * @brief Read ID register and figure out whether we have BMP280 or BME280 on I2C bus
      */
     void GetChipId(const struct device *dev);
+
+    /**
+     * @brief Called when trigger mode is received via BLE
+     * 
+     * @param buffer receviced buffer
+     * @param length buffer length
+     * @param offset data offset
+     * 
+     * @return true if command was processed succesfully
+     */
+    bool OnBleCommand(const uint8_t* buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset);
 
     /**
      * @brief Timer handler. Used to queue Reading of the BME280 data.
