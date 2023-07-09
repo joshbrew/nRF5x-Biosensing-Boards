@@ -71,3 +71,24 @@
         label = "CDC_ACM_0";
     };
 };
+
+
+// &clock {
+//     hfclkaudio-frequency = <11289600>;
+// };
+
+// i2s_rxtx: &i2s0 {
+//     status = "okay";
+//     sck-pin = <45>;
+//     lrck-pin = <46>;
+//     sdout-pin = <44>;
+//     sdin-pin = <42>;
+//     clock-source = "ACLK";
+// };
+
+// dmic_dev: &pdm0 {
+// 	status = "okay";
+// 	clk-pin = <36>;
+// 	din-pin = <23>;
+// 	clock-source = "ACLK";
+// };

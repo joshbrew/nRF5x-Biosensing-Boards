@@ -10,10 +10,20 @@
 #include "max30102.hpp"
 #include "mpu6050.hpp"
 #include "bme280.hpp"
+#include "qmc5883l.hpp"
 #include "serial_controller.hpp"
 #include "usb_comm_handler.hpp"
+// #include "audio_module.hpp"
+// #include "dmic_module.hpp"
 
 #include "ble_service.hpp"
+// Needed for OTA
+#include "os_mgmt/os_mgmt.h"
+#include "img_mgmt/img_mgmt.h"
+
+// PWM // because we forgot the CLKOUT pin on a draft BT840/BT40 PCB
+#include <drivers/pwm.h>
+
 
 #define ADS_CS              ((uint8_t)33)  //   47 (BC840M),   33 (BT840)
 #define DATA_READY_GPIO     ((uint8_t)6)  //   37 (BC840M),    6 (BT840)
@@ -27,12 +37,17 @@
 #define MAX_INT             ((uint8_t)7)  //  28 (BC840M),     7 (BT840)
 #define MPU_INT             ((uint8_t)38)   //  2 (BC840M),     38 (BT840)
 
+#define QMC5883L_DRDY       ((uint8_t)28)  //                  28 (BT840)
 
 #define PWM_CLK         ((uint32_t)8192000) //Frequency (Hz)
 #define PWM_PERIOD_NSEC ((uint8_t)122) //1/Frequency in nanosec
 #define PWM_PIN         ((uint8_t)37) //(BT840 draft 1 missing the CLKOUT pin in same position)
 
-bool usePWM = true;
+//disable on BC840M, enable on BT840
+static bool usePWM = true;
+
+static bool useADCs = true;
+static bool useLEDS = false;
 
 static const uint8_t samplesPerLED = 3;
 
@@ -40,11 +55,9 @@ static uint32_t LEDt_ms = 100;
 static const uint8_t nLEDs = 3;
 
 
-bool useLEDS = false;
-
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
-    20, 21, 255//, 15, 25, 
+    20, 25, 255//, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
     //15, 25, 15, 25, 
@@ -57,22 +70,24 @@ static uint8_t LEDn = 0;
 static uint8_t LEDSampleCtr = 0;
 
 
-
-
 LOG_MODULE_REGISTER(main);
 
 /* Static Functions */
 static int  gpio_init(void);
 static int  sensor_gpio_int(void);
 static int  setADS131_int(void);
-static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
-static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+
 static void interrupt_workQueue_handler(struct k_work* wrk);
 static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk);
 static void max30102_interrupt_workQueue_handler(struct k_work* wrk);
 static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk);
+static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk);
+
+static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 
 /* Global variables */
 const struct device *gpio_0_dev;
@@ -81,10 +96,12 @@ struct gpio_callback callback;
 struct gpio_callback ads131m08_1_callback;
 struct gpio_callback max30102_callback;
 struct gpio_callback mpu6050_callback;
+struct gpio_callback qmc5883l_callback;
 struct k_work        interrupt_work_item;    ///< interrupt work item
 struct k_work        ads131m08_1_interrupt_work_item;    ///< interrupt work item
 struct k_work        max30102_interrupt_work_item;    ///< interrupt work item
 struct k_work        mpu6050_interrupt_work_item;    ///< interrupt work item
+struct k_work qmc5883l_interrupt_work_item;    ///< interrupt work item
 
 static uint8_t sampleNum = 0;
 static uint8_t ads131m08_1_sampleNum = 0;
@@ -129,6 +146,11 @@ static mpu6050_config mpu6050_default_config = {
     .pwr_mgmt_2 = 0x00              // Don't use Accelerometer only Low Power mode. XYZ axes of Gyro and Accel enabled. 
 }; 
 
+static qmc5883l_config qmc5883l_default_config = {
+    .ctrl_reg_1 = (QMC5833L_OSR_512 << 6) | (QMC5833L_FS_8G << 4) | (QMC5833L_ODR_100Hz << 2) | (QMC5833L_MODE_STANDBY),
+    .ctrl_reg_2 = 0
+}; 
+
 ADS131M08 adc;
 ADS131M08 adc_1;
 SerialController serial;
@@ -136,7 +158,28 @@ UsbCommHandler usbCommHandler(serial);
 Max30102 max30102(usbCommHandler);
 Mpu6050 mpu6050(usbCommHandler);
 Bme280 bme280(usbCommHandler);
+Qmc5883l qmc5883l(usbCommHandler);
+//AudioModule audio;
+//DmicModule dmic;
 
+
+
+void initPWM(void) {
+
+    const struct device *pwm;
+
+	pwm = device_get_binding("PWM_0");
+
+    pwm_pin_set_nsec(
+        pwm, 
+        PWM_PIN, 
+        PWM_PERIOD_NSEC, 
+        PWM_PERIOD_NSEC / 2U, 
+        0
+    );
+}
+
+// //////////////////////////////
 
 
 
@@ -331,14 +374,24 @@ static int sensor_gpio_int(void){
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
     ret += configureGPIO(MPU_INT, GPIO_INPUT | GPIO_PULL_UP);
     ret += configureInterrupt(MPU_INT, GPIO_INT_EDGE_FALLING);
-    ret += addGPIOCallback(MPU_INT, &mpu6050_callback,&mpu6050_irq_cb);
+    ret += addGPIOCallback(MPU_INT, &mpu6050_callback, &mpu6050_irq_cb);
 
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
         LOG_INF("Mpu6050 Interrupt pin Int'd!");
     } 
-
+/* QMC5883L Interrupt */
+//TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
+    ret += configureGPIO( QMC5883L_DRDY, GPIO_INPUT | GPIO_PULL_DOWN); // Pin P0.2
+    ret += configureInterrupt( QMC5883L_DRDY, GPIO_INT_EDGE_RISING);
+    ret += addGPIOCallback(QMC5883L_DRDY, &qmc5883l_callback, &qmc5883l_irq_cb);
+    if (ret != 0){
+        LOG_ERR("***ERROR: GPIO initialization\n");
+    } else {
+        LOG_INF("QMC5883L Interrupt pin Int'd!");
+    } 
+   
     return ret;
 }
 
@@ -371,28 +424,6 @@ static int setADS131_int(void){
 
     return ret;
 }
-
-
-// PWM // because we forgot the CLKOUT pin on a draft BT840/BT40 PCB
-
-#include <drivers/pwm.h>
-
-void initPWM(void) {
-
-    const struct device *pwm;
-
-	pwm = device_get_binding("PWM_0");
-
-    pwm_pin_set_nsec(
-        pwm, 
-        PWM_PIN, 
-        PWM_PERIOD_NSEC, 
-        PWM_PERIOD_NSEC / 2U, 
-        0
-    );
-}
-
-// //////////////////////////////
 
 
 static int * setupadc(ADS131M08 * adc) {
@@ -488,6 +519,9 @@ static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, 
     k_work_submit(&mpu6050_interrupt_work_item);     
 }
 
+static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
+    k_work_submit(&qmc5883l_interrupt_work_item);     
+}
 
 /**
  * @brief IntWorkQueue handler. Used to process interrupts coming from ADS131M08 Data Ready interrupt pin 
@@ -567,28 +601,23 @@ static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
     mpu6050.HandleInterrupt();
 }
 
+/**
+ * @brief IntWorkQueue handler. Used to process interrupts coming from QMC5883L interrupt pin 
+ * Because all activity is performed on cooperative level no addition protection against data corruption is required
+ * @param wrk work object
+ * @warning  Called by system scheduled in cooperative level.
+ */
+static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk)
+{	
+    //LOG_INF("QMC5883L Interrupt!");
+    qmc5883l.HandleInterrupt();
+}
 
 
 
-
-
-
-
-
-
-
-/**    MAIN    */
-
-void main(void)
-{
-    LOG_ERR("This is a error message!");
-    LOG_WRN("This is a warning message!");
-    LOG_INF("This is a information message!");
-    LOG_DBG("This is a debugging message!");
-    // ble_tx_buff[225] = 0x0D;
-    // ble_tx_buff[226] = 0x0A;
+static void setupPeripherals() {
+    
     int ret = 0;
-    uint16_t reg_value = 0;
 
     gpio_init();
     ret = sensor_gpio_int();
@@ -600,7 +629,8 @@ void main(void)
     k_work_init(&ads131m08_1_interrupt_work_item,   ads131m08_1_interrupt_workQueue_handler);
     k_work_init(&max30102_interrupt_work_item,      max30102_interrupt_workQueue_handler);
     k_work_init(&mpu6050_interrupt_work_item,       mpu6050_interrupt_workQueue_handler);
-    
+    k_work_init(&qmc5883l_interrupt_work_item,      qmc5883l_interrupt_workQueue_handler);
+
     if (ret == 0){
         //LOG_INF("GPIOs Int'd!");        
     }
@@ -608,19 +638,21 @@ void main(void)
     serial.Initialize();
     usbCommHandler.Initialize();
     
-    adc.init(
-        ADS_CS, 
-        DATA_READY_GPIO, 
-        ADS_RESET, 
-        8192000
-    ); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
-    
-    adc_1.init(
-        ADS_1_CS, 
-        DATA_READY_1_GPIO, 
-        ADS_1_RESET, 
-        8192000
-    ); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    if(useADCs){
+        adc.init(
+            ADS_CS, 
+            DATA_READY_GPIO, 
+            ADS_RESET, 
+            8192000
+        ); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+        
+        adc_1.init(
+            ADS_1_CS, 
+            DATA_READY_1_GPIO, 
+            ADS_1_RESET, 
+            8192000
+        ); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    }
 
     max30102.Initialize();
     if(max30102.IsOnI2cBus()){
@@ -647,20 +679,59 @@ void main(void)
         LOG_WRN("***WARNING: BME280 is not connected or properly initialized!");
     }
 
-    Bluetooth::SetupBLE();
+    qmc5883l.Initialize();
+    if(qmc5883l.IsOnI2cBus()){
+        LOG_INF("QMC5883L is on I2C bus!");
+        qmc5883l.Configure(qmc5883l_default_config);
+        qmc5883l.StartSampling();
+    } else {
+        LOG_WRN("***WARNING: QMC5883L is not connected or properly initialized!");
+    }
 
-    setupadc(&adc);
-    setupadc(&adc_1);
+    // ret = audio.Initialize();
+    // LOG_INF("audio.Initialize: %d", ret);
+
+    // ret = dmic.Initialize();
+    // LOG_INF("dmic.Initialize: %d", ret);
+
+    if(useADCs) {
+        setupadc(&adc);
+        setupadc(&adc_1);
+        setADS131_int();
+    }
+
+
+    //uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
+
+}
+
+
+/**    MAIN    */
+
+void main(void)
+{
+    LOG_INF("Entry point");
+    // LOG_ERR("This is a error message!");
+    // LOG_WRN("This is a warning message!");
+    // LOG_INF("This is a information message!");
+    // LOG_DBG("This is a debugging message!");
+    // ble_tx_buff[225] = 0x0D;
+    // ble_tx_buff[226] = 0x0A;
+
+    // Needed for OTA
+    os_mgmt_register_group();
+    img_mgmt_register_group();
+
+    setupPeripherals();
+
+    Bluetooth::SetupBLE();
+    
     //LOG_INF("Starting in 3...");
     // k_msleep(1000);
     // //LOG_INF("2...");
     // k_msleep(1000);
     // //LOG_INF("1...");
     // k_msleep(1000);
-
-    setADS131_int();
-
-    //uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
 
     while(1){
 
