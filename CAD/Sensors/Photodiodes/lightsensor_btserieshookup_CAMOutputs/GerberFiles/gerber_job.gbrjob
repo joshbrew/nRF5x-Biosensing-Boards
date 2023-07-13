@@ -1,7 +1,7 @@
 {
     "Header": {
         "Comment": "All values are metric (mm)",
-        "CreationDate": "2023-06-27T20:52:38Z",
+        "CreationDate": "2023-07-13T22:02:22Z",
         "GenerationSoftware": {
             "Application": "EAGLE",
             "Vendor": "Autodesk",
@@ -13,7 +13,7 @@
         "BoardThickness": 1.57,
         "LayerNumber": 2,
         "Name": {
-            "ProjectId": "LightSensorCircuit_BTSeriesHookup"
+            "ProjectId": "LightSensorCircuitNoAmp_BTSeriesHookup"
         },
         "Owner": "Garrett Flynn <gflynn@usc.edu>",
         "Size": {

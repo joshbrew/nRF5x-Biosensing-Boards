@@ -8234,23 +8234,6 @@ Created 2014-06-03, Karrer Zheng&lt;br&gt;
 <label x="24.892" y="1.27" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="LED3_P11" class="0">
-<segment>
-<pinref part="J1" gate="G$1" pin="3"/>
-<wire x1="22.098" y1="4.064" x2="23.876" y2="4.064" width="0.1524" layer="91"/>
-<label x="24.638" y="3.81" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="R3" gate="G$1" pin="2"/>
-<wire x1="245.11" y1="45.72" x2="241.3" y2="45.72" width="0.1524" layer="91"/>
-<label x="236.22" y="43.18" size="1.778" layer="95"/>
-</segment>
-<segment>
-<wire x1="96.012" y1="5.08" x2="93.472" y2="5.08" width="0.1524" layer="91"/>
-<label x="85.852" y="5.08" size="1.778" layer="95"/>
-<pinref part="SV1" gate="G$1" pin="4"/>
-</segment>
-</net>
 <net name="LED2_P13" class="0">
 <segment>
 <pinref part="J1" gate="G$1" pin="5"/>
@@ -8268,21 +8251,38 @@ Created 2014-06-03, Karrer Zheng&lt;br&gt;
 <pinref part="SV1" gate="G$1" pin="6"/>
 </segment>
 </net>
-<net name="LED1_P12" class="0">
+<net name="LED1_P11" class="0">
 <segment>
-<pinref part="J1" gate="G$1" pin="9"/>
-<wire x1="22.098" y1="19.304" x2="24.384" y2="19.304" width="0.1524" layer="91"/>
-<label x="24.892" y="18.796" size="1.778" layer="95"/>
+<wire x1="96.012" y1="10.16" x2="93.472" y2="10.16" width="0.1524" layer="91"/>
+<label x="85.852" y="10.16" size="1.778" layer="95"/>
+<pinref part="SV1" gate="G$1" pin="8"/>
+</segment>
+<segment>
+<pinref part="J1" gate="G$1" pin="3"/>
+<wire x1="22.098" y1="4.064" x2="23.876" y2="4.064" width="0.1524" layer="91"/>
+<label x="24.638" y="3.81" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="245.11" y1="29.21" x2="241.3" y2="29.21" width="0.1524" layer="91"/>
 <label x="236.22" y="26.67" size="1.778" layer="95"/>
 </segment>
+</net>
+<net name="LED3_P12" class="0">
 <segment>
-<wire x1="96.012" y1="10.16" x2="93.472" y2="10.16" width="0.1524" layer="91"/>
-<label x="85.852" y="10.16" size="1.778" layer="95"/>
-<pinref part="SV1" gate="G$1" pin="8"/>
+<wire x1="96.012" y1="5.08" x2="93.472" y2="5.08" width="0.1524" layer="91"/>
+<label x="85.852" y="5.08" size="1.778" layer="95"/>
+<pinref part="SV1" gate="G$1" pin="4"/>
+</segment>
+<segment>
+<pinref part="J1" gate="G$1" pin="9"/>
+<wire x1="22.098" y1="19.304" x2="24.384" y2="19.304" width="0.1524" layer="91"/>
+<label x="24.892" y="18.796" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R3" gate="G$1" pin="2"/>
+<wire x1="245.11" y1="45.72" x2="241.3" y2="45.72" width="0.1524" layer="91"/>
+<label x="236.22" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
