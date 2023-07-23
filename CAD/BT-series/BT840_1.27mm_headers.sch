@@ -5426,23 +5426,6 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <label x="297.942" y="31.75" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="CLKIN" class="0">
-<segment>
-<pinref part="U5" gate="G$1" pin="XTAL1"/>
-<wire x1="439.293" y1="147.4978" x2="441.833" y2="147.4978" width="0.1524" layer="91"/>
-<label x="442.087" y="146.9898" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="X1" gate="G$1" pin="1"/>
-<wire x1="481.965" y1="139.3698" x2="479.425" y2="139.3698" width="0.1524" layer="91"/>
-<label x="476.885" y="141.9098" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="C3" gate="G$1" pin="1"/>
-<wire x1="471.805" y1="135.5344" x2="471.805" y2="139.3698" width="0.1524" layer="91"/>
-<label x="466.725" y="139.3698" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="0P" class="0">
 <segment>
 <pinref part="X5" gate="-1" pin="S"/>
@@ -6699,11 +6682,6 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <wire x1="507.365" y1="135.001" x2="507.365" y2="139.3698" width="0.1524" layer="91"/>
 <label x="507.365" y="139.3698" size="1.778" layer="95"/>
 </segment>
-<segment>
-<pinref part="X3" gate="-19" pin="S"/>
-<wire x1="192.0494" y1="35.814" x2="190.5" y2="35.814" width="0.1524" layer="91"/>
-<label x="180.594" y="35.052" size="1.778" layer="95"/>
-</segment>
 </net>
 <net name="TMR" class="0">
 <segment>
@@ -6916,6 +6894,28 @@ Source: http://www.leotronics.co.uk/Conexcon/Data%20Sheets/sec.%20A/1364ing.pdf<
 <wire x1="324.3326" y1="37.8206" x2="322.58" y2="37.8206" width="0.1524" layer="91"/>
 <wire x1="322.58" y1="37.8206" x2="322.58" y2="37.846" width="0.1524" layer="91"/>
 <label x="318.516" y="37.084" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="8.192MHZ" class="0">
+<segment>
+<pinref part="X3" gate="-19" pin="S"/>
+<wire x1="192.0494" y1="35.814" x2="190.5" y2="35.814" width="0.1524" layer="91"/>
+<label x="180.594" y="35.052" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U5" gate="G$1" pin="XTAL1"/>
+<wire x1="439.293" y1="147.4978" x2="441.833" y2="147.4978" width="0.1524" layer="91"/>
+<label x="442.087" y="146.9898" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="X1" gate="G$1" pin="1"/>
+<wire x1="481.965" y1="139.3698" x2="479.425" y2="139.3698" width="0.1524" layer="91"/>
+<label x="476.885" y="141.9098" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C3" gate="G$1" pin="1"/>
+<wire x1="471.805" y1="135.5344" x2="471.805" y2="139.3698" width="0.1524" layer="91"/>
+<label x="466.725" y="139.3698" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
