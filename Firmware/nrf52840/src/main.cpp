@@ -37,7 +37,7 @@
 #define MAX_INT             ((uint8_t)7)  //  28 (BC840M),     7 (BT840)
 #define MPU_INT             ((uint8_t)38)   //  2 (BC840M),     38 (BT840)
 
-#define QMC5883L_DRDY       ((uint8_t)28)  //                  28 (BT840)
+#define QMC5883L_DRDY       ((uint8_t)7)  //                  28 (BT840)
 
 #define PWM_CLK         ((uint32_t)8192000) //Frequency (Hz)
 #define PWM_PERIOD_NSEC ((uint8_t)122) //1/Frequency in nanosec
@@ -58,10 +58,18 @@ static const uint8_t nLEDs = 3;
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
     20, 21, 255//, 15, 25, 
-    //15, 25, 15, 25, 
-    //15, 25, 15, 25, 
-    //15, 25, 15, 25, 
-    //15, 25
+    /*
+    255,
+    12, 111,
+    31, 109,
+    110, 30,
+    7, 28,
+    106, 22,
+    5, 17,
+    3, 24,
+    4, 29,
+    113, 107
+    */
 };
 
 //LEDs 1.01, 1.11 etc are 32 + the number after the decimal. 1.00 is pin 32 (pretty sure)

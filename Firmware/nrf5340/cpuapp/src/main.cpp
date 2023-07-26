@@ -28,44 +28,55 @@
 #define DATA_READY_GPIO     ((uint8_t)15)  
 #define ADS_RESET           ((uint8_t)12)  
 
-#define ADS_1_CS            ((uint8_t)30)
-#define DATA_READY_1_GPIO   ((uint8_t)11) 
-#define ADS_1_RESET         ((uint8_t)9)
+#define ADS_1_CS            ((uint8_t)25)  // 30
+#define DATA_READY_1_GPIO   ((uint8_t)13)  // 11
+#define ADS_1_RESET         ((uint8_t)108) // 9
 
-#define DBG_LED             ((uint8_t)19) //red LED
+#define DBG_LED             ((uint8_t)19)  //Red LED
 
-#define MAX_INT             ((uint8_t)4)
+#define MAX_INT             ((uint8_t)113) // 4
 
-#define MPU_INT             ((uint8_t)5)
-#define QMC5883L_DRDY       ((uint8_t)6) // P0.12
+#define MPU_INT             ((uint8_t)4)   // 5
+#define QMC5883L_DRDY       ((uint8_t)32)   // 6
 
 #define PWM_CLK         ((uint32_t)8192000) //Frequency (Hz)
 #define PWM_PERIOD_NSEC ((uint8_t)122) //1/Frequency in nanosec
-#define PWM_PIN         ((uint8_t)33) //(BT840 draft 1 missing the CLKOUT pin in same position)
+//#define PWM_PIN         ((uint8_t)33) //set in overlay //(BT840 draft 1 missing the CLKOUT pin in same position)
 
 static bool useADCs = true;
-static bool usePWM = true;
 static bool useLEDS = true;
+
+static bool usePWM = false; //fix for a prototype not having a CLKOUT pin proper
+static bool useAudio = false;
 
 static const uint8_t samplesPerLED = 3;
 
-static uint32_t LEDt_ms = 100;
-static const uint8_t nLEDs = 3;
-
-
+static const uint8_t nLEDs = 7; //4 //7 //19 //3 ///includes ambient reading (255)
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
-    37, 38, 255//, 15, 25, 
-    //15, 25, 15, 25, 
-    //15, 25, 15, 25, 
-    //15, 25, 15, 25, 
-    //15, 25
+    //37, 38, 255
+    
+    255, //ambient
+    //10, 30, 9 //12, 13, 11 //2 channel hookup
+    
+    //16 channel hookup
+    // 10, 109,
+     14, 107,
+    // 114, 17,
+    // 100,  6,
+    // 115, 21,
+     16,  24,
+     5,   31,
+    // 8,    7,
+    // 111, 104
+    
 };
 
 //LEDs 1.01, 1.11 etc are 32 + the number after the decimal. 1.00 is pin 32 (pretty sure)
 
 static uint8_t LEDn = 0;
 static uint8_t LEDSampleCtr = 0;
+//static uint32_t LEDt_ms = 100; //for a blink routine that doesnt work with all the threads
 
 LOG_MODULE_REGISTER(main);
 
@@ -161,6 +172,12 @@ DmicModule dmic;
 
 
 
+#if DT_NODE_HAS_STATUS(DT_ALIAS(pwmadc), okay)
+#define PWM_CHANNEL DT_PWMS_CHANNEL(DT_ALIAS(pwmadc))
+#else
+#error "Choose a supported PWM driver"
+#endif
+
 void initPWM(void) {
 
     const struct device *pwm;
@@ -169,9 +186,9 @@ void initPWM(void) {
 
     pwm_pin_set_nsec(
         pwm, 
-        PWM_PIN, 
+        PWM_CHANNEL, 
         PWM_PERIOD_NSEC, 
-        PWM_PERIOD_NSEC / 2U, 
+        PWM_PERIOD_NSEC / 2, 
         0
     );
 }
@@ -311,13 +328,13 @@ static void incrLEDSampleCtr() {
     }
 }
 
-void blink(void) {
-    setupLEDS();
-    while(1) {
-	    alternateLEDs();
-        k_msleep(LEDt_ms);
-    }
-}
+// void blink(void) {
+//     setupLEDS();
+//     while(1) {
+// 	    alternateLEDs();
+//         k_msleep(LEDt_ms);
+//     }
+// }
 
 // does not synchronize correctly
 // K_THREAD_DEFINE(blink0_id, SSIZE, blink, NULL, NULL, NULL,
@@ -685,11 +702,13 @@ static void setupPeripherals() {
         LOG_WRN("***WARNING: QMC5883L is not connected or properly initialized!");
     }
 
-    ret = audio.Initialize();
-    LOG_INF("audio.Initialize: %d", ret);
+    if(useAudio) {
+        ret = audio.Initialize();
+        LOG_INF("audio.Initialize: %d", ret);
 
-    ret = dmic.Initialize();
-    LOG_INF("dmic.Initialize: %d", ret);
+        ret = dmic.Initialize();
+        LOG_INF("dmic.Initialize: %d", ret);
+    }
 
     if(useADCs) {
         setupadc(&adc);

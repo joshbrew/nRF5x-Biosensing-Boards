@@ -81,14 +81,14 @@
 //     status = "okay";
 //     sck-pin = <45>;
 //     lrck-pin = <46>;
-//     sdout-pin = <44>;
+//     sdout-pin = <4>;
 //     sdin-pin = <42>;
 //     clock-source = "ACLK";
 // };
 
 // dmic_dev: &pdm0 {
 // 	status = "okay";
-// 	clk-pin = <36>;
-// 	din-pin = <23>;
+// 	clk-pin = <40>;
+// 	din-pin = <35>;
 // 	clock-source = "ACLK";
 // };

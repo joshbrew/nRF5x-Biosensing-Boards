@@ -1,6 +1,21 @@
 // To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
+/ {
+    
+    aliases {
+        pwmadc = &pwm_dev0;
+    };
+
+    pwmdevs {
+        compatible = "pwm-leds";
+        pwm_dev0: pwm_dev_0 {
+            pwms = <&pwm0 33>;
+        };
+    };
+
+};
+
 &pwm0 {
 	status = "okay";
 	ch0-pin = <33>;
@@ -30,7 +45,7 @@
     sck-pin = <23>;
     mosi-pin = <29>; //DIN
     miso-pin = <20>; //DOUT
-    cs-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>, <&gpio0 30 GPIO_ACTIVE_LOW>;
+    cs-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>, <&gpio0 25 GPIO_ACTIVE_LOW>;
 
     ads131m08_0: ads131m08@0 {
         status = "okay";
@@ -92,14 +107,14 @@ i2s_rxtx: &i2s0 {
     status = "okay";
     sck-pin = <43>;
     lrck-pin = <44>;
-    sdout-pin = <42>;
+    sdout-pin = <8>;
     sdin-pin = <46>;
     clock-source = "ACLK";
 };
 
 dmic_dev: &pdm0 {
 	status = "okay";
-	clk-pin = <25>;
-	din-pin = <26>;
+	clk-pin = <40>;
+	din-pin = <13>;
 	clock-source = "ACLK";
 };
