@@ -29,7 +29,7 @@
 #define ADS_RESET           ((uint8_t)12)  
 
 #define ADS_1_CS            ((uint8_t)25)  // 30
-#define DATA_READY_1_GPIO   ((uint8_t)13)  // 11
+#define DATA_READY_1_GPIO   ((uint8_t)14)  // 11
 #define ADS_1_RESET         ((uint8_t)108) // 9
 
 #define DBG_LED             ((uint8_t)19)  //Red LED

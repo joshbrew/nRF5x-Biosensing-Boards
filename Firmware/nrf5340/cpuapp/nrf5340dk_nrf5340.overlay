@@ -115,6 +115,6 @@ i2s_rxtx: &i2s0 {
 dmic_dev: &pdm0 {
 	status = "okay";
 	clk-pin = <40>;
-	din-pin = <35>;
+	din-pin = <13>;
 	clock-source = "ACLK";
 };
