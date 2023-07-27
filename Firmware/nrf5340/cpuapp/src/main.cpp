@@ -50,23 +50,24 @@ static bool usePWM = false; //fix for a prototype not having a CLKOUT pin proper
 static bool useAudio = false;
 
 static const uint8_t samplesPerLED = 3;
+static const uint8_t samplesPerAmbient = 1;
 
-static const uint8_t nLEDs = 7; //4 //7 //19 //3 ///includes ambient reading (255)
+static const uint8_t nLEDs = 6; //4 //7 //19 //3 ///includes ambient reading (255)
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
     //37, 38, 255
     
     255, //ambient
-    //10, 30, 9 //12, 13, 11 //2 channel hookup
+    9, 255, 30, 255, 10 //11, 13, 12 //2 channel hookup
     
     //16 channel hookup
     // 10, 109,
-     14, 107,
+    // 14, 107,
     // 114, 17,
     // 100,  6,
     // 115, 21,
-     16,  24,
-     5,   31,
+    // 16,  24,
+    // 5,   31,
     // 8,    7,
     // 111, 104
     
@@ -321,9 +322,12 @@ static void alternateLEDs() {
 static void incrLEDSampleCtr() {
 
     LEDSampleCtr++;
-    if(LEDSampleCtr >= samplesPerLED) {
+    if(LED_gpio[LEDn] != 255 && LEDSampleCtr >= samplesPerLED) {
         //TODO: implement an LED driver chip. GPIO has bad power up time
         alternateLEDs(); //alternate to the ADC samples to time the LED pulses (for photodiode sampling)
+        LEDSampleCtr = 0;
+    } else if(LEDSampleCtr >= samplesPerAmbient) {
+        alternateLEDs();
         LEDSampleCtr = 0;
     }
 }
@@ -545,6 +549,9 @@ static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb,
  */
 static void interrupt_workQueue_handler(struct k_work* wrk)
 {	
+    
+    if(useLEDS) incrLEDSampleCtr();
+
     uint8_t adcBuffer[(adc.nWordsInFrame * adc.nBytesInWord)] = {0};
     adc.readAllChannels(adcBuffer);
     
@@ -556,7 +563,6 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     sampleNum++;
     i++;
 
-    if(useLEDS) incrLEDSampleCtr();
 
     if(i == 9){
         i = 0;
