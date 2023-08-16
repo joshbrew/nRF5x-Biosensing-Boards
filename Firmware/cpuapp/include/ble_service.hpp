@@ -79,6 +79,17 @@ namespace Bluetooth
     void RssiStopSampling();
 
     /**
+     * @brief Called when trigger mode is received via BLE
+     * 
+     * @param buffer receviced buffer
+     * @param length buffer length
+     * @param offset data offset
+     * 
+     * @return true if command was processed succesfully
+     */
+    bool OnBleCommand(const uint8_t* buffer, CommandKey key, BleLength length, BleOffset offset);
+
+    /**
      * @brief Register Control callback
      * 
      * @param commandId command ID

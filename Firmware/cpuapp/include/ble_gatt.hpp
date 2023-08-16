@@ -94,6 +94,18 @@ namespace Bluetooth::Gatt
     void OnBluetoothStarted(int err);
 
     /**
+     * @brief Start scanning for iBeacon devices
+     * 
+     */
+    void StartBeaconScanning(void);
+
+    /**
+     * @brief Stop scanning for iBeacon devices
+     * 
+     */
+    void StopBeaconScanning(void);
+
+    /**
      * @brief Register Control callback
      * 
      * @param commandId command ID

@@ -12,6 +12,15 @@
 #include "ble_gatt.hpp"
 #include "qmc5883l.hpp"
 
+#include <zephyr/types.h>
+#include <stddef.h>
+#include <errno.h>
+
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/conn.h>
+#include <sys/byteorder.h>
+
 namespace Bluetooth::Gatt
 {
 
@@ -28,6 +37,16 @@ uint8_t currentFunction = 0;
 CommandKey currentCommandKey; //! In addition to Saving current functionID active command key should be stored too
 
 BleControlAction handlers[maxHandlers];
+
+const bt_le_scan_param scan_params = {
+    .type = BT_LE_SCAN_TYPE_PASSIVE,
+    .options = BT_LE_SCAN_OPT_FILTER_DUPLICATE,
+    .interval = BT_GAP_SCAN_FAST_INTERVAL,
+    .window = BT_GAP_SCAN_FAST_WINDOW,
+    .timeout = 0,
+    .interval_coded = 0,
+    .window_coded = 0
+};
 
 /********************************************/
 /* BLE connection */
@@ -320,6 +339,41 @@ ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, cons
     }
 
     return retval;
+}
+
+static void onBleDeviceFound(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
+			 struct net_buf_simple *ad)
+{
+    LOG_INF("BLE device found!");
+
+}
+
+void StartBeaconScanning(void)
+{
+	int err;
+
+	/* This demo doesn't require active scan */
+	err = bt_le_scan_start(&scan_params, onBleDeviceFound);
+	if (err) {
+		printk("Scanning failed to start (err %d)\n", err);
+		return;
+	}
+
+	printk("Scanning successfully started\n");
+}
+
+void StopBeaconScanning(void)
+{
+	int err;
+ 
+	/* This demo doesn't require active scan */
+	err = bt_le_scan_stop();
+	if (err) {
+		printk("Scanning failed to stop (err %d)\n", err);
+		return;
+	}
+
+	printk("Scanning successfully stopped\n");
 }
 
 /**
