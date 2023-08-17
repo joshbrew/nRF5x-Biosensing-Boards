@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <bluetooth/bluetooth.h>
 
 namespace Bluetooth
 {
@@ -30,6 +31,19 @@ namespace Bluetooth
     struct CommandKey
     {
         uint8_t key[2];    
+    };
+
+    /**
+     * @brief Structure to hold the iBeacon details
+     */
+    struct iBeacon
+    {
+        uint8_t  addr[BT_ADDR_SIZE];
+        int8_t rssi;
+        uint8_t uuid[16];
+        uint8_t major[2];
+        uint8_t minor[2];
+        int8_t tx_pwr;
     };
 
     static_assert(sizeof(CommandKey) == sizeof(uint16_t));

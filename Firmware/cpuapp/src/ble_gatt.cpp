@@ -28,6 +28,8 @@ LOG_MODULE_REGISTER(BleGatt, LOG_LEVEL_INF);
 
 constexpr static size_t controlHeaderSize = 3;
 constexpr static size_t maxHandlers = 256;
+constexpr static size_t IBEACON_MAX_LENGTH = 21;
+constexpr static size_t IBEACON_TYPE = 0x02;
 
 /**
  * @brief When BLE Performs GATT write it might split transfer into several chunks, and only first byte contains 
@@ -47,6 +49,8 @@ const bt_le_scan_param scan_params = {
     .interval_coded = 0,
     .window_coded = 0
 };
+
+Bluetooth::iBeacon i_beacon = { 0 };
 
 /********************************************/
 /* BLE connection */
@@ -344,7 +348,60 @@ ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, cons
 static void onBleDeviceFound(const bt_addr_le_t *addr, int8_t rssi, uint8_t type,
 			 struct net_buf_simple *ad)
 {
-    LOG_INF("BLE device found!");
+    uint8_t *p_adv_data;
+    uint16_t i;
+    
+    if (type == BT_GAP_ADV_TYPE_ADV_NONCONN_IND){
+        uint8_t ad_length, ad_type;
+        p_adv_data  = &ad->data[0];
+
+        i = 0;
+        while(i < ad->len)
+        {
+            ad_length = p_adv_data[i];
+            ad_type = p_adv_data[i + 1];
+
+            switch (ad_type)
+            {
+                case BT_DATA_FLAGS:
+                    break;
+                case BT_DATA_TX_POWER:
+                    break;
+                case BT_DATA_NAME_COMPLETE:
+                {
+
+                }
+                case BT_DATA_MANUFACTURER_DATA:
+                {
+                    if ((ad_length == IBEACON_MAX_LENGTH + 5) &&
+                      (p_adv_data[i + 4] == IBEACON_TYPE) && // 0x02 => iBeacon Type
+                      (p_adv_data[i + 5] == IBEACON_MAX_LENGTH))  // iBeacon Length is 0x15 (21 Bytes)
+                    {
+                        /* iBeacon device found. */
+                        memcpy(&i_beacon.addr[0], addr->a.val, BT_ADDR_SIZE);
+                        i_beacon.rssi = rssi;
+                        memcpy(&i_beacon.uuid[0], &p_adv_data[i + 6], 16);
+                        memcpy(&i_beacon.major[0], &p_adv_data[i + 22], 2);
+                        memcpy(&i_beacon.minor[0], &p_adv_data[i + 24], 2);
+                        i_beacon.tx_pwr = p_adv_data[i + 26];
+
+                        LOG_HEXDUMP_INF(addr->a.val, BT_ADDR_SIZE, "BLE_addr");
+                        LOG_INF("RSSI: %d", rssi);
+                        LOG_HEXDUMP_INF(&p_adv_data[i + 6], 16, "iBeacon_UUID");
+                        LOG_HEXDUMP_INF(&p_adv_data[i + 22], 2, "iBeacon_Major");
+                        LOG_HEXDUMP_INF(&p_adv_data[i + 24], 2, "iBeacon_Minor");
+                        LOG_HEXDUMP_INF(&p_adv_data[i + 26], 1, "iBeacon_Tx_Power");
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }/* end of switch */
+            i += ad_length + 1; /* increment the iterator to go on next element */
+
+        }/* end of while */
+    } /* end of if(type ==) */
 
 }
 
