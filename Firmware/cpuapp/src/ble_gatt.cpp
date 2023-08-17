@@ -62,6 +62,7 @@ atomic_t mpu6050NotificationsEnable = false;
 atomic_t bme280NotificationsEnable = false;
 atomic_t rssiNotificationsEnable = false;
 atomic_t qmc5883lNotificationsEnable = false;
+atomic_t iBeaconNotificationsEnable = false;
 
 /* BT832A Custom Service  */
 bt_uuid_128 sensorServiceUUID = BT_UUID_INIT_128(
@@ -96,7 +97,9 @@ bt_uuid_128 qmc5883lDataUUID = BT_UUID_INIT_128(
 // BLE characteristic reserved for sending Control BLE commands
 bt_uuid_128 controlUUID = BT_UUID_INIT_128(
     BT_UUID_128_ENCODE(0x0009cafe,  0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
-
+// iBeacons Data Pipe
+bt_uuid_128 iBeaconUUID = BT_UUID_INIT_128(
+    BT_UUID_128_ENCODE(0x000acafe,  0xb0ba, 0x8bad, 0xf00d, 0xdeadbeef0000));
 
 static ssize_t ControlCharacteristicWrite(bt_conn *conn, const bt_gatt_attr *attr, const void *buf, uint16_t len, uint16_t offset, uint8_t flags);
 
@@ -173,6 +176,20 @@ static void qmc5883lCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&qmc5883lNotificationsEnable, value == BT_GATT_CCC_NOTIFY);
 	LOG_INF("QMC5883L Notification %s", qmc5883lNotificationsEnable ? "enabled" : "disabled");
+}
+
+/**
+ * @brief CCCD handler for iBeacons characteristic. Used to get notifications if client enables notifications
+ *        for iBeacon characteristic. CCC = Client Characteristic Configuration
+ *
+ * @param attr Ble Gatt attribute
+ * @param value characteristic value
+ */
+static void iBeaconCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);	
+    atomic_set(&iBeaconNotificationsEnable, value == BT_GATT_CCC_NOTIFY);
+	LOG_INF("iBeacon Notification %s", iBeaconNotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -258,6 +275,9 @@ BT_GATT_CCC(rssiCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),            
 BT_GATT_CHARACTERISTIC(&qmc5883lDataUUID.uuid, BT_GATT_CHRC_NOTIFY,                     // 22, 23
 		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
 BT_GATT_CCC(qmc5883lCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                // 24
+BT_GATT_CHARACTERISTIC(&iBeaconUUID.uuid, BT_GATT_CHRC_NOTIFY,                          // 25, 26
+		        BT_GATT_PERM_READ, nullptr, nullptr, nullptr),
+BT_GATT_CCC(iBeaconCccHandler, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),                 // 27
 BT_GATT_CHARACTERISTIC(&controlUUID.uuid, BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
     BT_GATT_PERM_WRITE, nullptr, ControlCharacteristicWrite, nullptr),
 );
@@ -384,13 +404,17 @@ static void onBleDeviceFound(const bt_addr_le_t *addr, int8_t rssi, uint8_t type
                         memcpy(&i_beacon.major[0], &p_adv_data[i + 22], 2);
                         memcpy(&i_beacon.minor[0], &p_adv_data[i + 24], 2);
                         i_beacon.tx_pwr = p_adv_data[i + 26];
-
-                        LOG_HEXDUMP_INF(addr->a.val, BT_ADDR_SIZE, "BLE_addr");
-                        LOG_INF("RSSI: %d", rssi);
-                        LOG_HEXDUMP_INF(&p_adv_data[i + 6], 16, "iBeacon_UUID");
-                        LOG_HEXDUMP_INF(&p_adv_data[i + 22], 2, "iBeacon_Major");
-                        LOG_HEXDUMP_INF(&p_adv_data[i + 24], 2, "iBeacon_Minor");
-                        LOG_HEXDUMP_INF(&p_adv_data[i + 26], 1, "iBeacon_Tx_Power");
+                        /* Send Notification over iBeacon Characteristic */
+                        if (atomic_get(&iBeaconNotificationsEnable)){
+                            bt_gatt_notify(nullptr, &bt832a_svc.attrs[CharacteristiciBeaconData], &i_beacon, sizeof(i_beacon));
+                        }
+                        
+                        LOG_HEXDUMP_DBG(addr->a.val, BT_ADDR_SIZE, "BLE_addr");
+                        LOG_DBG("RSSI: %d", rssi);
+                        LOG_HEXDUMP_DBG(&p_adv_data[i + 6], 16, "iBeacon_UUID");
+                        LOG_HEXDUMP_DBG(&p_adv_data[i + 22], 2, "iBeacon_Major");
+                        LOG_HEXDUMP_DBG(&p_adv_data[i + 24], 2, "iBeacon_Minor");
+                        LOG_HEXDUMP_DBG(&p_adv_data[i + 26], 1, "iBeacon_Tx_Power");
                     }
                     break;
                 }

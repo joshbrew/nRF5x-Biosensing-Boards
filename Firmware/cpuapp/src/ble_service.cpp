@@ -112,6 +112,7 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
     atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::rssiNotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::qmc5883lNotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::iBeaconNotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
