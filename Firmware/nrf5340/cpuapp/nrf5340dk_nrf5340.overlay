@@ -1,6 +1,8 @@
 // To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
+//NOTE gpio 1.xx are formatted as 32 + xx; e.g. 1.00 is 32, 1.10 is 42
+
 / {
     
     aliases {
@@ -105,16 +107,16 @@
 
 i2s_rxtx: &i2s0 {
     status = "okay";
-    sck-pin = <43>;
-    lrck-pin = <44>;
-    sdout-pin = <8>;
-    sdin-pin = <46>;
+    sck-pin =   <43>; 
+    lrck-pin =  <8>; 
+    sdout-pin = <44>;
+    sdin-pin =  <46>; 
     clock-source = "ACLK";
 };
 
 dmic_dev: &pdm0 {
 	status = "okay";
-	clk-pin = <40>;
-	din-pin = <13>;
+	clk-pin = <40>; 
+	din-pin = <13>; 
 	clock-source = "ACLK";
 };

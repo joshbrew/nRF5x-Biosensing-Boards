@@ -28,37 +28,37 @@
 #define DATA_READY_GPIO     ((uint8_t)15)  
 #define ADS_RESET           ((uint8_t)12)  
 
-#define ADS_1_CS            ((uint8_t)25)  // 30
-#define DATA_READY_1_GPIO   ((uint8_t)14)  // 11
-#define ADS_1_RESET         ((uint8_t)108) // 9
+#define ADS_1_CS            ((uint8_t)30)  // 30 //25 (nirs ensemble)
+#define DATA_READY_1_GPIO   ((uint8_t)11)  // 11 //14 (nirs ensemble)
+#define ADS_1_RESET         ((uint8_t)9)   // 9  //108 (nirs ensemble)
 
 #define DBG_LED             ((uint8_t)19)  //Red LED
 
-#define MAX_INT             ((uint8_t)113) // 4
+#define MAX_INT             ((uint8_t)4) // 4 //113 (nirs ensemble)
 
-#define MPU_INT             ((uint8_t)4)   // 5
-#define QMC5883L_DRDY       ((uint8_t)32)   // 6
+#define MPU_INT             ((uint8_t)5)   // 5 //4 (nirs ensemble)
+#define QMC5883L_DRDY       ((uint8_t)6)   // 6 //32 (nirs ensemble)
 
 #define PWM_CLK         ((uint32_t)8192000) //Frequency (Hz)
 #define PWM_PERIOD_NSEC ((uint8_t)122) //1/Frequency in nanosec
 //#define PWM_PIN         ((uint8_t)33) //set in overlay //(BT840 draft 1 missing the CLKOUT pin in same position)
 
 static bool useADCs = true;
-static bool useLEDS = true;
+static bool useLEDS = false;
 
 static bool usePWM = false; //fix for a prototype not having a CLKOUT pin proper
-static bool useAudio = false;
+static bool useAudio = true;
 
 static const uint8_t samplesPerLED = 3;
-static const uint8_t samplesPerAmbient = 1;
+static const uint8_t samplesPerAmbient = 3;
 
-static const uint8_t nLEDs = 6; //4 //7 //19 //3 ///includes ambient reading (255)
+static const uint8_t nLEDs = 4; //4 //7 //19 //3 ///includes ambient reading (255)
 //list the GPIO in the order we want to flash. 255 is ambient
 static uint8_t LED_gpio[nLEDs] = { 
     //37, 38, 255
     
     255, //ambient
-    9, 255, 30, 255, 10 //11, 13, 12 //2 channel hookup
+    9, 255, 30//, 255, 10 //11, 13, 12 //2 channel hookup
     
     //16 channel hookup
     // 10, 109,
@@ -558,7 +558,7 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     ble_tx_buff[25*i + 24] = sampleNum;
     memcpy((ble_tx_buff + 25*i), (adcBuffer + 3), 24);
 
-    ble_tx_buff[225+i] = LED_gpio[LEDn];
+    if(useLEDS) ble_tx_buff[225+i] = LED_gpio[LEDn];
 
     sampleNum++;
     i++;
@@ -585,7 +585,7 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     ads131m08_1_ble_tx_buff[25*j + 24] = ads131m08_1_sampleNum;
     memcpy((ads131m08_1_ble_tx_buff + 25*j), (adcBuffer + 3), 24);
 
-    ble_tx_buff[226+j] = LED_gpio[LEDn];
+    if(useLEDS) ble_tx_buff[225+j] = LED_gpio[LEDn];
 
     ads131m08_1_sampleNum++;
     //LOG_INF("ADS131M08_1 Sample: %d", ads131m08_1_sampleNum);

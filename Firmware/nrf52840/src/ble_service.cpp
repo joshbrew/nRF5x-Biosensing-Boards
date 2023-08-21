@@ -8,6 +8,7 @@
 #include <sys/byteorder.h>
 #include <logging/log.h>
 #include <sys/atomic.h>
+#include "ble_commands.hpp"
 
 #include "ble_gatt.hpp"
 #include "ble_service.hpp"
@@ -111,6 +112,7 @@ void OnClientDisconnected(struct bt_conn *disconn, uint8_t reason)
     atomic_set(&Bluetooth::Gatt::bme280NotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::rssiNotificationsEnable, false);
     atomic_set(&Bluetooth::Gatt::qmc5883lNotificationsEnable, false);
+    atomic_set(&Bluetooth::Gatt::iBeaconNotificationsEnable, false);    
     LOG_INF("Disconnected (reason %u)", reason);
 }
 
@@ -255,6 +257,8 @@ int SetupBLE()
         LOG_INF("enable Bluetooth with status %d", err);
     }
 
+    GattRegisterControlCallback(CommandId::BleCmd, OnBleCommand);
+
 	/* Initialize the Bluetooth mcumgr transport. */
 	smp_bt_register();
 
@@ -264,6 +268,31 @@ int SetupBLE()
                 &WorkingThread, nullptr, nullptr, nullptr, taskPriority, 0, K_NO_WAIT);
 
     return err;
+}
+
+bool OnBleCommand(const uint8_t *buffer, CommandKey key, BleLength length, BleOffset offset){
+    if (offset.value != 0 || length.value == 0)
+    {
+        return false;
+    }
+    LOG_DBG("BLE Command received");
+
+    CommandKey bleCommand;
+    memcpy(&bleCommand, &key, sizeof(key));
+          
+    switch(bleCommand.key[0]){
+        case static_cast<uint8_t>(BleCommand::StartBeaconScan):
+            Gatt::StartBeaconScanning();
+            break;
+        case static_cast<uint8_t>(BleCommand::StopBeaconScan):
+            Gatt::StopBeaconScanning();
+            break;
+        
+        default:
+            break;
+    }
+    
+    return true;
 }
 
 void RssiStartSampling(){

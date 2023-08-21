@@ -14,5 +14,6 @@ enum class CommandId : uint8_t
     Qmc5883lCmd = 5,
     AlarmCmd = 6,  ///< Start/Stop playing Alarm
     DmicCmd = 7,   ///< Commands for Digital Microphone (DMIC)
-    SystemCmd = 8, ///< For sending commands on the app/system level from where we can control every sensor/module
+    BleCmd = 8,    ///< Command for start/stop looking for iBeacon devices
+    SystemCmd = 9, ///< For sending commands on the app/system level from where we can control every sensor/module
 };

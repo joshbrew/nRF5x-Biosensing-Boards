@@ -47,6 +47,11 @@ namespace Bluetooth::Gatt
     extern atomic_t qmc5883lNotificationsEnable;
 
     /**
+     * @brief State of the iBeacons Notifications.
+     */
+    extern atomic_t iBeaconNotificationsEnable;
+
+    /**
      * @brief GATT service
      */
     extern const bt_gatt_service_static bt832a_svc;
@@ -87,11 +92,28 @@ namespace Bluetooth::Gatt
     constexpr static int CharacteristicQmc5883lData = 22;
 
     /**
+     * @brief Index of the Gatt iBeacon Data characteristic in service characteristic table
+     */
+    constexpr static int CharacteristiciBeaconData = 25;
+
+    /**
      * @brief Callback called when Bluetooth is initialized. Starts BLE server
      * 
      * @param err bluetooth initialization error code
      */
     void OnBluetoothStarted(int err);
+
+    /**
+     * @brief Start scanning for iBeacon devices
+     * 
+     */
+    void StartBeaconScanning(void);
+
+    /**
+     * @brief Stop scanning for iBeacon devices
+     * 
+     */
+    void StopBeaconScanning(void);
 
     /**
      * @brief Register Control callback
