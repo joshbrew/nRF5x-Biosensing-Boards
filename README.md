@@ -31,6 +31,8 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic.
 - MAX98357A Audio output amplifier
 - B079Q8G7N1 PDM MEMS microphone
 
+[Driver Docs](https://docs.google.com/document/d/1eThhvpdm9zZMaKTB0dwuHXi1aBz_5ESBecHRZPxs0kE/edit?usp=sharing)
+
 You can fairly easily add more sensor modules, which are all plug-and-play so the board can run with any combination of sensors. We'll clean this up more as we go for easier customization and feature inclusions. The BT840/BT40, BC840M, and BC40M prototypes include battery chargers with TVS diodes for safety so the boards could be FDA-approved.
 
 ![breakout](Revs.PNG)
