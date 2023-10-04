@@ -74,3 +74,14 @@ Note the ADS131M08 is pretty much completely useless on USB power as we do not h
 Todos:
 - PDFs, but the free EAGLE version works for these simple boards.
 - Make the firmware more API-like for adding sensors and easier to cross-compile.
+- Upgrade zephyr firmware version to latest Nordic SDK version, need to redo dependencies.
+- Finish NFC integration
+- Fine tune data throttling
+
+Bug fixing notes:
+- Bluetooth 5 connectivity is iffy on different devices. This is partially related to the connection interval settings, nrf52 vs nrf53 behave differently which we need to figure out why. Upgrading to latest zephyr might fix this.
+- Sensors not booting for Bojan, build error with the audio settings
+
+Exploratory:
+- SD card
+- Integration with a graphical 
