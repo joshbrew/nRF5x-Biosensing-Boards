@@ -84,4 +84,8 @@ Bug fixing notes:
 
 Exploratory:
 - SD card
-- Integration with a graphical 
+- Integration with a graphical device (stay tuned :-))
+- Vibration motor integration (just a GPIO on/off)
+- Frontend controls for the whole command interface in javascript
+- GPS (e.g. LG77L)
+- More design modularity, e.g. attachments and hubs
