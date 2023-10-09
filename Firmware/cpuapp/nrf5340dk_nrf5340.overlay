@@ -1,6 +1,18 @@
 // To get started, press Ctrl+Space to bring up the completion menu and view the available nodes.
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
+/ {
+    tlc5940: tlc5940_node {
+        // compatible = "gpio-leds";
+        tlc-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>, /* output pin, GSCLK */
+                    <&gpio0 3 GPIO_ACTIVE_HIGH>, /* output pin, XLAT */
+                    <&gpio0 7 GPIO_ACTIVE_HIGH>, /* output pin, BLANK */
+                    <&gpio0 8 GPIO_ACTIVE_HIGH>, /* output pin, SIN */
+                    <&gpio0 10 GPIO_ACTIVE_HIGH>; /* output pin, SCLK */
+        status = "okay";
+    };
+};
+
 &uart0 {
     status = "disabled";
 };
@@ -92,8 +104,8 @@ i2s_rxtx: &i2s0 {
 };
 
 dmic_dev: &pdm0 {
-	status = "okay";
-	clk-pin = <25>;
-	din-pin = <26>;
-	clock-source = "ACLK";
+    status = "okay";
+    clk-pin = <25>;
+    din-pin = <26>;
+    clock-source = "ACLK";
 };
