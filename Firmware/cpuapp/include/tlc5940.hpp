@@ -18,6 +18,19 @@ struct tlc5940_config {
     struct gpio_dt_spec sclk_gpio; /**< Serial data shift clock */
 };
 
+enum pins: uint8_t {
+    GSCLK_PIN = 0,
+    XLAT_PIN,
+    BLANK_PIN,
+    SIN_PIN,
+    SCLK_PIN
+};
+
+enum pulse_dir: uint8_t {
+    LOW_TO_HIGH = 0,
+    HIGH_TO_LOW
+};
+
 /**
  * @brief Tlc5940 driver
  */
@@ -81,6 +94,10 @@ public:
     int Update();
 
 private:
+
+    int InitializeGpios(void);
+    int SetPin(uint8_t pin, uint8_t state);
+    int PulsePin(uint8_t pin, uint8_t pulse_dir);
 
     /**
      * @brief Called when trigger mode is received via BLE
