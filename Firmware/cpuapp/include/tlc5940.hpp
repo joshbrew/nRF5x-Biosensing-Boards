@@ -7,9 +7,7 @@
 #include <atomic>
 #include "ble_types.hpp"
 #include "ble_commands.hpp"
-
-#define NUM_TLCS                    1
-                
+              
 struct tlc5940_config {
     struct gpio_dt_spec gsclk_gpio; /**< Reference clock for grayscale PWM control */
     struct gpio_dt_spec xlat_gpio; /**< Level triggered latch signal */
@@ -45,9 +43,11 @@ public:
     /**
      * @brief Initialization function. Used to perform actual initialization. Because of software stack initialization
      * could not be done in constructor
+     * 
+     * @param num_tlcs Number of daisy-chained TLC5940 devices
      * @return Status, 0 for no errors
      */
-    int Initialize();
+    int Initialize(uint8_t num_tlcs);
 
     /**
      * @brief Sets the grayscale data for channel
@@ -111,6 +111,7 @@ private:
     bool OnBleCommand(const uint8_t* buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset);
 
     struct tlc5940_config tlc_cfg;
+    uint8_t num_tlcs; //< Number of daisy-chained TLC5940 devices
     const struct device *gpio0;
 };
 

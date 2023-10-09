@@ -18,13 +18,13 @@ Tlc5940::Tlc5940() {
     LOG_INF("Tlc5940 Constructor!");
 }
 
-int Tlc5940::Initialize() {
+int Tlc5940::Initialize(uint8_t num_tlcs) {
 
     int ret = 0;
-    uint8_t part_id;
-    
+        
     LOG_INF("Starting Tlc5940 Initialization..."); 
     
+    num_tlcs = num_tlcs;
     InitializeGpios();
     SetPin(GSCLK_PIN, 0);
     SetPin(XLAT_PIN, 0);
