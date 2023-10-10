@@ -56,8 +56,9 @@ public:
      * @param channel Tlc5940 channel ID. 0 - (NUM_TLCS * 16 - 1)
      *                OUT0 of the first TLC is channel 0, OUT0 of the next TLC is channel 16, etc.
      * @param value Grayscale value to set. 0 - 4095.
+     * @return 0 if success, negative value otherwise
      */
-    void Set(uint8_t channel, uint16_t value);
+    int Set(uint8_t channel, uint16_t value);
 
     /**
      * @brief Set all channels to specified grayscale value
@@ -112,6 +113,10 @@ private:
 
     struct tlc5940_config tlc_cfg;
     uint8_t num_tlcs; //< Number of daisy-chained TLC5940 devices
+    uint8_t *p_gsData;
+    uint16_t gsDataSize;
+    uint16_t numChannels;
+
     const struct device *gpio0;
 };
 

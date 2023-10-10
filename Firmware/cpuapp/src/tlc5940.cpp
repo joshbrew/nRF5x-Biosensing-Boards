@@ -31,7 +31,11 @@ int Tlc5940::Initialize(uint8_t num_tlcs) {
     SetPin(BLANK_PIN, 1);
     SetPin(SIN_PIN, 0);
     SetPin(SCLK_PIN, 0);
-
+    gsDataSize = 24 * num_tlcs;
+    numChannels = 16 * num_tlcs;
+    uint8_t gsData[gsDataSize] = { 0 };
+    p_gsData = static_cast<uint8_t *>(&gsData[0]);
+    
     Bluetooth::GattRegisterControlCallback(CommandId::Tlc5940Cmd,
         [this](const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset)
         {
@@ -41,20 +45,55 @@ int Tlc5940::Initialize(uint8_t num_tlcs) {
     return ret;
 }
 
-void Tlc5940::Set(uint8_t channel, uint16_t value){
-    
+int Tlc5940::Set(uint8_t channel, uint16_t value){
+
+    if(channel > numChannels){
+        return -1;
+    }
+
+    uint16_t index8 = (num_tlcs * 16 - 1) - channel;
+    uint8_t *index12p = p_gsData + ((((uint16_t)index8) * 3) >> 1);
+
+    if (index8 & 1) { // starts in the middle
+                      // first 4 bits intact | 4 top bits of value
+        *index12p = (*index12p & 0xF0) | (value >> 8);
+                      // 8 lower bits of value
+        *(++index12p) = value & 0xFF;
+    } else { // starts clean
+                      // 8 upper bits of value
+        *(index12p++) = value >> 4;
+                      // 4 lower bits of value | last 4 bits intact
+        *index12p = ((uint8_t)(value << 4)) | (*index12p & 0xF);
+    }
+
+    return 0;
 }
 
 void Tlc5940::SetAll(uint16_t value){
-    
+
+    for (int i = 0; i < numChannels; i++){
+        Set(i, value);
+    }
 }
 
 void Tlc5940::Clear(){
-    
+    memset(p_gsData, 0, gsDataSize);
 }
 
 uint16_t Tlc5940::Get(uint8_t channel){
-    
+
+    uint16_t value = 0;
+
+    uint16_t index8 = (num_tlcs * 16 - 1) - channel;
+    uint8_t *index12p = p_gsData + ((((uint16_t)index8) * 3) >> 1);
+    return (index8 & 1)? // starts in the middle
+            (((uint16_t)(*index12p & 15)) << 8) | // upper 4 bits
+            *(index12p + 1)                       // lower 8 bits
+        : // starts clean
+            (((uint16_t)(*index12p)) << 4) | // upper 8 bits
+            ((*(index12p + 1) & 0xF0) >> 4); // lower 4 bits
+
+    return value;
 }
 
 int Tlc5940::Update(){
