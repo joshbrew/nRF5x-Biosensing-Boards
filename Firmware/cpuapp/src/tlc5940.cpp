@@ -14,33 +14,51 @@
 
 LOG_MODULE_REGISTER(tlc5940, LOG_LEVEL_INF);
 
+volatile bool update_in_progress;
+
+/* Work handler function */
+void gsUpdate_work_handler(struct k_work *work) {
+    update_in_progress = false;   
+}
+/* Register the work handler */
+K_WORK_DEFINE(gsUpdate_work, gsUpdate_work_handler);
+
+namespace
+{
+    constexpr static int stackSizeTlc = 2048;           ///< Worker thread size
+    constexpr static int taskPriorityTlc = 1;           ///< Worker thread priority
+    K_THREAD_STACK_DEFINE(pollStackAreaTlc, stackSizeTlc); ///< Worker thread stack
+} // namespace
+
 Tlc5940::Tlc5940() {
     LOG_INF("Tlc5940 Constructor!");
 }
 
-int Tlc5940::Initialize(uint8_t num_tlcs) {
+int Tlc5940::Initialize(uint16_t initialValue) {
 
     int ret = 0;
         
     LOG_INF("Starting Tlc5940 Initialization..."); 
     
-    num_tlcs = num_tlcs;
     InitializeGpios();
-    SetPin(GSCLK_PIN, 0);
-    SetPin(XLAT_PIN, 0);
-    SetPin(BLANK_PIN, 1);
-    SetPin(SIN_PIN, 0);
-    SetPin(SCLK_PIN, 0);
-    gsDataSize = 24 * num_tlcs;
-    numChannels = 16 * num_tlcs;
-    uint8_t gsData[gsDataSize] = { 0 };
+    numChannels = 16 * CONFIG_NUM_TLCS;
+    firstCycleFlag = 0;
+    
     p_gsData = static_cast<uint8_t *>(&gsData[0]);
     
+    SetAll(initialValue);
+
+    LOG_INF("Tlc5940 Intl'ed!");
+
     Bluetooth::GattRegisterControlCallback(CommandId::Tlc5940Cmd,
         [this](const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset)
         {
             return OnBleCommand(buffer, key, length, offset);
         });
+
+    // Start working thread
+    k_thread_create(&worker, pollStackAreaTlc, K_THREAD_STACK_SIZEOF(pollStackAreaTlc),
+                    &TlcWorkingThread, this, nullptr, nullptr, taskPriorityTlc, 0, K_NO_WAIT);
 
     return ret;
 }
@@ -51,7 +69,7 @@ int Tlc5940::Set(uint8_t channel, uint16_t value){
         return -1;
     }
 
-    uint16_t index8 = (num_tlcs * 16 - 1) - channel;
+    uint16_t index8 = (CONFIG_NUM_TLCS * 16 - 1) - channel;
     uint8_t *index12p = p_gsData + ((((uint16_t)index8) * 3) >> 1);
 
     if (index8 & 1) { // starts in the middle
@@ -77,14 +95,14 @@ void Tlc5940::SetAll(uint16_t value){
 }
 
 void Tlc5940::Clear(){
-    memset(p_gsData, 0, gsDataSize);
+    memset(p_gsData, 0, sizeof(gsData));
 }
 
 uint16_t Tlc5940::Get(uint8_t channel){
 
     uint16_t value = 0;
 
-    uint16_t index8 = (num_tlcs * 16 - 1) - channel;
+    uint16_t index8 = (CONFIG_NUM_TLCS * 16 - 1) - channel;
     uint8_t *index12p = p_gsData + ((((uint16_t)index8) * 3) >> 1);
     return (index8 & 1)? // starts in the middle
             (((uint16_t)(*index12p & 15)) << 8) | // upper 4 bits
@@ -97,14 +115,42 @@ uint16_t Tlc5940::Get(uint8_t channel){
 }
 
 int Tlc5940::Update(){
+    bool first_time_here = true;
+
+    //TODO: read VCPRG state. If it is HIGH
+    // set it to LOW and set firstCycleFlag flag to 1
+    // On the Sparkfun TLC5940 devkit, VCPRG is tied to GND
+    uint8_t ByteCounter = 0;
+    uint8_t GSCLK_Counter = 0;
+
+    update_in_progress = true;
     
+    for(int i = 0; i < CONFIG_NUM_TLCS * 24; i++){
+        ShiftByte(*(p_gsData + i)); 
+    }
+
+    if (firstCycleFlag) {
+        PulsePin(SCLK_PIN, LOW_TO_HIGH);
+    } else {
+        firstCycleFlag = 1;
+    }  
+
+    SetPin(BLANK_PIN, 1);
+    PulsePin(XLAT_PIN, LOW_TO_HIGH);
+    SetPin(BLANK_PIN, 0);
+
+    for(int j = 0; j < 4096; j++){
+        PulsePin(GSCLK_PIN, LOW_TO_HIGH);
+    }
+
+    return 0;
 }
 
 int Tlc5940::InitializeGpios(){
     int ret = 0;
 
-    gpio0 = device_get_binding("GPIO_0");
-	if (gpio0 == NULL) {
+    gpio_dev = device_get_binding("GPIO_1");
+	if (gpio_dev == NULL) {
 		LOG_ERR("***ERROR: GPIO_0 device binding!");
         return -1;
 	} 
@@ -112,11 +158,12 @@ int Tlc5940::InitializeGpios(){
     /* Configure GSCLK pin to active */
     //TODO: Get the GPIO details from the device tree (.overlay file). See tlc5940 node
     // tlc_cfg.gsclk_gpio = GPIO_DT_SPEC_GET_BY_IDX(DT_NODELABEL(tlc5940), tlc_gpios, 0);
-    tlc_cfg.gsclk_gpio.port = gpio0;
-    tlc_cfg.gsclk_gpio.pin = 2;
+    
+    tlc_cfg.gsclk_gpio.port = gpio_dev;
+    tlc_cfg.gsclk_gpio.pin = 7;
     tlc_cfg.gsclk_gpio.dt_flags = GPIO_ACTIVE_HIGH;
 
-    ret = gpio_pin_configure_dt(&tlc_cfg.gsclk_gpio, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(&tlc_cfg.gsclk_gpio, GPIO_OUTPUT_INACTIVE);
     if (ret != 0) {
         LOG_ERR("GSCLK config failed, err: %d", ret);
         return -EIO;
@@ -125,11 +172,11 @@ int Tlc5940::InitializeGpios(){
     /* Configure XLAT pin to active */
     //TODO: Get the GPIO details from the device tree (.overlay file). See tlc5940 node
     // tlc_cfg.xlat_gpio = GPIO_DT_SPEC_GET_BY_IDX(DT_NODELABEL(tlc5940), tlc_gpios, 1);
-    tlc_cfg.xlat_gpio.port = gpio0;
-    tlc_cfg.xlat_gpio.pin = 3;
+    tlc_cfg.xlat_gpio.port = gpio_dev;
+    tlc_cfg.xlat_gpio.pin = 8;
     tlc_cfg.xlat_gpio.dt_flags = GPIO_ACTIVE_HIGH;
 
-    ret = gpio_pin_configure_dt(&tlc_cfg.xlat_gpio, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(&tlc_cfg.xlat_gpio, GPIO_OUTPUT_INACTIVE);
     if (ret != 0) {
         LOG_ERR("XLAT config failed, err: %d", ret);
         return -EIO;
@@ -138,8 +185,8 @@ int Tlc5940::InitializeGpios(){
     /* Configure BLANK pin to active */
     //TODO: Get the GPIO details from the device tree (.overlay file). See tlc5940 node
     // tlc_cfg.blank_gpio = GPIO_DT_SPEC_GET_BY_IDX(DT_NODELABEL(tlc5940), tlc_gpios, 2);
-    tlc_cfg.blank_gpio.port = gpio0;
-    tlc_cfg.blank_gpio.pin = 7;
+    tlc_cfg.blank_gpio.port = gpio_dev;
+    tlc_cfg.blank_gpio.pin = 4;
     tlc_cfg.blank_gpio.dt_flags = GPIO_ACTIVE_HIGH;
 
     ret = gpio_pin_configure_dt(&tlc_cfg.blank_gpio, GPIO_OUTPUT_ACTIVE);
@@ -151,11 +198,11 @@ int Tlc5940::InitializeGpios(){
     /* Configure SIN pin to active */
     //TODO: Get the GPIO details from the device tree (.overlay file). See tlc5940 node
     // tlc_cfg.sin_gpio = GPIO_DT_SPEC_GET_BY_IDX(DT_NODELABEL(tlc5940), tlc_gpios, 3);
-    tlc_cfg.sin_gpio.port = gpio0;
-    tlc_cfg.sin_gpio.pin = 8;
+    tlc_cfg.sin_gpio.port = gpio_dev;
+    tlc_cfg.sin_gpio.pin = 5;
     tlc_cfg.sin_gpio.dt_flags = GPIO_ACTIVE_HIGH;
 
-    ret = gpio_pin_configure_dt(&tlc_cfg.sin_gpio, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(&tlc_cfg.sin_gpio, GPIO_OUTPUT_INACTIVE);
     if (ret != 0) {
         LOG_ERR("SIN config failed, err: %d", ret);
         return -EIO;
@@ -164,11 +211,11 @@ int Tlc5940::InitializeGpios(){
     /* Configure SCLK pin to active */
     //TODO: Get the GPIO details from the device tree (.overlay file). See tlc5940 node
     // tlc_cfg.sclk_gpio = GPIO_DT_SPEC_GET_BY_IDX(DT_NODELABEL(tlc5940), tlc_gpios, 4);
-    tlc_cfg.sclk_gpio.port = gpio0;
-    tlc_cfg.sclk_gpio.pin = 10;
+    tlc_cfg.sclk_gpio.port = gpio_dev;
+    tlc_cfg.sclk_gpio.pin = 6;
     tlc_cfg.sclk_gpio.dt_flags = GPIO_ACTIVE_HIGH;
 
-    ret = gpio_pin_configure_dt(&tlc_cfg.sclk_gpio, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(&tlc_cfg.sclk_gpio, GPIO_OUTPUT_INACTIVE);
     if (ret != 0) {
         LOG_ERR("SCLK config failed, err: %d", ret);
         return -EIO;
@@ -210,9 +257,32 @@ int Tlc5940::SetPin(uint8_t pin, uint8_t state){
                 gpio_spec->port->name, gpio_spec->pin);
         return -1;
     }
-
+    
     return ret;
 
+}
+
+int Tlc5940::PulsePin(uint8_t pin, uint8_t pulse_dir){
+    if (pulse_dir == LOW_TO_HIGH){
+            SetPin(pin, 1);
+            SetPin(pin, 0);
+    } else {
+            SetPin(pin, 0);
+            SetPin(pin, 1);
+    }
+    return 0;
+}
+
+inline void Tlc5940::ShiftByte(uint8_t byte){
+    
+    for (uint8_t bit = 0x80; bit; bit >>= 1) {
+        if (bit & byte) {
+            SetPin(SIN_PIN, 1);
+        } else {
+            SetPin(SIN_PIN, 0);
+        }
+        PulsePin(SCLK_PIN, LOW_TO_HIGH);
+    }
 }
 
 bool Tlc5940::OnBleCommand(const uint8_t *buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset){

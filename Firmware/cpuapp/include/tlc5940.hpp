@@ -44,10 +44,10 @@ public:
      * @brief Initialization function. Used to perform actual initialization. Because of software stack initialization
      * could not be done in constructor
      * 
-     * @param num_tlcs Number of daisy-chained TLC5940 devices
+     * @param initialValue Initial GrayScay value for all channels
      * @return Status, 0 for no errors
      */
-    int Initialize(uint8_t num_tlcs);
+    int Initialize(uint16_t initialValue);
 
     /**
      * @brief Sets the grayscale data for channel
@@ -84,6 +84,12 @@ public:
      */
     uint16_t Get(uint8_t channel);
 
+private:
+
+    int InitializeGpios(void);
+    int SetPin(uint8_t pin, uint8_t state);
+    int PulsePin(uint8_t pin, uint8_t pulse_dir);
+    void ShiftByte(uint8_t byte);
     /**
      * @brief Shifts in the data from the GrayScale data array into TLC5940
      * @note If data has already been shifted in this GrayScale cycle, another call to Update() will immediatelly return -1
@@ -91,14 +97,23 @@ public:
      *       while(Tlc5940.Update())
      * 
      * @return 0 if data was successfully shifted, -1 if there is data waiting to be latched
-     */
+     */    
     int Update();
 
-private:
-
-    int InitializeGpios(void);
-    int SetPin(uint8_t pin, uint8_t state);
-    int PulsePin(uint8_t pin, uint8_t pulse_dir);
+    /**
+     * @brief Main working thread. Used to perform continous Tlc5940 refresh.
+     *        Not clear from Tlc5940 datasheet whether it is needed or not
+     *
+     * @param data pointer to this
+     */
+    static void TlcWorkingThread(void *data, void *, void *){
+        Tlc5940 *self = static_cast<Tlc5940 *>(data);
+        
+        while(1){
+            self->Update();
+            k_msleep(10);
+        }
+    }
 
     /**
      * @brief Called when trigger mode is received via BLE
@@ -112,11 +127,12 @@ private:
     bool OnBleCommand(const uint8_t* buffer, Bluetooth::CommandKey key, Bluetooth::BleLength length, Bluetooth::BleOffset offset);
 
     struct tlc5940_config tlc_cfg;
-    uint8_t num_tlcs; //< Number of daisy-chained TLC5940 devices
     uint8_t *p_gsData;
-    uint16_t gsDataSize;
     uint16_t numChannels;
+    uint8_t firstCycleFlag;
+    uint8_t gsData[CONFIG_NUM_TLCS * 24];
+    k_thread worker; 
 
-    const struct device *gpio0;
+    const struct device *gpio_dev;
 };
 

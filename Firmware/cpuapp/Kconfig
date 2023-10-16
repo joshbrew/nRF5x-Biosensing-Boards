@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Proprietary
+
+mainmenu "Application"
+
+    config NUM_TLCS
+        int "Number of chained TLC drivers"
+        default 1
+        range 1 8
+
+source "Kconfig.zephyr"
