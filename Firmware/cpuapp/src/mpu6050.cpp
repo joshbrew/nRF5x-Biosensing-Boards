@@ -14,7 +14,7 @@
 LOG_MODULE_REGISTER(mpu6050, LOG_LEVEL_INF);
 
 Mpu6050::Mpu6050(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Mpu6050 Constructor!");
+    LOG_DBG("Mpu6050 Constructor!");
 }
 
 int Mpu6050::Initialize() {
@@ -22,7 +22,7 @@ int Mpu6050::Initialize() {
     int ret = 0;
     uint8_t part_id;
     
-    LOG_INF("Starting Mpu6050 Initialization..."); 
+    LOG_DBG("Starting Mpu6050 Initialization..."); 
     sample_cnt = 0;
     packet_cnt = 0;
     transport.Initialize();   

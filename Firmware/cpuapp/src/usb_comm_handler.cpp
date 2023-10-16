@@ -4,7 +4,7 @@
 
 #include <logging/log.h>
 
-LOG_MODULE_REGISTER(UsbCommHandler);
+LOG_MODULE_REGISTER(UsbCommHandler, LOG_LEVEL_INF);
 
 namespace
 {
@@ -40,7 +40,7 @@ UsbCommHandler::UsbCommHandler(SerialController &serial)
  */
 void UsbCommHandler::Initialize()
 {
-    LOG_INF("UsbCommHandler Initialization...");
+    LOG_DBG("UsbCommHandler Initialization...");
 }
 
 /**

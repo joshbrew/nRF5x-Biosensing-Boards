@@ -5,7 +5,7 @@
 LOG_MODULE_REGISTER(bme280, LOG_LEVEL_INF);
 
 Bme280::Bme280(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Bme280 Constructor!");
+    LOG_DBG("Bme280 Constructor!");
     k_timer_init(&timer, &Bme280::TimerHandler, nullptr);
     k_sem_init(&pollSemaphore, 0, 1);    
 }
@@ -15,7 +15,7 @@ int Bme280::Initialize() {
     int ret = 0;
     uint8_t part_id;
     
-    LOG_INF("Starting Bme280 Initialization..."); 
+    LOG_DBG("Starting Bme280 Initialization..."); 
     
     packet_cnt = 0;
     sample_cnt = 0;

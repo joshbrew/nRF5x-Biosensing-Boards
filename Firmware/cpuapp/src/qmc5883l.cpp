@@ -16,7 +16,7 @@
 LOG_MODULE_REGISTER(qmc5883l, LOG_LEVEL_INF);
 
 Qmc5883l::Qmc5883l(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Qmc5883l Constructor!");
+    LOG_DBG("Qmc5883l Constructor!");
 }
 
 int Qmc5883l::Initialize() {
@@ -24,7 +24,7 @@ int Qmc5883l::Initialize() {
     int ret = 0;
     uint8_t part_id;
     
-    LOG_INF("Starting Qmc5883l Initialization..."); 
+    LOG_DBG("Starting Qmc5883l Initialization..."); 
     sample_cnt = 0;
     packet_cnt = 0;
     transport.Initialize();   

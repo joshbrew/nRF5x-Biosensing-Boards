@@ -18,12 +18,12 @@ LOG_MODULE_REGISTER(dmic, LOG_LEVEL_INF);
 K_MEM_SLAB_DEFINE_STATIC(mem_slab, MAX_BLOCK_SIZE, BLOCK_COUNT, 4);
 
 DmicModule::DmicModule() {
-    LOG_INF("DmicModule Constructor!");
+    LOG_DBG("DmicModule Constructor!");
 }
 
 int DmicModule::Initialize() {
 
-    LOG_INF("Starting DmicModule Initialization...");
+    LOG_DBG("Starting DmicModule Initialization...");
     dmic_dev = DEVICE_DT_GET(DT_NODELABEL(dmic_dev));
 	
     if (!device_is_ready(dmic_dev)) {

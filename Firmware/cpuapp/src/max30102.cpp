@@ -14,7 +14,7 @@
 LOG_MODULE_REGISTER(max30102, LOG_LEVEL_INF);
 
 Max30102::Max30102(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Max30102 Constructor!");
+    LOG_DBG("Max30102 Constructor!");
 }
 
 int Max30102::Initialize() {
@@ -23,7 +23,7 @@ int Max30102::Initialize() {
     uint8_t part_id;
     uint8_t interrupt_status_reg;
     
-    LOG_INF("Starting Max30102 Initialization..."); 
+    LOG_DBG("Starting Max30102 Initialization..."); 
     packet_cnt = 0;
     transport.Initialize();   
     

@@ -8,7 +8,7 @@
 #include "ble_service.hpp"
 
 /** Register log module */
-LOG_MODULE_REGISTER(i2s, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(i2s, LOG_LEVEL_INF);
 
 /* Define a new Memory Slab which consistes of NUM_BLOCKS blocks
    __________________________________________________________________________
@@ -19,12 +19,12 @@ LOG_MODULE_REGISTER(i2s, LOG_LEVEL_DBG);
 static K_MEM_SLAB_DEFINE(mem_slab, BLOCK_SIZE, NUM_BLOCKS, NUM_SAMPLES);
 
 AudioModule::AudioModule() {
-    LOG_INF("AudioModule Constructor!");
+    LOG_DBG("AudioModule Constructor!");
 }
 
 int AudioModule::Initialize() {
 
-    LOG_INF("Starting AudioModule Initialization...");
+    LOG_DBG("Starting AudioModule Initialization...");
 
     i2s_dev = DEVICE_DT_GET(DT_NODELABEL(i2s_rxtx));
     if (!device_is_ready(i2s_dev)) {
