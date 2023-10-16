@@ -2,13 +2,18 @@
 // For more help, browse the DeviceTree documentation at https: //docs.zephyrproject.org/latest/guides/dts/index.html
 
 / {
+
+    aliases {
+        tlc = &tlc5940;
+    };
+
     tlc5940: tlc5940_node {
         // compatible = "gpio-leds";
-        tlc-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>, /* output pin, GSCLK */
-                    <&gpio0 3 GPIO_ACTIVE_HIGH>, /* output pin, XLAT */
-                    <&gpio0 7 GPIO_ACTIVE_HIGH>, /* output pin, BLANK */
-                    <&gpio0 8 GPIO_ACTIVE_HIGH>, /* output pin, SIN */
-                    <&gpio0 10 GPIO_ACTIVE_HIGH>; /* output pin, SCLK */
+        tlc-gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>, /* output pin, GSCLK */
+                    <&gpio1 1 GPIO_ACTIVE_HIGH>, /* output pin, XLAT */
+                    <&gpio1 4 GPIO_ACTIVE_HIGH>, /* output pin, BLANK */
+                    <&gpio1 5 GPIO_ACTIVE_HIGH>, /* output pin, SIN */
+                    <&gpio1 6 GPIO_ACTIVE_HIGH>; /* output pin, SCLK */
         status = "okay";
     };
 };
