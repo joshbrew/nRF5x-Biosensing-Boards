@@ -15,6 +15,7 @@
 #include "usb_comm_handler.hpp"
 #include "audio_module.hpp"
 #include "dmic_module.hpp"
+#include "tlc5940.hpp"
 
 #include "ble_service.hpp"
 // Needed for OTA
@@ -41,7 +42,7 @@
 
 #define USE_ADC_MODULES     (0)
 
-LOG_MODULE_REGISTER(main);
+LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 /* Static Functions */
 static int gpio_init(void);
@@ -117,6 +118,7 @@ Bme280 bme280(usbCommHandler);
 Qmc5883l qmc5883l(usbCommHandler);
 AudioModule audio;
 DmicModule dmic;
+Tlc5940 tlc;
 
 void main(void)
 {
@@ -150,7 +152,7 @@ if (USE_ADC_MODULES != 0){
 
     max30102.Initialize();
     if(max30102.IsOnI2cBus()){
-        LOG_INF("MAX30102 is on I2C bus!");
+        LOG_DBG("MAX30102 is on I2C bus!");
         max30102.Configure(max30102_default_config);
         max30102.StartSampling();
     } else {
@@ -159,7 +161,7 @@ if (USE_ADC_MODULES != 0){
 
     mpu6050.Initialize();
     if(mpu6050.IsOnI2cBus()){
-        LOG_INF("MPU6050 is on I2C bus!");
+        LOG_DBG("MPU6050 is on I2C bus!");
         mpu6050.Configure(mpu6050_default_config);
     } else {
         LOG_WRN("***WARNING: MPU6050 is not connected or properly initialized!");
@@ -175,7 +177,7 @@ if (USE_ADC_MODULES != 0){
 
     qmc5883l.Initialize();
     if(qmc5883l.IsOnI2cBus()){
-        LOG_INF("QMC5883L is on I2C bus!");
+        LOG_DBG("QMC5883L is on I2C bus!");
         qmc5883l.Configure(qmc5883l_default_config);
         qmc5883l.StartSampling();
     } else {
@@ -183,10 +185,13 @@ if (USE_ADC_MODULES != 0){
     }
 
     ret = audio.Initialize();
-    LOG_INF("audio.Initialize: %d", ret);
+    LOG_DBG("audio.Initialize: %d", ret);
 
     ret = dmic.Initialize();
-    LOG_INF("dmic.Initialize: %d", ret);
+    LOG_DBG("dmic.Initialize: %d", ret);
+
+    ret = tlc.Initialize(0x000);
+    LOG_DBG("tlc.Initialize: %d", ret);
 
     Bluetooth::SetupBLE();
 
@@ -387,7 +392,7 @@ static int gpio_init(void){
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("Max30102 Interrupt pin Int'd!");
+        LOG_DBG("Max30102 Interrupt pin Int'd!");
     } 
 
 /* MPU6050 Interrupt */
@@ -399,7 +404,7 @@ static int gpio_init(void){
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("Mpu6050 Interrupt pin Int'd!");
+        LOG_DBG("Mpu6050 Interrupt pin Int'd!");
     } 
 
 /* QMC5883L Interrupt */
@@ -411,7 +416,7 @@ static int gpio_init(void){
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("QMC5883L Interrupt pin Int'd!");
+        LOG_DBG("QMC5883L Interrupt pin Int'd!");
     } 
    
     return ret;
@@ -428,7 +433,7 @@ static int activate_irq_on_data_ready(void){
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("Data Ready Int'd!");
+        LOG_DBG("Data Ready Int'd!");
     } 
 
 //ADS131M08_1
@@ -439,7 +444,7 @@ static int activate_irq_on_data_ready(void){
     if (ret != 0){
         LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("Data Ready Int'd!");
+        LOG_DBG("Data Ready Int'd!");
     } 
 
     return ret;
