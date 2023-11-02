@@ -35,6 +35,16 @@
     cts-pin = <0xFFFFFFFF>;
 };
 
+&uart3 {
+    status = "okay";
+    compatible = "nordic,nrf-uarte";
+    current-speed = <115200>;
+    tx-pin = <37>;
+    rx-pin = <36>;
+    rts-pin = <0xFFFFFFFF>;
+    cts-pin = <0xFFFFFFFF>;
+};
+
 &spi0 {
     compatible = "nordic,nrf-spim";
     status = "okay";
