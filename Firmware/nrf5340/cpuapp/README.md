@@ -3,6 +3,10 @@ Working repository for the nRF52 Zephyr firmware, made for a [BT40/BC40M prototy
 
 Recommended build tools: nRFConnect with VSCode. 
 
+For pinouts refer to datasheet: https://www.mouser.com/datasheet/2/915/Fanstel_08262021_BT40F_Product_Specificationsv1_01-2530184.pdf or see the BT-series CAD folder for pinout screenshots.
+
+Note, the BT-series design is using the BT840 footprint, so correlate the pins via the datasheet.
+
 Instructions:
 - [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode.  We used SDK version 1.9.1 in the toolchain manager.
 - Open this repo in VSCode and launch the nRFConnect menu within VSCode
@@ -27,3 +31,5 @@ Was also able to use a 1 dollar STM32 blue pill to flash a built hex file manual
 Device sensor test: http://modules.brainsatplay.com/
 
 Debugger demo: https://devicedebugger.netlify.app/ 
+
+
