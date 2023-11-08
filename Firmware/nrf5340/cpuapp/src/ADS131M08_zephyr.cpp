@@ -10,18 +10,18 @@
 
 #include "ADS131M08_zephyr.hpp"
 
-LOG_MODULE_REGISTER(ads131m08);
+LOG_MODULE_REGISTER(ads131m08, LOG_LEVEL_INF);
 
 ADS131M08::ADS131M08() {
 
-    LOG_INF("ADS131M08 Constructor!");
+    LOG_DBG("ADS131M08 Constructor!");
     // CS = cs; XTAL = xtal; DRDY = drdy; //You don't have to use DRDY, can also read off the ADS131_STATUS register.
     // SpiClk = clk;
 }
 
 void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uint32_t spi_frequency) {
 
-    LOG_INF("Starting ADS131M08 Initialization...");
+    LOG_DBG("Starting ADS131M08 Initialization...");
     int ret = 0;
 
 /* Configure DRDY and SYNC/RESET GPIOs */

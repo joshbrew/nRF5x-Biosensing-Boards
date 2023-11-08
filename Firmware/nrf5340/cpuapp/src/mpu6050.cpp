@@ -14,7 +14,7 @@
 LOG_MODULE_REGISTER(mpu6050, LOG_LEVEL_INF);
 
 Mpu6050::Mpu6050(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Mpu6050 Constructor!");
+    LOG_DBG("Mpu6050 Constructor!");
 }
 
 int Mpu6050::Initialize() {
@@ -22,7 +22,7 @@ int Mpu6050::Initialize() {
     int ret = 0;
     uint8_t part_id;
     
-    LOG_INF("Starting Mpu6050 Initialization..."); 
+    LOG_DBG("Starting Mpu6050 Initialization..."); 
     sample_cnt = 0;
     packet_cnt = 0;
     transport.Initialize();   
@@ -32,7 +32,7 @@ int Mpu6050::Initialize() {
     part_id = transport.ReadRegister(MPU6050_RA_WHO_AM_I);
 
     if(part_id == mpu6050_id){
-        LOG_INF("SUCCESS: Max30102 ID match!");
+        LOG_DBG("SUCCESS: Max30102 ID match!");
         mpu6050_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
     } else {
         LOG_ERR("Wrong ID: 0x%X", part_id);
@@ -109,7 +109,7 @@ void Mpu6050::Reset() {
 
     //transport.WriteRegister(MPU6050_RA_SIGNAL_PATH_RESET, 0x07); // GYRO_RESET, ACCEL_RESET, TEMP_RESET
 
-    LOG_INF("Mpu6050 Reset Success!");
+    LOG_DBG("Mpu6050 Reset Success!");
 }
 
 void Mpu6050::Shutdown() {
@@ -142,11 +142,11 @@ void Mpu6050::HandleInterrupt(){
     if(int_reason & BIT(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)){
         //transport.ReadRegisters(MAX30102_REG_FIFO_DATA, tx_buf, 192);        
         //InitiateTemperatureReading();
-        LOG_INF("FIFO overflow!");
+        LOG_DBG("FIFO overflow!");
     }
 
     if(int_reason & BIT(MPU6050_INTERRUPT_I2C_MST_INT_BIT)){
-        LOG_INF("I2C master interrupt!");
+        LOG_DBG("I2C master interrupt!");
     }
 
     if(int_reason & BIT(MPU6050_INTERRUPT_DATA_RDY_BIT)){

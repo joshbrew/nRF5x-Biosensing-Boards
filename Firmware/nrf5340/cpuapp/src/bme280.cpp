@@ -5,7 +5,7 @@
 LOG_MODULE_REGISTER(bme280, LOG_LEVEL_INF);
 
 Bme280::Bme280(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Bme280 Constructor!");
+    LOG_DBG("Bme280 Constructor!");
     k_timer_init(&timer, &Bme280::TimerHandler, nullptr);
     k_sem_init(&pollSemaphore, 0, 1);    
 }
@@ -15,7 +15,7 @@ int Bme280::Initialize() {
     int ret = 0;
     uint8_t part_id;
     
-    LOG_INF("Starting Bme280 Initialization..."); 
+    LOG_DBG("Starting Bme280 Initialization..."); 
     
     packet_cnt = 0;
     sample_cnt = 0;
@@ -72,10 +72,10 @@ void Bme280::GetChipId(const struct device *dev){
 
     bmx_id = data->chip_id;
     if(data->chip_id == bme280_id){
-        LOG_INF("BME280 on I2C bus!");
+        LOG_DBG("BME280 on I2C bus!");
         bme280_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
     } else if (data->chip_id == bmp280_id_sample_1 || data->chip_id == bmp280_id_mp){
-        LOG_INF("BMP280 on I2C bus!");
+        LOG_DBG("BMP280 on I2C bus!");
         bmp280_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
     }
 }
@@ -96,7 +96,7 @@ const struct device * Bme280::get_bme280_device(void){
 		return nullptr;
 	}
 
-	LOG_INF("Found device \"%s\", getting sensor data\n", dev->name);
+	LOG_DBG("Found device \"%s\", getting sensor data\n", dev->name);
 	return dev;    
 }
 

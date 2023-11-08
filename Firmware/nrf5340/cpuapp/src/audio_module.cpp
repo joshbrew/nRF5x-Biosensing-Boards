@@ -8,7 +8,7 @@
 #include "ble_service.hpp"
 
 /** Register log module */
-LOG_MODULE_REGISTER(i2s, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(i2s, LOG_LEVEL_INF);
 
 /* Define a new Memory Slab which consistes of NUM_BLOCKS blocks
    __________________________________________________________________________
@@ -19,19 +19,19 @@ LOG_MODULE_REGISTER(i2s, LOG_LEVEL_DBG);
 static K_MEM_SLAB_DEFINE(mem_slab, BLOCK_SIZE, NUM_BLOCKS, NUM_SAMPLES);
 
 AudioModule::AudioModule() {
-    LOG_INF("AudioModule Constructor!");
+    LOG_DBG("AudioModule Constructor!");
 }
 
 int AudioModule::Initialize() {
 
-    LOG_INF("Starting AudioModule Initialization...");
+    LOG_DBG("Starting AudioModule Initialization...");
 
     i2s_dev = DEVICE_DT_GET(DT_NODELABEL(i2s_rxtx));
     if (!device_is_ready(i2s_dev)) {
         LOG_ERR("%s is not ready\n", i2s_dev->name);
         return -1;
     } else {
-        LOG_INF("i2s_dev ready!");
+        LOG_DBG("i2s_dev ready!");
     }
 
     struct i2s_config i2s_cfg;
@@ -49,7 +49,7 @@ int AudioModule::Initialize() {
         LOG_ERR("Failed to configure the I2S stream: (%d)\n", ret);
         return ret;
     } else {
-        LOG_INF("i2s_configured successfully!");
+        LOG_DBG("i2s_configured successfully!");
     }
 
     ret = k_mem_slab_alloc(&mem_slab, &mem_blocks, K_NO_WAIT);
@@ -57,7 +57,7 @@ int AudioModule::Initialize() {
         LOG_ERR("Failed to allocate the memory blocks: %d\n", ret);
         return ret;
     } else {
-        LOG_INF("slab allocated successfully!");
+        LOG_DBG("slab allocated successfully!");
     }
 
     memset((uint16_t*)mem_blocks, 0, (NUM_SAMPLES * NUM_BLOCKS));
@@ -107,7 +107,7 @@ int AudioModule::StartSampling(){
 	if (ret < 0) {
 		LOG_ERR("Failed to start the transmission: %d", ret);
 	} else {
-        LOG_INF("Resuming thread...");
+        LOG_DBG("Resuming thread...");
         k_thread_resume(&worker);
     }
     return ret;
@@ -119,7 +119,7 @@ int AudioModule::StopSampling(){
 	if (ret < 0) {
 		LOG_ERR("Failed to stop the transmission: %d", ret);
 	} else {
-        LOG_INF("Suspending thread...");
+        LOG_DBG("Suspending thread...");
         k_thread_suspend(&worker);
     }
     return ret;

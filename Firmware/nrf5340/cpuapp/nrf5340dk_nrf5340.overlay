@@ -6,23 +6,34 @@
 / {
     
     aliases {
-        pwmadc = &pwm_dev0;
+        //pwmadc = &pwm_dev0;
+        //tlc = &tlc5940;
     };
 
-    pwmdevs {
-        compatible = "pwm-leds";
-        pwm_dev0: pwm_dev_0 {
-            pwms = <&pwm0 33>;
-        };
-    };
+    //pwmdevs {
+    //    compatible = "pwm-leds";
+    //    pwm_dev0: pwm_dev_0 {
+    //        pwms = <&pwm0 33>;
+    //    };
+    //};
+
+    // tlc5940: tlc5940_node {
+    //     // compatible = "gpio-leds";
+    //     tlc-gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>, /* output pin, GSCLK */
+    //                 <&gpio1 1 GPIO_ACTIVE_HIGH>, /* output pin, XLAT */
+    //                 <&gpio1 4 GPIO_ACTIVE_HIGH>, /* output pin, BLANK */
+    //                 <&gpio1 5 GPIO_ACTIVE_HIGH>, /* output pin, SIN */
+    //                 <&gpio1 6 GPIO_ACTIVE_HIGH>; /* output pin, SCLK */
+    //     status = "okay";
+    // };
 
 };
 
-&pwm0 {
-	status = "okay";
-	ch0-pin = <33>;
-	//ch0-inverted;
-};
+// &pwm0 {
+// 	status = "okay";
+// 	ch0-pin = <33>;
+// 	//ch0-inverted;
+// };
 
 &uart0 {
     status = "disabled";
@@ -37,6 +48,16 @@
     current-speed = <115200>;
     tx-pin = <47>;
     rx-pin = <45>;
+    rts-pin = <0xFFFFFFFF>;
+    cts-pin = <0xFFFFFFFF>;
+};
+
+&uart3 {
+    status = "okay";
+    compatible = "nordic,nrf-uarte";
+    current-speed = <115200>;
+    tx-pin = <37>;
+    rx-pin = <36>;
     rts-pin = <0xFFFFFFFF>;
     cts-pin = <0xFFFFFFFF>;
 };

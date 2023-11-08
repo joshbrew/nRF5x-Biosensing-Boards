@@ -16,7 +16,7 @@
 LOG_MODULE_REGISTER(qmc5883l, LOG_LEVEL_INF);
 
 Qmc5883l::Qmc5883l(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Qmc5883l Constructor!");
+    LOG_DBG("Qmc5883l Constructor!");
 }
 
 int Qmc5883l::Initialize() {
@@ -24,7 +24,7 @@ int Qmc5883l::Initialize() {
     int ret = 0;
     uint8_t part_id;
     
-    LOG_INF("Starting Qmc5883l Initialization..."); 
+    LOG_DBG("Starting Qmc5883l Initialization..."); 
     sample_cnt = 0;
     packet_cnt = 0;
     transport.Initialize();   
@@ -34,7 +34,7 @@ int Qmc5883l::Initialize() {
     part_id = transport.ReadRegister(QMC5883L_WHO_AM_I);
 
     if(part_id == qmc5883l_id){
-        LOG_INF("SUCCESS: QMC5883L ID match!");
+        LOG_DBG("SUCCESS: QMC5883L ID match!");
         qmc5883l_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
     } else {
         LOG_ERR("Wrong ID: 0x%X", part_id);
@@ -100,7 +100,7 @@ void Qmc5883l::Reset() {
     // QMC5883L immediately switches to standby mode.
     transport.UpdateRegister(QMC5883L_CTRL_REG_2, BIT(QMC5883L_SOFT_RST_BIT), 0xFF);    
 
-    LOG_INF("Qmc5883l Reset Success!");
+    LOG_DBG("Qmc5883l Reset Success!");
 }
 
 void Qmc5883l::Shutdown() {
@@ -131,13 +131,13 @@ void Qmc5883l::HandleInterrupt(){
     int_reason = transport.ReadRegister(QMC5883L_STATUS_REG);
     
     if(int_reason & BIT(QMC5883L_OVL_BIT)){
-        LOG_INF("Sensor value overflow!");
+        LOG_DBG("Sensor value overflow!");
         // Read one of the XYZ output registers to clear DRDY
         transport.ReadRegister(QMC5883L_Z_MSB);
     }
 
     if(int_reason & BIT(QMC5883L_DOR_BIT)){
-        LOG_INF("QMC5883L Data Skip (DOR) Interrupt!");
+        LOG_DBG("QMC5883L Data Skip (DOR) Interrupt!");
         // Read one of the XYZ output registers to clear DRDY
         transport.ReadRegister(QMC5883L_Z_MSB);        
     }

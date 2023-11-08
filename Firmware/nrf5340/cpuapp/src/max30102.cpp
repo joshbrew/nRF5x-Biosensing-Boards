@@ -14,7 +14,7 @@
 LOG_MODULE_REGISTER(max30102, LOG_LEVEL_INF);
 
 Max30102::Max30102(UsbCommHandler &controller) : serialHandler(controller) {
-    LOG_INF("Max30102 Constructor!");
+    LOG_DBG("Max30102 Constructor!");
 }
 
 int Max30102::Initialize() {
@@ -23,7 +23,7 @@ int Max30102::Initialize() {
     uint8_t part_id;
     uint8_t interrupt_status_reg;
     
-    LOG_INF("Starting Max30102 Initialization..."); 
+    LOG_DBG("Starting Max30102 Initialization..."); 
     packet_cnt = 0;
     transport.Initialize();   
     
@@ -37,7 +37,7 @@ int Max30102::Initialize() {
     part_id = transport.ReadRegister(MAX30102_REG_PART_ID);
 
     if(part_id == max30102_id){
-        LOG_INF("SUCCESS: Max30102 ID match!");
+        LOG_DBG("SUCCESS: Max30102 ID match!");
         max30102_is_on_i2c_bus_.store(true, std::memory_order_relaxed);
     } else {
         LOG_ERR("Wrong ID: 0x%X", part_id);
@@ -111,7 +111,7 @@ void Max30102::Reset() {
 //TODO(bojankoce): We can get stuck here. Implement some timeout before returning reset error!        
     } while(mode_cfg_reg & MAX30102_MODE_CFG_RESET_MASK);
     
-    LOG_INF("Max30102 Reset Success!");
+    LOG_DBG("Max30102 Reset Success!");
 }
 
 void Max30102::Shutdown() {
@@ -151,21 +151,21 @@ void Max30102::HandleInterrupt(){
     }
 
     if(int_reason & PPG_RDY_MASK){
-        LOG_INF("PPG Ready!");
+        LOG_DBG("PPG Ready!");
     }
 
     if(int_reason & ALC_OVF_MASK){
-        LOG_INF("ALC_OVF!");
+        LOG_DBG("ALC_OVF!");
     }
     
     if(int_reason & PWR_RDY_MASK){
-        LOG_INF("Power Ready!");
+        LOG_DBG("Power Ready!");
     }
 
     int_reason = transport.ReadRegister(MAX30102_REG_INT_STS2);
 
     if(int_reason & DIE_TEMP_RDY_MASK){
-        //LOG_INF("Temperature Ready!");
+        //LOG_DBG("Temperature Ready!");
         TemperatureRead();
         Bluetooth::Max30102Notify(tx_buf, 195);
         serialHandler.SendMax30102Samples(tx_buf, 195);
@@ -177,7 +177,7 @@ void Max30102::TemperatureRead(){
     uint8_t tfrac;
     tint = transport.ReadRegister(MAX30102_REG_TINT);
     tfrac = transport.ReadRegister(MAX30102_REG_TFRAC);
-    //LOG_INF("Temperature: %d, %d", tint, tfrac);
+    //LOG_DBG("Temperature: %d, %d", tint, tfrac);
     tx_buf[193] = tint;
     tx_buf[194] = tfrac;
     tx_buf[0] = packet_cnt;            

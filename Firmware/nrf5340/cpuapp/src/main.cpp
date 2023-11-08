@@ -21,9 +21,14 @@
 #include "os_mgmt/os_mgmt.h"
 #include "img_mgmt/img_mgmt.h"
 
-// PWM // because we forgot the CLKOUT pin on a draft BT840/BT40 PCB
-#include <drivers/pwm.h>
+/* Global variables*/
+const struct device *gpio_0_dev;
+const struct device *gpio_1_dev;
 
+//#include "gpio_macros.cpp"
+//#include "led_testing.cpp" //pwm and LED alternating routines
+
+//make sure the pins are updated in the .overlay file as well, and double check the prj.conf
 #define ADS_CS              ((uint8_t)22)
 #define DATA_READY_GPIO     ((uint8_t)15)  
 #define ADS_RESET           ((uint8_t)12)  
@@ -39,99 +44,43 @@
 #define MPU_INT             ((uint8_t)5)   // 5 //4 (nirs ensemble)
 #define QMC5883L_DRDY       ((uint8_t)6)   // 6 //32 (nirs ensemble)
 
-#define PWM_CLK         ((uint32_t)8192000) //Frequency (Hz)
-#define PWM_PERIOD_NSEC ((uint8_t)122) //1/Frequency in nanosec
-//#define PWM_PIN         ((uint8_t)33) //set in overlay //(BT840 draft 1 missing the CLKOUT pin in same position)
-
-static bool useADCs = true;
-static bool useLEDS = false;
-
-static bool usePWM = false; //fix for a prototype not having a CLKOUT pin proper
-static bool useAudio = true;
-
-static const uint8_t samplesPerLED = 3;
-static const uint8_t samplesPerAmbient = 3;
-
-static const uint8_t nLEDs = 4; //4 //7 //19 //3 ///includes ambient reading (255)
-//list the GPIO in the order we want to flash. 255 is ambient
-static uint8_t LED_gpio[nLEDs] = { 
-    //37, 38, 255
-    
-    255, //ambient
-    9, 255, 30//, 255, 10 //11, 13, 12 //2 channel hookup
-    
-    //16 channel hookup
-    // 10, 109,
-    // 14, 107,
-    // 114, 17,
-    // 100,  6,
-    // 115, 21,
-    // 16,  24,
-    // 5,   31,
-    // 8,    7,
-    // 111, 104
-    
-};
-
-//LEDs 1.01, 1.11 etc are 32 + the number after the decimal. 1.00 is pin 32 (pretty sure)
-
-static uint8_t LEDn = 0;
-static uint8_t LEDSampleCtr = 0;
-//static uint32_t LEDt_ms = 100; //for a blink routine that doesnt work with all the threads
-
 LOG_MODULE_REGISTER(main);
 
 /* Static Functions */
 static int  gpio_init(void);
-static int  sensor_gpio_int(void);
-static int  setADS131_int(void);
+static int  init_sensor_gpio_int(void);
+static int  init_ads131_gpio_int(void);
 
-static void interrupt_workQueue_handler(struct k_work* wrk);
-static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk);
-static void max30102_interrupt_workQueue_handler(struct k_work* wrk);
-static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk);
-static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk);
-
+#if CONFIG_USE_ADS131M08
+/* Static Functions */
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
-static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
-static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
-static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+static void interrupt_workQueue_handler(struct k_work* wrk);
+static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk);
+static int activate_irq_on_data_ready(void);
 
 /* Global variables */
-const struct device *gpio_0_dev;
-const struct device *gpio_1_dev;
 struct gpio_callback callback;
 struct gpio_callback ads131m08_1_callback;
-struct gpio_callback max30102_callback;
-struct gpio_callback mpu6050_callback;
-struct gpio_callback qmc5883l_callback;
-struct k_work        interrupt_work_item;    ///< interrupt work item
-struct k_work        ads131m08_1_interrupt_work_item;    ///< interrupt work item
-struct k_work        max30102_interrupt_work_item;    ///< interrupt work item
-struct k_work        mpu6050_interrupt_work_item;    ///< interrupt work item
-struct k_work        qmc5883l_interrupt_work_item;    ///< interrupt work item
-
-static uint8_t sampleNum = 0;
-static uint8_t ads131m08_1_sampleNum = 0;
-
-static uint8_t i = 0;
-static uint8_t j = 0;
+struct k_work interrupt_work_item;    ///< interrupt work item
+struct k_work ads131m08_1_interrupt_work_item;    ///< interrupt work item
 
 static uint8_t ble_tx_buff[247] = {0};
 static uint8_t ads131m08_1_ble_tx_buff[247] = {0};
+static uint8_t sampleNum = 0;
+static uint8_t ads131m08_1_sampleNum = 0;
+static uint8_t i = 0;
+static uint8_t j = 0;
+#endif 
 
-// /* size of stack area used by each thread */
-#define SSIZE 1024
+#if CONFIG_USE_MAX30102
+/* Static Functions */
+static void max30102_interrupt_workQueue_handler(struct k_work* wrk);
+static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 
-// /* scheduling priority used by each thread */
-#define TPRIORITY 7
-
-
-
-
-
-//static uint8_t adcRawData[27] = {0};
+/* Global variables */
+struct gpio_callback max30102_callback;
+struct k_work max30102_interrupt_work_item;    ///< interrupt work item
 static max30102_config max30102_default_config = {
     0x80, // Interrupt Config 1. Enable FIFO_A_FULL interrupt
     MAX30102_INTR_2_DIE_TEMP_RDY_EN, // Interrupt Config 2. Enable temperature ready interrupt
@@ -141,7 +90,16 @@ static max30102_config max30102_default_config = {
     {50, 50}, // LED1/LED2 config. 25.4mA typical LED current
     {0x11, 0x22}  // SLOT config. SLOT1/2 for LED1, SLOT3/4 for LED2.
 };
+#endif
 
+#if CONFIG_USE_MPU6050
+/* Static Functions */
+static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk);
+static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+
+/* Global variables */
+struct gpio_callback mpu6050_callback;
+struct k_work mpu6050_interrupt_work_item;    ///< interrupt work item
 static mpu6050_config mpu6050_default_config = {
     .sample_rate_config = 0x09,     // Sample rate = 100Hz
     .config_reg = 0x01,             // FSYNC disabled. Digital Low Pass filter enabled. 
@@ -154,49 +112,72 @@ static mpu6050_config mpu6050_default_config = {
     .pwr_mgmt_1 = 0x01,             // Use PLL with X axis gyroscope as Clock Source.
     .pwr_mgmt_2 = 0x00              // Don't use Accelerometer only Low Power mode. XYZ axes of Gyro and Accel enabled. 
 }; 
+#endif
 
+#if CONFIG_USE_QMC5883L
+/* Static Functions */
+static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk);
+static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
+
+/* Global variables */
+struct gpio_callback qmc5883l_callback;
+struct k_work qmc5883l_interrupt_work_item;    ///< interrupt work item
 static qmc5883l_config qmc5883l_default_config = {
     .ctrl_reg_1 = (QMC5833L_OSR_512 << 6) | (QMC5833L_FS_8G << 4) | (QMC5833L_ODR_100Hz << 2) | (QMC5833L_MODE_STANDBY),
     .ctrl_reg_2 = 0
 }; 
-
-ADS131M08 adc;
-ADS131M08 adc_1;
-SerialController serial;
-UsbCommHandler usbCommHandler(serial);
-Max30102 max30102(usbCommHandler);
-Mpu6050 mpu6050(usbCommHandler);
-Bme280 bme280(usbCommHandler);
-Qmc5883l qmc5883l(usbCommHandler);
-AudioModule audio;
-DmicModule dmic;
-
-
-
-#if DT_NODE_HAS_STATUS(DT_ALIAS(pwmadc), okay)
-#define PWM_CHANNEL DT_PWMS_CHANNEL(DT_ALIAS(pwmadc))
-#else
-#error "Choose a supported PWM driver"
 #endif
 
-void initPWM(void) {
+#if CONFIG_USE_MCU2MCU
+/* Static Functions */
+static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data);
+static int init_uart(void);
 
-    const struct device *pwm;
-
-	pwm = device_get_binding("PWM_0");
-
-    pwm_pin_set_nsec(
-        pwm, 
-        PWM_CHANNEL, 
-        PWM_PERIOD_NSEC, 
-        PWM_PERIOD_NSEC / 2, 
-        0
-    );
-}
-
-// //////////////////////////////
+/* Global variables */
+const struct device *uart_dev; /** UART device. For communication with RP2040 */
+static uint8_t recvBuffer[CONFIG_UART_RX_TX_BUF_SZ]; ///< receive buffer. Contains data received from RP2040
+#endif
 
 
+#if CONFIG_USE_ADS131M08
+ADS131M08 adc;
+ADS131M08 adc_1;
+#endif
+
+#if CONFIG_USE_USB
+SerialController serial;
+UsbCommHandler usbCommHandler(serial);
+#endif
+
+#if CONFIG_USE_MAX30102
+Max30102 max30102(usbCommHandler);
+#endif
+
+#if CONFIG_USE_MPU6050
+Mpu6050 mpu6050(usbCommHandler);
+#endif
+
+#if CONFIG_USE_BME280
+Bme280 bme280(usbCommHandler);
+#endif
+
+#if CONFIG_USE_QMC5883L
+Qmc5883l qmc5883l(usbCommHandler);
+#endif
+
+#if CONFIG_USE_I2S
+AudioModule audio;
+#endif
+
+#if CONFIG_USE_DMIC
+DmicModule dmic;
+#endif
+
+#if CONFIG_USE_TLC5940
+Tlc5940 tlc;
+#endif
+
+// GPIO Macros
 
 
 static int configureGPIO(int pin, gpio_flags_t rule) {
@@ -268,81 +249,7 @@ static int setGPIO(int pin, int state) {
     return ret;
 }
 
-//LED routines using GPIO
-
-static int setupLEDS() {
-    int ret = 0;
-    for(uint8_t i = 0; i < nLEDs; i++) {
-        if(LED_gpio[i] == 255) continue;
-        else if(LED_gpio[i] < 32) {
-            ret += gpio_pin_configure(gpio_0_dev, LED_gpio[i], GPIO_OUTPUT_ACTIVE); 
-            gpio_pin_set(gpio_0_dev, LED_gpio[i], 0);
-        } else if (LED_gpio[1] < 100) {
-            ret += gpio_pin_configure(gpio_1_dev, LED_gpio[i] - 32, GPIO_OUTPUT_ACTIVE); 
-            gpio_pin_set(gpio_1_dev, LED_gpio[i] - 32, 0);
-        } else {
-            ret += gpio_pin_configure(gpio_1_dev, LED_gpio[i] - 100, GPIO_OUTPUT_ACTIVE);  //supports e.g. 114 for 1.14
-            gpio_pin_set(gpio_1_dev, LED_gpio[i] - 100, 0);
-        }
-        
-    }
-
-    return ret;
-}
-
-
-static void alternateLEDs() {
-    if(LED_gpio[LEDn] != 255) {
-        if(LED_gpio[LEDn] < 32) {
-            gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 0);
-        } else if (LED_gpio[1] < 100) {
-            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn] - 32, 0);
-        } else {
-            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn] - 100, 0);
-        }
-    }
-    
-    LEDn++;
-    
-    if (LEDn >= nLEDs) {
-        LEDn = 0;
-    }
-    
-    if(LED_gpio[LEDn] != 255) {
-        if(LED_gpio[LEDn] < 32) {
-            gpio_pin_set(gpio_0_dev, LED_gpio[LEDn], 1);
-        } else if (LED_gpio[1] < 100) {
-            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn] - 32, 1);
-        } else {
-            gpio_pin_set(gpio_1_dev, LED_gpio[LEDn] - 100, 1);
-        }
-    }
-}
-
-static void incrLEDSampleCtr() {
-
-    LEDSampleCtr++;
-    if(LED_gpio[LEDn] != 255 && LEDSampleCtr >= samplesPerLED) {
-        //TODO: implement an LED driver chip. GPIO has bad power up time
-        alternateLEDs(); //alternate to the ADC samples to time the LED pulses (for photodiode sampling)
-        LEDSampleCtr = 0;
-    } else if(LEDSampleCtr >= samplesPerAmbient) {
-        alternateLEDs();
-        LEDSampleCtr = 0;
-    }
-}
-
-// void blink(void) {
-//     setupLEDS();
-//     while(1) {
-// 	    alternateLEDs();
-//         k_msleep(LEDt_ms);
-//     }
-// }
-
-// does not synchronize correctly
-// K_THREAD_DEFINE(blink0_id, SSIZE, blink, NULL, NULL, NULL,
-//         TPRIORITY, 0, 0);
+// //////////////////////////////
 
 static int gpio_init(void) {
     
@@ -357,7 +264,7 @@ static int gpio_init(void) {
         return -1;
 	}        
 
-    //setADS131_int();
+    //init_ads131_gpio_int();
     //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
     
     configureGPIO(DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
@@ -368,16 +275,17 @@ static int gpio_init(void) {
     LOG_INF("Waking up...");
 
     setGPIO(DBG_LED, 1);
-
+    return 0;
 }
 
-static int sensor_gpio_int(void){
+static int init_sensor_gpio_int(void){
 	int ret = 0;
 
 
 /* Max30102 Interrupt */
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
 
+#if CONFIG_USE_MAX30102
     ret += configureGPIO(MAX_INT, GPIO_INPUT | GPIO_PULL_UP);
     ret += configureInterrupt(MAX_INT, GPIO_INT_EDGE_FALLING);
     ret += addGPIOCallback(MAX_INT, &max30102_callback, &max30102_irq_cb);
@@ -387,8 +295,10 @@ static int sensor_gpio_int(void){
     } else {
         LOG_INF("Max30102 Interrupt pin Int'd!");
     } 
+#endif
 
 /* MPU6050 Interrupt */
+#if CONFIG_USE_MPU6050
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
     ret += configureGPIO(MPU_INT, GPIO_INPUT | GPIO_PULL_UP);
     ret += configureInterrupt(MPU_INT, GPIO_INT_EDGE_FALLING);
@@ -399,7 +309,9 @@ static int sensor_gpio_int(void){
     } else {
         LOG_INF("Mpu6050 Interrupt pin Int'd!");
     } 
+#endif
 /* QMC5883L Interrupt */
+#if CONFIG_USE_QMC5883L
 //TODO(bojankoce): Use Zephyr DT (device tree) macros to get GPIO device, port and pin number
     ret += configureGPIO( QMC5883L_DRDY, GPIO_INPUT | GPIO_PULL_DOWN); // Pin P0.2
     ret += configureInterrupt( QMC5883L_DRDY, GPIO_INT_EDGE_RISING);
@@ -412,12 +324,13 @@ static int sensor_gpio_int(void){
    
     return ret;
 }
+#endif
 
 
 
-static int setADS131_int(void){
+static int init_ads131_gpio_int(void){
     int ret = 0;
-
+    #if CONFIG_USE_ADS131M08
 //ADS131M08_0
     ret += configureGPIO(DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
     ret += configureInterrupt(DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
@@ -439,13 +352,14 @@ static int setADS131_int(void){
     } else {
         LOG_INF("Data Ready 1 Int'd!");
     } 
-
+    #endif
     return ret;
 }
 
 
-static int * setupadc(ADS131M08 * adc) {
-
+static int setupadc(ADS131M08 * adc) {
+    int reg_value = 0;
+    #if CONFIG_USE_ADS131M08
     if(adc->writeReg(ADS131_CLOCK,0b1111111100011111)){  //< Clock register (page 55 in datasheet)
         //LOG_INF("ADS131_CLOCK register successfully configured");
     } else {
@@ -458,7 +372,20 @@ static int * setupadc(ADS131M08 * adc) {
         LOG_ERR("***ERROR: Setting ADC gain!");
     }
     k_msleep(10);
-
+    if(adc->writeReg(ADS131_THRSHLD_LSB,0b0000000000001010)){  //< Clock register (page 55 in datasheet)
+        //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
+        // adc.writeReg(ADS131_CH0_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH1_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH2_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH3_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH4_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH5_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH6_CFG,0b0000000000000000);
+        // adc.writeReg(ADS131_CH7_CFG,0b0000000000000000);
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
+    }
+    k_msleep(10);
 
 // Write 0 to RESET bit
     if(adc->writeReg(ADS131_MODE,0x0110)){  
@@ -469,57 +396,39 @@ static int * setupadc(ADS131M08 * adc) {
     k_msleep(10);
   
 //DC Block Filter settings:
-    if(
-        adc->writeReg(ADS131_THRSHLD_LSB, 0x0C)
-    ){  // Enable DC Block Filter. Write 0x0C to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
+    if(adc->writeReg(ADS131_THRSHLD_LSB,0x04)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
     } else {
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
     }  
 
-    // adc_1.writeReg(ADS131_CH0_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH1_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH2_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH3_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH4_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH5_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH6_CFG,0b0000000000000000);
-    // k_msleep(10);
-    // adc_1.writeReg(ADS131_CH7_CFG,0b0000000000000000);
-    // k_msleep(10);
-
-    int reg_value[5];
-    reg_value[0] = adc->readReg(ADS131_CLOCK);
+    reg_value = adc->readReg(ADS131_CLOCK);
     //LOG_INF("ADS131_CLOCK: 0x%X", reg_value);
     k_msleep(10); 
     
-    reg_value[1] = adc->readReg(ADS131_GAIN1);
+    reg_value = adc->readReg(ADS131_GAIN1);
     //LOG_INF("ADS131_GAIN1: 0x%X", reg_value);
     k_msleep(10);
 
-    reg_value[2] = adc->readReg(ADS131_ID);
+    reg_value = adc->readReg(ADS131_ID);
     //LOG_INF("ADS131_ID: 0x%X", reg_value);
     k_msleep(10);
 
-    reg_value[3] = adc->readReg(ADS131_STATUS);
+    reg_value = adc->readReg(ADS131_STATUS);
     //LOG_INF("ADS131_STATUS: 0x%X", reg_value);
     k_msleep(10);
 
-    reg_value[4] = adc->readReg(ADS131_MODE);
+    reg_value = adc->readReg(ADS131_MODE);
     //LOG_INF("ADS131_MODE: 0x%X", reg_value);
     k_msleep(10);
 
+    #endif
     return reg_value;
 }
 
 
 
+#if CONFIG_USE_ADS131M08
 
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
     k_work_submit(&interrupt_work_item); 
@@ -527,18 +436,6 @@ static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *c
 
 static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
     k_work_submit(&ads131m08_1_interrupt_work_item); 
-}
-
-static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
-    k_work_submit(&max30102_interrupt_work_item);     
-}
-
-static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
-    k_work_submit(&mpu6050_interrupt_work_item);     
-}
-
-static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
-    k_work_submit(&qmc5883l_interrupt_work_item);     
 }
 
 /**
@@ -549,25 +446,18 @@ static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb,
  */
 static void interrupt_workQueue_handler(struct k_work* wrk)
 {	
-    
-    if(useLEDS) incrLEDSampleCtr();
-
     uint8_t adcBuffer[(adc.nWordsInFrame * adc.nBytesInWord)] = {0};
     adc.readAllChannels(adcBuffer);
     
     ble_tx_buff[25*i + 24] = sampleNum;
     memcpy((ble_tx_buff + 25*i), (adcBuffer + 3), 24);
 
-    if(useLEDS) ble_tx_buff[225+i] = LED_gpio[LEDn];
-
     sampleNum++;
     i++;
-
-
     if(i == 9){
         i = 0;
-        Bluetooth::Ads131m08Notify(ble_tx_buff, 234); //225
-        usbCommHandler.SendAds131m08Samples(ble_tx_buff, 234, 0);
+        Bluetooth::Ads131m08Notify(ble_tx_buff, 227);
+        usbCommHandler.SendAds131m08Samples(ble_tx_buff, 227, 0);
     }
 }
 
@@ -585,16 +475,20 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     ads131m08_1_ble_tx_buff[25*j + 24] = ads131m08_1_sampleNum;
     memcpy((ads131m08_1_ble_tx_buff + 25*j), (adcBuffer + 3), 24);
 
-    if(useLEDS) ble_tx_buff[225+j] = LED_gpio[LEDn];
-
     ads131m08_1_sampleNum++;
     //LOG_INF("ADS131M08_1 Sample: %d", ads131m08_1_sampleNum);
     j++;
     if(j == 9){
         j = 0;
-        Bluetooth::Ads131m08_1_Notify(ads131m08_1_ble_tx_buff, 234);
-        usbCommHandler.SendAds131m08Samples(ads131m08_1_ble_tx_buff, 234, 0);
+        Bluetooth::Ads131m08_1_Notify(ads131m08_1_ble_tx_buff, 227);
+        usbCommHandler.SendAds131m08Samples(ads131m08_1_ble_tx_buff, 227, 0);
     }
+}
+#endif
+
+#if CONFIG_USE_MAX30102
+static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
+    k_work_submit(&max30102_interrupt_work_item);     
 }
 
 /**
@@ -608,6 +502,12 @@ static void max30102_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("Max30102 Interrupt!");
     max30102.HandleInterrupt();
 }
+#endif
+
+#if CONFIG_USE_MPU6050
+static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
+    k_work_submit(&mpu6050_interrupt_work_item);     
+}
 
 /**
  * @brief IntWorkQueue handler. Used to process interrupts coming from MPU6050 interrupt pin 
@@ -619,6 +519,13 @@ static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
 {	
     //LOG_INF("MPU6050 Interrupt!");
     mpu6050.HandleInterrupt();
+}
+#endif
+
+
+#if CONFIG_USE_QMC5883L
+static void qmc5883l_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
+    k_work_submit(&qmc5883l_interrupt_work_item);     
 }
 
 /**
@@ -632,7 +539,7 @@ static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("QMC5883L Interrupt!");
     qmc5883l.HandleInterrupt();
 }
-
+#endif
 
 
 static void setupPeripherals() {
@@ -640,92 +547,192 @@ static void setupPeripherals() {
     int ret = 0;
 
     gpio_init();
-    ret = sensor_gpio_int();
+    ret = init_sensor_gpio_int();
 
-    if(usePWM) initPWM();
-    if(useLEDS) setupLEDS();
+    #if CONFIG_USE_ADS131M08    
+        k_work_init(&interrupt_work_item, interrupt_workQueue_handler);
+        k_work_init(&ads131m08_1_interrupt_work_item, ads131m08_1_interrupt_workQueue_handler);
+    #endif
 
-    k_work_init(&interrupt_work_item,               interrupt_workQueue_handler);
-    k_work_init(&ads131m08_1_interrupt_work_item,   ads131m08_1_interrupt_workQueue_handler);
-    k_work_init(&max30102_interrupt_work_item,      max30102_interrupt_workQueue_handler);
-    k_work_init(&mpu6050_interrupt_work_item,       mpu6050_interrupt_workQueue_handler);
-    k_work_init(&qmc5883l_interrupt_work_item,      qmc5883l_interrupt_workQueue_handler);
+    #if CONFIG_USE_MAX30102
+        k_work_init(&max30102_interrupt_work_item, max30102_interrupt_workQueue_handler);
+    #endif
 
-    if (ret == 0){
-        //LOG_INF("GPIOs Int'd!");        
-    }
+    #if CONFIG_USE_MPU6050
+        k_work_init(&mpu6050_interrupt_work_item, mpu6050_interrupt_workQueue_handler);
+    #endif
 
-    serial.Initialize();
-    usbCommHandler.Initialize();
-    
-    if(useADCs){
-        adc.init(
-            ADS_CS, 
-            DATA_READY_GPIO, 
-            ADS_RESET, 
-            8192000
-        ); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
-        
-        adc_1.init(
-            ADS_1_CS, 
-            DATA_READY_1_GPIO, 
-            ADS_1_RESET, 
-            8192000
-        ); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
-    }
+    #if CONFIG_USE_QMC5883L
+        k_work_init(&qmc5883l_interrupt_work_item, qmc5883l_interrupt_workQueue_handler);
+    #endif
 
-    max30102.Initialize();
-    if(max30102.IsOnI2cBus()){
-        LOG_INF("MAX30102 is on I2C bus!");
-        max30102.Configure(max30102_default_config);
-        max30102.StartSampling();
-    } else {
-        LOG_WRN("***WARNING: MAX30102 is not connected or properly initialized!");
-    }
+        if (ret == 0){
+            //LOG_INF("GPIOs Int'd!");        
+        }
 
-    mpu6050.Initialize();
-    if(mpu6050.IsOnI2cBus()){
-        LOG_INF("MPU6050 is on I2C bus!");
-        mpu6050.Configure(mpu6050_default_config);
-    } else {
-        LOG_WRN("***WARNING: MPU6050 is not connected or properly initialized!");
-    }
+    #if CONFIG_USE_USB
+        serial.Initialize();
+        usbCommHandler.Initialize();
+    #endif
 
-    bme280.Initialize();
-    if(bme280.BmX280IsOnI2cBus()){
-        LOG_INF("Start BME280 sampling...");
-        bme280.StartSampling();
-    } else {
-        LOG_WRN("***WARNING: BME280 is not connected or properly initialized!");
-    }
+    #if CONFIG_USE_ADS131M08    
+        adc.init(ADS_CS, DATA_READY_GPIO, ADS_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+        adc_1.init(ADS_1_CS, DATA_READY_1_GPIO, ADS_1_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+    #endif
 
-    qmc5883l.Initialize();
-    if(qmc5883l.IsOnI2cBus()){
-        LOG_INF("QMC5883L is on I2C bus!");
-        qmc5883l.Configure(qmc5883l_default_config);
-        qmc5883l.StartSampling();
-    } else {
-        LOG_WRN("***WARNING: QMC5883L is not connected or properly initialized!");
-    }
+    #if CONFIG_USE_MAX30102
+        max30102.Initialize();
+        if(max30102.IsOnI2cBus()){
+            LOG_DBG("MAX30102 is on I2C bus!");
+            max30102.Configure(max30102_default_config);
+            max30102.StartSampling();
+        } else {
+            LOG_WRN("***WARNING: MAX30102 is not connected or properly initialized!");
+        }
+    #endif
 
-    if(useAudio) {
+    #if CONFIG_USE_MPU6050
+        mpu6050.Initialize();
+        if(mpu6050.IsOnI2cBus()){
+            LOG_DBG("MPU6050 is on I2C bus!");
+            mpu6050.Configure(mpu6050_default_config);
+        } else {
+            LOG_WRN("***WARNING: MPU6050 is not connected or properly initialized!");
+        }
+    #endif
+
+    #if CONFIG_USE_BME280
+        bme280.Initialize();
+        if(bme280.BmX280IsOnI2cBus()){
+            // LOG_INF("Start BME280 sampling...");
+            bme280.StartSampling();
+        } else {
+            LOG_WRN("***WARNING: BME280 is not connected or properly initialized!");
+        }
+    #endif
+
+    #if CONFIG_USE_QMC5883L
+        qmc5883l.Initialize();
+        if(qmc5883l.IsOnI2cBus()){
+            LOG_DBG("QMC5883L is on I2C bus!");
+            qmc5883l.Configure(qmc5883l_default_config);
+            qmc5883l.StartSampling();
+        } else {
+            LOG_WRN("***WARNING: QMC5883L is not connected or properly initialized!");
+        }
+    #endif
+
+    #if CONFIG_USE_I2S
         ret = audio.Initialize();
-        LOG_INF("audio.Initialize: %d", ret);
+        LOG_DBG("audio.Initialize: %d", ret);
+    #endif
 
+    #if CONFIG_USE_DMIC
         ret = dmic.Initialize();
-        LOG_INF("dmic.Initialize: %d", ret);
-    }
+        LOG_DBG("dmic.Initialize: %d", ret);
+    #endif
 
-    if(useADCs) {
+    #if CONFIG_USE_TLC5940
+        ret = tlc.Initialize(0x000);
+        LOG_DBG("tlc.Initialize: %d", ret);
+    #endif
+
+    #if CONFIG_USE_MCU2MCU
+        init_uart();
+    #endif
+
+    #if CONFIG_USE_ADS131M08
         setupadc(&adc);
         setupadc(&adc_1);
-        setADS131_int();
-    }
+        init_ads131_gpio_int();
+    #endif
+
+    //need to time this correctly with the ADC if controlling LEDs on second MCU
+    #if CONFIG_USE_MCU2MCU    
+        char cmd_buf[10] = "Hello 123";
+        uart_tx(uart_dev, (uint8_t *)&cmd_buf[0], sizeof(cmd_buf), SYS_FOREVER_MS);
+    #endif 
 
 
     //uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
 
 }
+
+
+#if CONFIG_USE_MCU2MCU
+static int init_uart(void){
+    int ret = 0;
+
+    uart_dev =  device_get_binding(DT_LABEL(DT_NODELABEL(uart3)));
+	if (uart_dev == NULL) {
+		LOG_ERR("Could not find  %s!\n\r",DT_LABEL(DT_NODELABEL(uart3)));
+        return -1;		
+	}
+
+    ret = uart_callback_set(uart_dev, &uart_cb, NULL);
+    if (ret != 0) {
+		LOG_ERR("uart_callback_set: %d", ret);
+        return ret;
+	}
+   
+    ret = uart_rx_enable(uart_dev, recvBuffer, sizeof(recvBuffer), CONFIG_UART_RX_TOUT_US);
+	if (ret != 0) {
+		LOG_ERR("uart_rx_enable");
+        return ret;
+	}
+
+    return ret;
+}
+
+static void uart_cb(const struct device *dev, struct uart_event *evt, void *user_data)
+{	
+    
+    switch (evt->type) {
+        case UART_TX_DONE:
+            LOG_DBG("UART_TX_DONE");             
+            break;
+
+        case UART_RX_RDY:
+            LOG_DBG("UART_RX_RDY\n");
+            LOG_DBG("%d Bytes received from other MCU", evt->data.rx.len);
+            LOG_DBG("offset: %d", evt->data.rx.offset);            
+            LOG_HEXDUMP_INF(evt->data.rx.buf + evt->data.rx.offset, evt->data.rx.len, "rp2040_data");         
+            break;
+
+        case UART_RX_DISABLED:
+            LOG_DBG("UART_RX_DISABLED\n");
+            uart_rx_enable(dev, recvBuffer, sizeof(recvBuffer), CONFIG_UART_RX_TOUT_US);
+            break;
+
+        case UART_TX_ABORTED:
+            LOG_DBG("UART_TX_ABORTED\n");
+            break;
+
+        case UART_RX_BUF_REQUEST:
+            LOG_DBG("UART_RX_BUF_REQUEST\n");
+            break;
+
+        case UART_RX_BUF_RELEASED:
+            LOG_DBG("UART_RX_BUF_RELEASED\n");            
+            break;
+
+        case UART_RX_STOPPED:
+            LOG_DBG("UART_RX_STOPPED\n");
+            break;
+
+        default:
+            break;
+	}
+}
+#endif
+
+
+
+
+
+
+
+
 
 
 /**    MAIN    */
@@ -744,7 +751,7 @@ void main(void)
     os_mgmt_register_group();
     img_mgmt_register_group();
 
-    setupPeripherals();
+    setupPeripherals(); //will setup interrupts etc
 
     Bluetooth::SetupBLE();
     
@@ -754,23 +761,26 @@ void main(void)
     // k_msleep(1000);
     // //LOG_INF("1...");
     // k_msleep(1000);
+    
+    // while(1){
+    //     #if 0        
+    //         bool drdy = getGPIO(DATA_READY_GPIO);
 
-    while(1){
+    //         if(drdy) {
+    //             adc.readAllChannels(adcRawData);
 
-#if 0        
-    bool drdy = getGPIO(DATA_READY_GPIO);
-
-    if(drdy) {
-        adc.readAllChannels(adcRawData);
-
-        sampleNum++;
-        //LOG_INF("Sample: %d", sampleNum);
-        if (sampleNum == 100){
-            LOG_INF("ADC[0]: %d", ((adcRawData[3] << 16) | (adcRawData[4] << 8) | adcRawData[5]));
-        }
-    }      
-#endif
-    LOG_INF("Hi");
-    k_msleep(10000);
-    }
+    //             sampleNum++;
+    //             //LOG_INF("Sample: %d", sampleNum);
+    //             if (sampleNum == 100){
+    //                 LOG_INF("ADC[0]: %d", ((adcRawData[3] << 16) | (adcRawData[4] << 8) | adcRawData[5]));
+    //             }
+    //         }      
+    //     #endif
+    //     LOG_INF("Hi");
+    //     k_msleep(10000);
+    // }
 }
+
+
+
+

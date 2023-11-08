@@ -18,12 +18,12 @@ LOG_MODULE_REGISTER(dmic, LOG_LEVEL_INF);
 K_MEM_SLAB_DEFINE_STATIC(mem_slab, MAX_BLOCK_SIZE, BLOCK_COUNT, 4);
 
 DmicModule::DmicModule() {
-    LOG_INF("DmicModule Constructor!");
+    LOG_DBG("DmicModule Constructor!");
 }
 
 int DmicModule::Initialize() {
 
-    LOG_INF("Starting DmicModule Initialization...");
+    LOG_DBG("Starting DmicModule Initialization...");
     dmic_dev = DEVICE_DT_GET(DT_NODELABEL(dmic_dev));
 	
     if (!device_is_ready(dmic_dev)) {
@@ -59,7 +59,7 @@ int DmicModule::Initialize() {
 	cfg.streams[0].block_size =
 		BLOCK_SIZE(cfg.streams[0].pcm_rate, cfg.channel.req_num_chan);
 
-	LOG_INF("PCM output rate: %u, channels: %u",
+	LOG_DBG("PCM output rate: %u, channels: %u",
 		cfg.streams[0].pcm_rate, cfg.channel.req_num_chan);
 
 	int ret = dmic_configure(dmic_dev, &cfg);
@@ -115,7 +115,7 @@ int DmicModule::StartSampling(){
 	if (ret < 0) {
 		LOG_ERR("START DMIC trigger failed: %d", ret);
     } else {
-        LOG_INF("Resuming thread...");
+        LOG_DBG("Resuming thread...");
         k_thread_resume(&worker);
     }
 
@@ -128,7 +128,7 @@ int DmicModule::StopSampling(){
 	if (ret < 0) {
 		LOG_ERR("STOP DMIC trigger failed: %d", ret);
 	} else {
-        LOG_INF("Suspending thread...");
+        LOG_DBG("Suspending thread...");
         k_thread_suspend(&worker);
     }
 
@@ -159,7 +159,7 @@ int DmicModule::StopSampling(){
         if (ret < 0){
             LOG_ERR("arm_rfft_init_q15: %d", ret);
         } else {
-            LOG_INF("arm_rfft_init_q15: SUCESS");
+            LOG_DBG("arm_rfft_init_q15: SUCESS");
         }
 
         for (;;)

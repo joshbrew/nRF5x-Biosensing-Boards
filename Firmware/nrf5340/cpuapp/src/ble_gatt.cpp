@@ -115,7 +115,7 @@ static void ads131CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&ads131m08NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("ADS131M08 Notification %s", ads131m08NotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("ADS131M08 Notification %s", ads131m08NotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -130,7 +130,7 @@ static void ads131_1_CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&ads131m08_1_NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("ADS131M08_1 Notification %s", ads131m08_1_NotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("ADS131M08_1 Notification %s", ads131m08_1_NotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -145,7 +145,7 @@ static void max30102CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&max30102NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("Max30102 Notification %s", max30102NotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("Max30102 Notification %s", max30102NotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -160,7 +160,7 @@ static void mpu6050CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&mpu6050NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("MPU6050 Notification %s", mpu6050NotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("MPU6050 Notification %s", mpu6050NotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -175,7 +175,7 @@ static void qmc5883lCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&qmc5883lNotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("QMC5883L Notification %s", qmc5883lNotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("QMC5883L Notification %s", qmc5883lNotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -189,7 +189,7 @@ static void iBeaconCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 {
 	ARG_UNUSED(attr);	
     atomic_set(&iBeaconNotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("iBeacon Notification %s", iBeaconNotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("iBeacon Notification %s", iBeaconNotificationsEnable ? "enabled" : "disabled");
 }
 
 /**
@@ -204,7 +204,7 @@ static void bme280CccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&bme280NotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("BME280 Notification %s", bme280NotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("BME280 Notification %s", bme280NotificationsEnable ? "enabled" : "disabled");
 }
 
 static void rssiCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
@@ -212,7 +212,7 @@ static void rssiCccHandler(const struct bt_gatt_attr *attr, uint16_t value)
 	ARG_UNUSED(attr);
 	//notify_enable = (value == BT_GATT_CCC_NOTIFY);
     atomic_set(&rssiNotificationsEnable, value == BT_GATT_CCC_NOTIFY);
-	LOG_INF("RSSI Notification %s", rssiNotificationsEnable ? "enabled" : "disabled");
+	LOG_DBG("RSSI Notification %s", rssiNotificationsEnable ? "enabled" : "disabled");
     if(rssiNotificationsEnable){
         Bluetooth::RssiStartSampling();
     } else {
@@ -300,7 +300,7 @@ void OnBluetoothStarted(int err)
 
     bt_le_adv_param param = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE, BT_GAP_ADV_FAST_INT_MIN_2, BT_GAP_ADV_FAST_INT_MAX_2, NULL);
 
-    LOG_INF("Bluetooth initialized");
+    LOG_DBG("Bluetooth initialized");
 
     /* Start advertising */
     err = bt_le_adv_start(&param, ad, ARRAY_SIZE(ad), nullptr, 0); // nullptr for scan response 0 for scan response data size
@@ -310,7 +310,7 @@ void OnBluetoothStarted(int err)
         return;
     }
 
-    LOG_INF("Configuration mode: waiting connections...");
+    LOG_DBG("Configuration mode: waiting connections...");
 }
 
 /**

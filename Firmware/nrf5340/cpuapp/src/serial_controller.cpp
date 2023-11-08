@@ -14,7 +14,7 @@
 #include <usb/usb_device.h>
 #include <logging/log.h>
 
-LOG_MODULE_REGISTER(usb_serial);
+LOG_MODULE_REGISTER(usb_serial, LOG_LEVEL_INF);
 
 namespace
 {
@@ -60,7 +60,7 @@ namespace
  */
 SerialController::SerialController()
 {
-    LOG_INF("Serial Controller Constructor!");
+    LOG_DBG("Serial Controller Constructor!");
     k_sem_init(&rxSem, 0, 1);
     k_sem_init(&txSem, 0, 1);
 
@@ -145,7 +145,7 @@ void SerialController::WorkingThread(void *data, void *, void *)
 
     SerialTransfer *currentTask;
 
-	LOG_INF("Wait for DTR");
+	LOG_DBG("Wait for DTR");
 
 	while (true) {
 		uart_line_ctrl_get(self->dev, UART_LINE_CTRL_DTR, &dtr);
@@ -157,7 +157,7 @@ void SerialController::WorkingThread(void *data, void *, void *)
 		}
 	}
 
-	LOG_INF("DTR set");
+	LOG_DBG("DTR set");
 
 	/* They are optional, we use them to test the interrupt endpoint */
 	ret = uart_line_ctrl_set(self->dev, UART_LINE_CTRL_DCD, 1);
@@ -191,7 +191,7 @@ void SerialController::WorkingThread(void *data, void *, void *)
 
         k_sem_reset(&self->rxSem);
         k_sem_reset(&self->txSem);
-        //LOG_INF("SerialController::WorkingThread");
+        //LOG_DBG("SerialController::WorkingThread");
         self->SendPacket(*currentTask->request);
 
         serialStatus.store(status, std::memory_order_relaxed);
@@ -406,13 +406,13 @@ void SerialController::interrupt_handler(const struct device *dev, void *user_da
 		if (uart_irq_tx_ready(dev)) {
 			uint8_t buffer[64];
 			int rb_len, send_len;
-            //LOG_INF("Ready to send back!");
+            //LOG_DBG("Ready to send back!");
             uart_irq_tx_disable(dev);
           
 		}
 
         if (uart_irq_tx_complete(dev)) {
-            //LOG_INF("TX Complete!");
+            //LOG_DBG("TX Complete!");
             k_sem_give(&self->txSem);
             //uart_irq_tx_disable(dev);
         }
