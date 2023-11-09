@@ -649,7 +649,7 @@ static void setupPeripherals() {
 
     //need to time this correctly with the ADC if controlling LEDs on second MCU
     #if CONFIG_USE_MCU2MCU    
-        char cmd_buf[10] = "Hello 123";
+        char cmd_buf[5] = "ledr1";//"debug"; "ledr1"; //"ledr2";
         uart_tx(uart_dev, (uint8_t *)&cmd_buf[0], sizeof(cmd_buf), SYS_FOREVER_MS);
     #endif 
 
