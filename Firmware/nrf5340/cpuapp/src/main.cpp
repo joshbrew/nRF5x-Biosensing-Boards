@@ -87,7 +87,7 @@ static max30102_config max30102_default_config = {
     0b01110000, // FIFO Config. Average 16 samples, FIFO Rollover Enabled, FFIO_A_FULL = 32
     0x87, // Mode config. Keep Max30102 shutdown. Multi LED mode .
     0b01110011, // Sp02 config. 800sps rate, 2048 full scale, 18-bit ADC resolution.
-    {50, 50}, // LED1/LED2 config. 25.4mA typical LED current
+    {100, 100}, // LED1/LED2 config. 25.4mA typical LED current
     {0x11, 0x22}  // SLOT config. SLOT1/2 for LED1, SLOT3/4 for LED2.
 };
 #endif
@@ -649,7 +649,7 @@ static void setupPeripherals() {
 
     //need to time this correctly with the ADC if controlling LEDs on second MCU
     #if CONFIG_USE_MCU2MCU    
-        char cmd_buf[5] = "ledr1";//"debug"; "ledr1"; //"ledr2";
+        char cmd_buf[6] = "ledr1";//"debug"; "ledr1"; //"ledr2";
         uart_tx(uart_dev, (uint8_t *)&cmd_buf[0], sizeof(cmd_buf), SYS_FOREVER_MS);
     #endif 
 
