@@ -23,7 +23,9 @@ mainmenu "Application"
     config USE_BME280
         bool "Include the BME280 sensor in compilation"
         default n
-        select USE_USB      
+        select USE_USB
+        select SENSOR
+        select BME280      
 
     config USE_MAX30102
         bool "Include the MAX30102 sensor in compilation"

@@ -49,10 +49,10 @@ LOG_MODULE_REGISTER(main);
 /* Static Functions */
 static int  gpio_init(void);
 static int  init_sensor_gpio_int(void);
-static int  init_ads131_gpio_int(void);
 
 #if CONFIG_USE_ADS131M08
 /* Static Functions */
+static int  init_ads131_gpio_int(void);
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void interrupt_workQueue_handler(struct k_work* wrk);
@@ -321,16 +321,15 @@ static int init_sensor_gpio_int(void){
     } else {
         LOG_INF("QMC5883L Interrupt pin Int'd!");
     } 
-   
+#endif 
+
     return ret;
 }
-#endif
 
-
-
+#if CONFIG_USE_ADS131M08
 static int init_ads131_gpio_int(void){
     int ret = 0;
-    #if CONFIG_USE_ADS131M08
+
 //ADS131M08_0
     ret += configureGPIO(DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
     ret += configureInterrupt(DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
@@ -352,10 +351,9 @@ static int init_ads131_gpio_int(void){
     } else {
         LOG_INF("Data Ready 1 Int'd!");
     } 
-    #endif
+
     return ret;
 }
-
 
 static int setupadc(ADS131M08 * adc) {
     int reg_value = 0;
@@ -426,10 +424,6 @@ static int setupadc(ADS131M08 * adc) {
     return reg_value;
 }
 
-
-
-#if CONFIG_USE_ADS131M08
-
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
     k_work_submit(&interrupt_work_item); 
 }
@@ -457,7 +451,9 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     if(i == 9){
         i = 0;
         Bluetooth::Ads131m08Notify(ble_tx_buff, 227);
+#if CONFIG_USE_USB
         usbCommHandler.SendAds131m08Samples(ble_tx_buff, 227, 0);
+#endif        
     }
 }
 
@@ -481,7 +477,9 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     if(j == 9){
         j = 0;
         Bluetooth::Ads131m08_1_Notify(ads131m08_1_ble_tx_buff, 227);
+#if CONFIG_USE_USB
         usbCommHandler.SendAds131m08Samples(ads131m08_1_ble_tx_buff, 227, 0);
+#endif        
     }
 }
 #endif
