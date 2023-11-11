@@ -49,10 +49,10 @@ LOG_MODULE_REGISTER(main);
 /* Static Functions */
 static int  gpio_init(void);
 static int  init_sensor_gpio_int(void);
-static int  init_ads131_gpio_int(void);
 
 #if CONFIG_USE_ADS131M08
 /* Static Functions */
+static int  init_ads131_gpio_int(void);
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void ads131m08_1_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
 static void interrupt_workQueue_handler(struct k_work* wrk);
@@ -321,16 +321,15 @@ static int init_sensor_gpio_int(void){
     } else {
         LOG_INF("QMC5883L Interrupt pin Int'd!");
     } 
-   
+#endif 
+
     return ret;
 }
-#endif
 
-
-
+#if CONFIG_USE_ADS131M08
 static int init_ads131_gpio_int(void){
     int ret = 0;
-    #if CONFIG_USE_ADS131M08
+
 //ADS131M08_0
     ret += configureGPIO(DATA_READY_GPIO, GPIO_INPUT | GPIO_PULL_UP);
     ret += configureInterrupt(DATA_READY_GPIO, GPIO_INT_EDGE_FALLING);
@@ -352,10 +351,9 @@ static int init_ads131_gpio_int(void){
     } else {
         LOG_INF("Data Ready 1 Int'd!");
     } 
-    #endif
+
     return ret;
 }
-
 
 static int setupadc(ADS131M08 * adc) {
     int reg_value = 0;
@@ -425,10 +423,6 @@ static int setupadc(ADS131M08 * adc) {
     #endif
     return reg_value;
 }
-
-
-
-#if CONFIG_USE_ADS131M08
 
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
     k_work_submit(&interrupt_work_item); 
@@ -649,7 +643,7 @@ static void setupPeripherals() {
 
     //need to time this correctly with the ADC if controlling LEDs on second MCU
     #if CONFIG_USE_MCU2MCU    
-        char cmd_buf[5] = "ledr1";//"debug"; "ledr1"; //"ledr2";
+        char cmd_buf[6] = "ledr1";//"debug"; "ledr1"; //"ledr2";
         uart_tx(uart_dev, (uint8_t *)&cmd_buf[0], sizeof(cmd_buf), SYS_FOREVER_MS);
     #endif 
 
