@@ -451,7 +451,9 @@ static void interrupt_workQueue_handler(struct k_work* wrk)
     if(i == 9){
         i = 0;
         Bluetooth::Ads131m08Notify(ble_tx_buff, 227);
+#if CONFIG_USE_USB
         usbCommHandler.SendAds131m08Samples(ble_tx_buff, 227, 0);
+#endif        
     }
 }
 
@@ -475,7 +477,9 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
     if(j == 9){
         j = 0;
         Bluetooth::Ads131m08_1_Notify(ads131m08_1_ble_tx_buff, 227);
+#if CONFIG_USE_USB
         usbCommHandler.SendAds131m08Samples(ads131m08_1_ble_tx_buff, 227, 0);
+#endif        
     }
 }
 #endif
