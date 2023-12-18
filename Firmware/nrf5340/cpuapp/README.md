@@ -32,4 +32,3 @@ Device sensor test: http://modules.brainsatplay.com/
 
 Debugger demo: https://devicedebugger.netlify.app/ 
 
-

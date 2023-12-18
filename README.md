@@ -37,7 +37,7 @@ You can fairly easily add more sensor modules, which are all plug-and-play so th
 
 ![breakout](Revs.PNG)
 
-![bc840m](BC840M_pinout.png)
+![bc840m](BC840M_pinout_updated.png)
 
 ![bt40](BT40_pinout.PNG)
 
