@@ -37,9 +37,9 @@ You can fairly easily add more sensor modules, which are all plug-and-play so th
 
 ![breakout](Revs.PNG)
 
-![bc840m](BC840M_pinou.png)
+![bc840m](BC840M_pinout.png)
 
-![bt40](BT40_pinoutt_updated.PNG)
+![bt40](BT40_pinout_updated.PNG)
 
 Version 3 (BT40/BT840, BC840M R2 & BC40M R1 designs) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. 
 
