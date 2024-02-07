@@ -57,7 +57,7 @@
     compatible = "nordic,nrf-uarte";
     current-speed = <115200>;
     tx-pin = <31>;
-    rx-pin = <36>;
+    rx-pin = <17>;
     rts-pin = <0xFFFFFFFF>;
     cts-pin = <0xFFFFFFFF>;
 };
