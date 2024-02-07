@@ -1,10 +1,10 @@
 # nrf5340 Zephyr
 Working repository for the nRF52 Zephyr firmware, made for a [BT40/BC40M prototype](https://github.com/moothyknight/nRF52-Biosensing-Boards)
 
-Recommended build tools: nRFConnect with VSCode. 
+Recommended build tools: nRFConnect with VSCode.
 
 Instructions:
-- [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode.  We used SDK version 1.9.1 in the toolchain manager.
+- [Install](https://nrfconnect.github.io/vscode-nrf-connect/) nRFConnect for VSCode.  We used SDK version 1.9.1 in the toolchain manager. Note v2023.11.301 of the main plugin would not work for us and others. Use v2023.11.24
 - Open this repo in VSCode and launch the nRFConnect menu within VSCode
 - In VSCode, in the nRFConnect extension under the APPLICATIONS tab, select the "Add Build Configuration" button to the right of the main folder name (cpunet). Select the correct board, nrf5340dk_nrf5340_cpunet, and click Build Configuration. Make sure prj.conf is selected as the configuration below it.
 - Connect the nRF52-dk via usb with the flash pins wired to the custom PCB. Note: wire VTG to VDD on the DK, then VDDnRF to the custom PCB's VDD pin, then the rest of the SW/Reset/Gnd pins.
