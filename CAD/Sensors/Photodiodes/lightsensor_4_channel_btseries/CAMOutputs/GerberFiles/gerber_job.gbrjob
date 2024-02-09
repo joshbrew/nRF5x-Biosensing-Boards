@@ -1,11 +1,11 @@
 {
     "Header": {
         "Comment": "All values are metric (mm)",
-        "CreationDate": "2023-07-17T04:29:26Z",
+        "CreationDate": "2024-02-09T02:55:30Z",
         "GenerationSoftware": {
             "Application": "EAGLE",
             "Vendor": "Autodesk",
-            "Version": "9.6.2"
+            "Version": "9.5.1"
         },
         "Part": "Single"
     },
@@ -13,12 +13,12 @@
         "BoardThickness": 1.57,
         "LayerNumber": 2,
         "Name": {
-            "ProjectId": "LightSensorCircuitNoAmp_BTSeriesHookup"
+            "ProjectId": "LightSensorCircuitNoAmp_BTSeriesHookup - Copy"
         },
-        "Owner": "Garrett Flynn <gflynn@usc.edu>",
+        "Owner": "Joshua Brewster <brewster.joshua1@gmail.com>",
         "Size": {
-            "X": 111.0234,
-            "Y": 22.733
+            "X": 288.6456,
+            "Y": 33.2486
         }
     }
 }

@@ -229,21 +229,6 @@
                         "description": "Other",
                         "file_function": "Other"
                     },
-                    "filename_format": "%PREFIX/Stiffener_TOP.gbr",
-                    "layers": [
-                        156
-                    ],
-                    "milling": false,
-                    "name": "Stiffener_Top",
-                    "polarity": "positive",
-                    "type": "gerber_layer"
-                },
-                {
-                    "board_outline": false,
-                    "config": {
-                        "description": "Other",
-                        "file_function": "Other"
-                    },
                     "filename_format": "%PREFIX/Stiffener_BOT.gbr",
                     "layers": [
                         117
