@@ -151,7 +151,7 @@ void OnLeParamUpdated(struct bt_conn *conn, uint16_t interval,
     LOG_INF("Connection interval: %d x 1.25ms", interval);
     int error;
 
-    //if(interval > connectionIntervalMax || interval < connectionIntervalMin){ /* If connection interval is greater than 6 x 1.25ms = 7.5ms */
+    if(interval >= 6){ /* If connection interval is greater than 6 x 1.25ms = 7.5ms */
         bt_le_conn_param param = BT_LE_CONN_PARAM_INIT(
             connectionIntervalMin,
             connectionIntervalMax,
@@ -165,7 +165,7 @@ void OnLeParamUpdated(struct bt_conn *conn, uint16_t interval,
         } else {
             LOG_INF("Connection parameters successfully updated!");
         }
-    //}
+    }
 
 }
 
