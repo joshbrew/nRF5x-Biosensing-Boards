@@ -79,8 +79,7 @@ Todos:
 - Fine tune data throttling
 
 Bug fixing notes:
-- Bluetooth 5 connectivity is iffy on different devices. This is partially related to the connection interval settings, nrf52 vs nrf53 behave differently which we need to figure out why. Upgrading to latest zephyr might fix this.
-- Sensors not booting for Bojan, build error with the audio settings
+- Bojan note (old, worked elsewhere): Sensors not booting, build error with the audio settings
 
 Exploratory:
 - SD card
