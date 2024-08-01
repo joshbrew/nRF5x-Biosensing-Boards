@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: Proprietary
+
+mainmenu "Application"
+
+    config NUM_TLCS
+        int "Number of chained TLC drivers"
+        default 1
+        range 1 8
+
+    config UART_RX_TX_BUF_SZ
+        int "The size of RP2040 UART RX buffer"
+        default 32
+        range 1 256
+
+    config UART_RX_TOUT_US
+        int "UART RX timeout in milliseconds"
+        default 100000
+
+    config USE_ADS131M08
+        bool "Include the ADS131M08 sensors in compilation"
+        default n
+
+    config USE_BME280
+        bool "Include the BME280 sensor in compilation"
+        default n
+        select USE_USB
+        select SENSOR
+        select BME280      
+
+    config USE_MAX30102
+        bool "Include the MAX30102 sensor in compilation"
+        default n
+        select USE_USB
+
+    config USE_MPU6050
+        bool "Include the MPU6050 sensor in compilation"
+        default n
+        select USE_USB 
+
+    config USE_QMC5883L
+        bool "Include the QMC5883L sensor in compilation"
+        default n  
+        select USE_USB
+
+    config USE_TLC5940
+        bool "Include the TLC5940 sensor in compilation"
+        default n
+
+    config USE_DMIC
+        bool "Include the Digital Microphone in compilation"
+        default n  
+
+    config USE_I2S
+        bool "Include the I2S driver for controlling MAX98357A Class D audio amplifier"
+        default n          
+
+    config USE_USB
+        bool "Include the USB driver for sending sensor samples over USB"
+        default n 
+
+    config USE_MCU2MCU
+        bool "Include the UART driver for communication with RP2040"
+        default n    
+
+source "Kconfig.zephyr"
