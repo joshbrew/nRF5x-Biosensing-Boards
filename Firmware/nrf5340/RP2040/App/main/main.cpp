@@ -129,6 +129,9 @@ void parseCommand(const std::string& command) {
 
 int main() {
     stdio_init_all();
+
+    // Set system clock to 60MHz
+    set_sys_clock_khz(60000, true);
     
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);

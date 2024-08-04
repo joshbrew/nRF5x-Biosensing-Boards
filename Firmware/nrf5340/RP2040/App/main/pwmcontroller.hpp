@@ -12,7 +12,7 @@
 #define INFRARED_LED_PIN PWM_LED_PIN_N1
 #define RED_LED_PIN PWM_LED_PIN_N2
 
-#define RPI_PICO_CLOCK_FREQUENCY 125000000U
+#define RPI_PICO_CLOCK_FREQUENCY 60000000U //Set to same clock used in main thread set_sys_clock_khz
 #define PWM_CLOCK_DIVIDER 256.f
 #define PWM_DUTY_CYCLE 0.25
 
