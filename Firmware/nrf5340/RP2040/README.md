@@ -22,6 +22,8 @@ PICO_TOOLCHAIN_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\gcc-arm-none-e
 
 # Build
 
+`cd App` (if starting in this README directory)
+
 `cmake CMakeLists.txt`
 
 # UF2 Binary
