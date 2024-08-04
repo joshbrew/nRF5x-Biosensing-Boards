@@ -1,75 +1,55 @@
-# RPI PICO C++ Project Setup Guide
-
-This guide walks you through installing and building a C++ project for Raspberry Pi Pico using Visual Studio Code and the Pico SDK.
-
-## Installation Steps
-
-### Platform-Specific Instructions
-
-If you are on a platform other than Windows, please refer to the official Raspberry Pi Pico documentation for detailed instructions:
-
-[Getting Started with Raspberry Pi Pico (PDF)](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
-
-1. **Download the Latest Release:**
-   - Visit the [GitHub repository](https://github.com/example/repository).
-   - Download the latest release by clicking "Download the latest release."
-
-2. **Install the Executable:**
-   - Run the downloaded executable installer.
-   - Follow on-screen instructions, ensuring to select "Clone and build example in this folder" before clicking "Finish."
-   - ![image](https://i.imgur.com/ddJbKNg.png)
-   - If you see this output then everything is installed properly.
-   - ![image](https://i.imgur.com/SSjUpyQ.png)
+# RPI PICO C++ Project
 
 
-3. **Open Project in Visual Studio Code:**
-   - Navigate to the project folder where the executable was installed.
-   - Open the folder in Visual Studio Code.
+[Windows SDK installation](https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/)
 
-4. **Configure GCC 10.3.1 ARM-none-eabi Compiler:**
-   - If not already installed, install the CMake extension.
-   - Navigate to the CMake extension in Visual Studio Code.
-   - Configure GCC 10.3.1 ARM-none-eabi compiler.
-   - ![image](https://i.imgur.com/IxmM66O.png)
+You need to set two environment variables afterward.
+
+PICO_SDK_PATH
+
+PICO_TOOLCHAIN_PATH
+
+In Windows, if using the installer provided at the previous link:
+
+PICO_SDK_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\pico-sdk
+
+PICO_TOOLCHAIN_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\gcc-arm-none-eabi
+
+[Pico SDK github](https://github.com/raspberrypi/pico-sdk)
+
+[Raspberry Pi Pico SDK PDF (linux oriented)](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
 
 
-## Troubleshooting
+# Build
 
-If you encounter errors during setup, follow these steps:
+`cmake CMakeLists.txt`
 
-- **PICO_SDK_PATH Error:**
-  - If encountering errors related to `PICO_SDK_PATH`, add a new environmental variable:
-    - Variable Name: `PICO_SDK_PATH`
-    - Variable Value: `C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\pico-sdk`
+# UF2 Binary
 
-- **Ninja Error:**
-  - If encountering errors related to Ninja, add the following path in environmental variables :
-    - `C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\ninja`
+In `./binaries` after bundling, you can drag and drop main.uf2 into your RP2040 plugged in via USB to program it.
 
-## Building the Project
+# COMMANDS
 
-Once setup is complete and any issues are addressed:
+The RP2040 expects commands to begin alternating LEDs, you can set up more with in the main.cpp
 
-- Click "Build" within Visual Studio Code to build the project.
+- `A\n` - 250Hz period for pins defined in main();
+- `B\n` - 500Hz period
+- `C\n` - 1000Hz period
+- `D\n` - 2000Hz period
 
-## UF2 File Location
+Stop PWM Command:
 
-After successfully building the project, the UF2 file will be located in the build folder.
+- `STOP\n`: Stops the PWM operation.
+Enter Deep Sleep Command:
 
-## updateWrapValue Calculation Steps
+- `SLEEP\n`: Puts the system into deep sleep for a specified duration.
+Wake Up and Resume PWM Command:
 
-1. **PWM Timer Peripheral Clock Frequency Calculation:**
-    - The PWM clock divider divides the Raspberry Pi clock frequency by 256, resulting in a PWM timer peripheral clock frequency of 488,281.25 Hz.
+- `WAKE\n`: Wakes up the system and resumes PWM operation.
+Set Custom Parameters:
 
-2. **Timer Tick Duration Calculation:**
-    - With the PWM timer peripheral clock frequency, each timer tick duration is calculated as 2.048 microseconds (us).
-
-3. **Target PWM Frequency:**
-    - The desired PWM frequency is set to 250 Hz. We can select 500, 1000 or 2000.
-
-4. **Counter Value Calculation:**
-    - To achieve the desired PWM frequency, the total number of timer ticks required per cycle is calculated by dividing the PWM timer peripheral clock frequency (488,281.25 Hz) by the desired PWM frequency (250 Hz), resulting in approximately 1953.125 ticks.
-
-5. **Total Cycle Duration Calculation:**
-    - Multiplying the tick duration (2.048 us) by the total number of ticks (1953) gives the total cycle duration of the PWM signal, which is approximately 4 milliseconds (ms). This results in a PWM signal with a frequency of 250 Hz.
-
+Commands with a parameter followed by a value, separated by a space.
+Examples:
+- `PULSEWIDTH 300\n`: Sets pulseWidthUs to 300 microseconds.
+- `PERIOD 4000\n`: Sets periodUs to 4000 microseconds.
+- `INITIALDELAY 500\n`: Sets initialDelayUs to 500 microseconds.

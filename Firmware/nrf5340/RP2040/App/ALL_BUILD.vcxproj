@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{54523B11-4D34-371F-970D-20C10B24DC09}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App -BC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App --check-stamp-file C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU-ASM.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\Platform\PICO.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_platform.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_toolchain.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_utils.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\pico\pico.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\rp2040.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\find_compiler.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\pico_arm_gcc.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\set_flags.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_init.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_version.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeASMCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCXXCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeSystem.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\example_auto_set_url.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\pico_sdk_import.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App -BC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App --check-stamp-file C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU-ASM.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\Platform\PICO.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_platform.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_toolchain.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_utils.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\pico\pico.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\rp2040.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\find_compiler.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\pico_arm_gcc.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\set_flags.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_init.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_version.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeASMCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCXXCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeSystem.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\example_auto_set_url.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\pico_sdk_import.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App -BC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App --check-stamp-file C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU-ASM.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\Platform\PICO.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_platform.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_toolchain.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_utils.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\pico\pico.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\rp2040.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\find_compiler.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\pico_arm_gcc.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\set_flags.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_init.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_version.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeASMCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCXXCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeSystem.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\example_auto_set_url.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\pico_sdk_import.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App -BC:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App --check-stamp-file C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeASMInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU-ASM.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\GNU.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.26\Modules\Compiler\MSVC.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\Platform\PICO.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_platform.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_pre_load_toolchain.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\pico_utils.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\pico\pico.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\platforms\rp2040.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\find_compiler.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\pico_arm_gcc.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\cmake\preload\toolchains\set_flags.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_init.cmake;C:\Users\brews\.pico-sdk\sdk\1.5.1\pico_sdk_version.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeASMCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeCXXCompiler.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\3.26.3\CMakeSystem.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\example_auto_set_url.cmake;C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\pico_sdk_import.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\ZERO_CHECK.vcxproj">
+      <Project>{BF247455-43DB-355F-B87B-A2DA00DCB879}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\pico-sdk\src\rp2_common\boot_stage2\bs2_default.vcxproj">
+      <Project>{D52B9322-4FCC-3DFA-976E-5B91F60B8CED}</Project>
+      <Name>bs2_default</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\brews\Documents\Github\nRF52-Biosensing-Boards\Firmware\nrf5340\RP2040\App\main\main.vcxproj">
+      <Project>{D2684E72-BF44-3462-A292-21CA2576CCA9}</Project>
+      <Name>main</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

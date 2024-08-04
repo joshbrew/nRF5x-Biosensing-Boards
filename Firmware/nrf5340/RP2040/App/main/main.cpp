@@ -7,46 +7,153 @@
 #include "hardware/pwm.h"
 #include "hardware/timer.h"
 #include "hardware/clocks.h"
+#include "hardware/rtc.h"
+#include "pico/sleep.h"
+#include "pico/multicore.h"
 
-int main() 
-{
+#define DEFAULT_PULSE_WIDTH_US 200
+#define DEFAULT_PERIOD_US (1000000 / 250) // 250Hz
+#define DEFAULT_INITIAL_DELAY_US 0
+
+// Function to select the period based on a preset character
+uint32_t selectPeriod(char preset) {
+    switch (preset) {
+        case 'A': return 1000000 / 250; // 250Hz
+        case 'B': return 1000000 / 500; // 500Hz
+        case 'C': return 1000000 / 1000; // 1000Hz
+        case 'D': return 1000000 / 2000; // 2000Hz
+        default: return DEFAULT_PERIOD_US; // Default to 250Hz
+    }
+}
+
+// Function to enter deep sleep for a specified duration (in seconds)
+void enterDeepSleep(uint32_t duration_seconds) {
+    // Set RTC to wake up the microcontroller after duration_seconds
+    datetime_t t = {
+        .year  = 2023,
+        .month = 1,
+        .day   = 1,
+        .dotw  = 0, // 0 is Sunday, so 5 is Thursday
+        .hour  = 0,
+        .min   = 0,
+        .sec   = duration_seconds
+    };
+    rtc_init();
+    rtc_set_datetime(&t);
+    
+    // Enter sleep
+    sleep_goto_sleep_until(&t);
+}
+
+// Global variables to share data between cores
+std::vector<PWMController> pwmControllers = {
+    PWMController(2, 1),
+    PWMController(3, 2)
+};
+volatile uint32_t periodUs = DEFAULT_PERIOD_US;
+volatile uint32_t pulseWidthUs = DEFAULT_PULSE_WIDTH_US;
+volatile uint32_t initialDelayUs = DEFAULT_INITIAL_DELAY_US;
+volatile bool running = true;
+std::string receivedString; 
+
+// Core 1 entry function
+void core1_entry() {
+    size_t currentLed = 0;
+
+    while (running) {
+        // Apply initial delay before starting the first pulse
+        if(initialDelayUs > 0) busy_wait_us(initialDelayUs);
+
+        // Start the current LED
+        pwmControllers[currentLed].start();
+        // Wait for the pulse width
+        busy_wait_us(pulseWidthUs);
+        // Stop the current LED
+        pwmControllers[currentLed].stop();
+        // Wait for the remainder of the period
+        if(periodUs > 0) busy_wait_us(periodUs - pulseWidthUs);
+
+        // Move to the next LED
+        currentLed = (currentLed + 1) % pwmControllers.size();
+    }
+}
+
+// Function to parse the received command
+void parseCommand(const std::string& command) {
+    std::stringstream ss(command);
+    std::string cmd;
+    ss >> cmd;
+
+    if (cmd == "STOP") {
+        running = false;
+    } else if (cmd == "SLEEP") {
+        // Enter deep sleep for a specified duration (e.g., 10 seconds)
+        enterDeepSleep(10);
+    } else if (cmd == "WAKE") {
+        // Re-initialize the controllers and resume operation
+        running = true;
+        for (auto& controller : pwmControllers) {
+            controller.init();
+            controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
+            controller.setPWMValues();
+        }
+        multicore_launch_core1(core1_entry); // Restart core 1 if needed
+    } else if (cmd.length() == 1 && std::isalpha(cmd[0])) {
+        // Handle frequency preset command
+        periodUs = selectPeriod(cmd[0]);
+        for (auto& controller : pwmControllers) {
+            controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width
+            controller.setPWMValues();
+        }
+    } else {
+        // Assume the command is to set period, pulse width, or initial delay
+        std::string parameter;
+        uint32_t value;
+        while (ss >> parameter >> value) {
+            if (parameter == "PULSEWIDTH") {
+                pulseWidthUs = value;
+            } else if (parameter == "PERIOD") {
+                periodUs = value;
+            } else if (parameter == "INITIALDELAY") {
+                initialDelayUs = value;
+            }
+        }
+
+        // Apply the new settings
+        for (auto& controller : pwmControllers) {
+            controller.updateWrapValue(pulseWidthUs, periodUs);
+            controller.setPWMValues();
+        }
+    }
+}
+
+int main() {
     stdio_init_all();
-
-    std::vector<PWMController> pwmControllers = {PWMController(RED_LED_PIN, 1), PWMController(INFRARED_LED_PIN, 2)};
+    
+    // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
-    std::string receivedString; 
+    // Initialize the PWM controllers
+    for (auto& controller : pwmControllers) {
+        controller.init();
+        controller.updateWrapValue(pulseWidthUs, periodUs); // Initial pulse width and period
+        controller.setPWMValues();
+    }
 
-    while (true) 
-    {
-        if (uartController.isReadable()) 
-        {
+    // Launch core 1 to handle PWM
+    multicore_launch_core1(core1_entry);
+
+    while (true) {
+        if (uartController.isReadable()) {
             char receivedChar = uartController.read();
 
-            if (receivedChar == '\n') 
-            {
+            if (receivedChar == '\n') {
                 // End of the string received, process it
-                auto ledConfig = uartController.parse(receivedString);
+                parseCommand(receivedString);
 
-                if (pwmControllers[0].getLedNumber() == ledConfig.first)
-                {
-                    pwmControllers[0].init();
-                    pwmControllers[1].init();
-
-                    pwmControllers[0].updateWrapValue(ledConfig.second);
-                    pwmControllers[0].setPWMValues();
-                    pwmControllers[1].updateWrapValue(ledConfig.second);
-                    pwmControllers[1].setPWMValues();
-
-                    pwmControllers[0].start();
-                    busy_wait_us(pwmControllers[0].getPulseDelay());
-                    pwmControllers[1].start();
-                }
                 // Clear the receivedString for the next input 
                 receivedString.clear();
-            } 
-            else 
-            {
+            } else {
                 // Append the character to the received string
                 receivedString += receivedChar;
             }
