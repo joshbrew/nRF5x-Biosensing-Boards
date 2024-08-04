@@ -15,6 +15,7 @@
 #define DEFAULT_PULSE_WIDTH_US 200
 #define DEFAULT_PERIOD_US (1000000 / 250) // 250Hz
 #define DEFAULT_INITIAL_DELAY_US 0
+#define CORE_CLOCK_KHZ 60000
 
 #define WAKE_CHECK_INTERVAL 5 // Interval in seconds to wake up and check for a wake command
 
@@ -156,7 +157,7 @@ int main() {
     stdio_init_all();
 
     // Set system clock to 60MHz
-    set_sys_clock_khz(60000, true);
+    set_sys_clock_khz(CORE_CLOCK_KHZ, true);
     
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
