@@ -35,7 +35,9 @@ In VSCode, open RP2040
 
 In `./binaries/main` after making, you can drag and drop main.uf2 into your RP2040 plugged in via USB to program it.
 
-This will remove the USB detection when it flashes successfully. To reset, on the RP2040, hold down the reset button, then hold down the boot button, and release the reset button. This will put it back to factory settings. 
+This will remove the USB detection when it flashes successfully. 
+
+To reset, on the RP2040, hold down the reset button, then hold down the boot button and press the reset button. It will show up again as a USB device.
 
 # COMMANDS
 
