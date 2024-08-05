@@ -2,7 +2,7 @@
 
 [Windows SDK installation](https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/)
 
-You also need VSCommunity 2022 in the current config to access the C/C++/ASM compilers and NMake, and ensure the tool path is in your System or User ENV Path:
+You also need CMake and VSCommunity 2022 in the current config to access the C/C++/ASM compilers and NMake, and ensure the tool path is in your System or User ENV Path:
 
 e.g. C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x64
 
