@@ -355,15 +355,15 @@ static int init_ads131_gpio_int(void){
     } 
 
 //ADS131M08_1
-    // ret += configureGPIO(DATA_READY_1_GPIO, GPIO_INPUT | GPIO_PULL_UP);
-    // ret += configureInterrupt(DATA_READY_1_GPIO, GPIO_INT_EDGE_FALLING);
-    // ret += addGPIOCallback(DATA_READY_1_GPIO, &ads131m08_1_callback, &ads131m08_1_drdy_cb);
+    ret += configureGPIO(DATA_READY_1_GPIO, GPIO_INPUT | GPIO_PULL_UP);
+    ret += configureInterrupt(DATA_READY_1_GPIO, GPIO_INT_EDGE_FALLING);
+    ret += addGPIOCallback(DATA_READY_1_GPIO, &ads131m08_1_callback, &ads131m08_1_drdy_cb);
 
-    // if (ret != 0){
-    //     LOG_ERR("***ERROR: GPIO initialization\n");
-    // } else {
-    //     LOG_INF("Data Ready 1 Int'd!");
-    // } 
+    if (ret != 0){
+        LOG_ERR("***ERROR: GPIO initialization\n");
+    } else {
+        LOG_INF("Data Ready 1 Int'd!");
+    } 
 
     return ret;
 }
@@ -402,16 +402,17 @@ static int setupadc(ADS131M08 * adc) {
         LOG_ERR("***ERROR: Setting ADC gain!");
     }
     k_msleep(10);
-    if(adc->writeReg(ADS131_THRSHLD_LSB,0b0000000000001010)){  //< Clock register (page 55 in datasheet)
+    //DC Block Filter settings:
+    if(adc->writeReg(ADS131_THRSHLD_LSB,0b0000000000001010)){ //0b0000000000001010 //< DC Block register (page 55 in datasheet)
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
-        // adc.writeReg(ADS131_CH0_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH1_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH2_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH3_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH4_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH5_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH6_CFG,0b0000000000000000);
-        // adc.writeReg(ADS131_CH7_CFG,0b0000000000000000);
+        adc->writeReg(ADS131_CH0_CFG,0b0000000000000100); 
+        adc->writeReg(ADS131_CH1_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH2_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH3_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH4_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH5_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH6_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH7_CFG,0b0000000000000100);
     } else {
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
     }
@@ -425,13 +426,6 @@ static int setupadc(ADS131M08 * adc) {
     }
     k_msleep(10);
   
-//DC Block Filter settings:
-    if(adc->writeReg(ADS131_THRSHLD_LSB,0x04)){  // Enable DC Block Filter. Write 0x04 to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
-        //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
-    } else {
-        LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
-    }  
-    k_msleep(10); 
 
     // reg_value = adc->readReg(ADS131_CLOCK);
     // //LOG_INF("ADS131_CLOCK: 0x%X", reg_value);
@@ -586,9 +580,10 @@ static void setupPeripherals() {
     gpio_init();
     ret = init_sensor_gpio_int();
 
+    //peripherals won't break anything if undetected, can run all of them in general (audio is nRF53 ONLY)
     #if CONFIG_USE_ADS131M08    
         k_work_init(&interrupt_work_item, interrupt_workQueue_handler);
-        // k_work_init(&ads131m08_1_interrupt_work_item, ads131m08_1_interrupt_workQueue_handler);
+        k_work_init(&ads131m08_1_interrupt_work_item, ads131m08_1_interrupt_workQueue_handler);
     #endif
 
     #if CONFIG_USE_MAX30102
@@ -614,7 +609,7 @@ static void setupPeripherals() {
 
     #if CONFIG_USE_ADS131M08    
         adc.init(ADS_CS, DATA_READY_GPIO, ADS_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
-        // adc_1.init(ADS_1_CS, DATA_READY_1_GPIO, ADS_1_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
+        adc_1.init(ADS_1_CS, DATA_READY_1_GPIO, ADS_1_RESET, 8000000); // cs_pin, drdy_pin, sync_rst_pin, 8MHz SPI bus
     #endif
 
     #if CONFIG_USE_MAX30102
@@ -680,7 +675,7 @@ static void setupPeripherals() {
 
     #if CONFIG_USE_ADS131M08
         setupadc(&adc);
-        // setupadc(&adc_1);
+        setupadc(&adc_1); 
         init_ads131_gpio_int();
     #endif
 

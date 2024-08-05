@@ -124,7 +124,6 @@ bool launched = false;
 void initPWMRoutine() {
     running = true;
     for (auto& controller : pwmControllers) {
-        if(!launched) controller.init(DEFAULT_CLOCK_FREQUENCY);
         controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
     }
     if(!launched) {
@@ -188,6 +187,9 @@ int main() {
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
+    for (auto& controller : pwmControllers) {
+        controller.init(DEFAULT_CLOCK_FREQUENCY);
+    }
     // Initialize the PWM controllers
     //parseCommand("A"); // Auto start to test
 

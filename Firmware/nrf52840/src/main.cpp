@@ -449,8 +449,23 @@ static int * setupadc(ADS131M08 * adc) {
     }
     k_msleep(10);
 
+    //DC Block Filter settings:
+    if(adc->writeReg(ADS131_THRSHLD_LSB,0b0000000000001010)){ //0b0000000000001010 //< DC Block register (page 63 in datasheet)
+        //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
+        adc->writeReg(ADS131_CH0_CFG,0b0000000000000100); 
+        adc->writeReg(ADS131_CH1_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH2_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH3_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH4_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH5_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH6_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH7_CFG,0b0000000000000100);
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
+    }
+    k_msleep(10);
 
-// Write 0 to RESET bit
+    // Write 0 to RESET bit
     if(adc->writeReg(ADS131_MODE,0x0110)){  
         //LOG_INF("ADS131_MODE register successfully configured");
     } else {
@@ -458,15 +473,6 @@ static int * setupadc(ADS131M08 * adc) {
     }
     k_msleep(10);
   
-//DC Block Filter settings:
-    if(
-        adc->writeReg(ADS131_THRSHLD_LSB, 0x0C)
-    ){  // Enable DC Block Filter. Write 0x0C to DCBLOCK[3:0] bits. See Table 8-4 in ADS131 datasheet. 
-        //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
-    } else {
-        LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
-    }  
-
     // adc_1.writeReg(ADS131_CH0_CFG,0b0000000000000000);
     // k_msleep(10);
     // adc_1.writeReg(ADS131_CH1_CFG,0b0000000000000000);
