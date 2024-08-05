@@ -37,7 +37,7 @@ const struct device *gpio_1_dev;
 #define DATA_READY_1_GPIO   ((uint8_t)11)  // 11 //14 (nirs ensemble)
 #define ADS_1_RESET         ((uint8_t)9)   // 9  //108 (nirs ensemble)
 
-#define DBG_LED             ((uint8_t)19)  //Red LED
+#define RED_LED             ((uint8_t)19)  //Red LED
 #define GREEN_LED           ((uint8_t)37)  //GREEN LED
 #define BLUE_LED            ((uint8_t)38)  //BLUE LED
 
@@ -274,20 +274,20 @@ static int gpio_init(void) {
     //init_ads131_gpio_int();
     //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
     
-    configureGPIO(DBG_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
+    configureGPIO(RED_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
     configureGPIO(GREEN_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
     configureGPIO(BLUE_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
-    setGPIO(DBG_LED, 0);
-    setGPIO(GREEN_LED, 0);
-    setGPIO(BLUE_LED, 0);
-
-    LOG_INF("Entering sleep...");
-    k_sleep(K_MSEC(1000)); // give some time to ADS131 to settle after power on
-    LOG_INF("Waking up...");
-
-    setGPIO(DBG_LED, 1);
+    setGPIO(RED_LED, 0);
     setGPIO(GREEN_LED, 1);
     setGPIO(BLUE_LED, 1);
+
+    //LOG_INF("Entering sleep...");
+    k_sleep(K_MSEC(500)); // give some time to ADS131 to settle after power on
+    //LOG_INF("Waking up...");
+
+    setGPIO(RED_LED, 1);
+    setGPIO(GREEN_LED, 0);
+    setGPIO(BLUE_LED, 0);
     return 0;
 }
 
