@@ -23,6 +23,10 @@
 #define DEFAULT_INITIAL_DELAY_US 0
 #define CORE_CLOCK_KHZ 80000
 
+#define BAUD_RATE 115200
+#define TX_PIN 0
+#define RX_PIN 1
+
 #define WAKE_CHECK_INTERVAL 5 // Interval in seconds to wake up and check for a wake command
 
 // Function to select the period based on a preset character
@@ -120,7 +124,7 @@ bool launched = false;
 void initPWMRoutine() {
     running = true;
     for (auto& controller : pwmControllers) {
-        controller.init(DEFAULT_CLOCK_FREQUENCY);
+        if(!launched) controller.init(DEFAULT_CLOCK_FREQUENCY);
         controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
     }
     if(!launched) {
@@ -152,9 +156,7 @@ void parseCommand(const std::string& command) {
         // Handle frequency preset command
         periodUs = selectPeriod(cmd[0]);
         // Apply the new settings
-        for (auto& controller : pwmControllers) {
-            controller.updateWrapValue(pulseWidthUs, periodUs);
-        }
+        initPWMRoutine();
 
     } else {
         // Assume the command is to set period, pulse width, or initial delay
@@ -187,8 +189,7 @@ int main() {
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
     // Initialize the PWM controllers
-    initPWMRoutine();
-    parseCommand("A"); // Auto start to test
+    //parseCommand("A"); // Auto start to test
 
     while (true) {
         if (uartController.isReadable()) {

@@ -69,22 +69,3 @@ PWMController::~PWMController() {
     // Cleanup if needed (currently not used)
 }
 
-/**
-## updateWrapValue Calculation Steps
-
-1. **PWM Timer Peripheral Clock Frequency Calculation:**
-    - The PWM clock divider divides the Raspberry Pi clock frequency by 256, resulting in a PWM timer peripheral clock frequency of 488,281.25 Hz.
-
-2. **Timer Tick Duration Calculation:**
-    - With the PWM timer peripheral clock frequency, each timer tick duration is calculated as 2.048 microseconds (us).
-
-3. **Target PWM Frequency:**
-    - The desired PWM frequency is set to 250 Hz. We can select 500, 1000 or 2000.
-
-4. **Counter Value Calculation:**
-    - To achieve the desired PWM frequency, the total number of timer ticks required per cycle is calculated by dividing the PWM timer peripheral clock frequency (488,281.25 Hz) by the desired PWM frequency (250 Hz), resulting in approximately 1953.125 ticks.
-
-5. **Total Cycle Duration Calculation:**
-    - Multiplying the tick duration (2.048 us) by the total number of ticks (1953) gives the total cycle duration of the PWM signal, which is approximately 4 milliseconds (ms). This results in a PWM signal with a frequency of 250 Hz.
-
- */

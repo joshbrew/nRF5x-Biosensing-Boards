@@ -4,9 +4,6 @@
 #include <string>
 
 #define UART_ID uart0
-#define BAUD_RATE 115200
-#define TX_PIN 0
-#define RX_PIN 1
 
 class UARTController 
 {
