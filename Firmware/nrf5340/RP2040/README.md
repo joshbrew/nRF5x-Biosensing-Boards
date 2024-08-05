@@ -2,19 +2,17 @@
 
 [Windows SDK installation](https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/)
 
-You also need CMake, m
+You also need VSCommunity 2022 in the current config to access the C/C++/ASM compilers and NMake, and ensure the tool path is in your System or User ENV Path:
 
-You need to set two environment variables afterward.
+e.g. C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x64
 
-PICO_SDK_PATH
-
-PICO_TOOLCHAIN_PATH
-
-In Windows, if using the installer provided at the previous link:
+Also set the env variables (or declare manually in CMakeLists.txt)
 
 PICO_SDK_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\pico-sdk
 
 PICO_TOOLCHAIN_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\gcc-arm-none-eabi
+
+In Windows, if using the installer provided at the previous link:
 
 [Pico SDK github](https://github.com/raspberrypi/pico-sdk)
 
@@ -23,15 +21,15 @@ PICO_TOOLCHAIN_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\gcc-arm-none-e
 
 # Build
 
+In VSCode, open RP2040
+
 `cd App` (if starting in this README directory)
 
 `mkdir binaries` or `cd ./binaries`
 
-`cmake ..`
+`cmake -G "NMMake Makefiles" ..`
 
-Then to make the uf2
-
-`make`
+`nmake`
 
 # UF2 Binary
 
