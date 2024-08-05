@@ -686,7 +686,7 @@ static void setupPeripherals() {
 
     //need to time this correctly with the ADC if controlling LEDs on second MCU
     #if CONFIG_USE_MCU2MCU    
-        uint8_t command[] = "ledNum=1,  Config=A\r\n";
+        uint8_t command[] = "A\r\n"; //see README in RP2040/ for commands
         uart_poll_buffer(uart_dev, command, sizeof(command));
     #endif 
 
