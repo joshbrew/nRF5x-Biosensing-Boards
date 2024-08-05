@@ -1,7 +1,8 @@
 # RPI PICO C++ Project
 
-
 [Windows SDK installation](https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/)
+
+You also need CMake, m
 
 You need to set two environment variables afterward.
 
@@ -24,11 +25,19 @@ PICO_TOOLCHAIN_PATH=C:\Program Files\Raspberry Pi\Pico SDK v1.5.1\gcc-arm-none-e
 
 `cd App` (if starting in this README directory)
 
-`cmake CMakeLists.txt`
+`mkdir binaries` or `cd ./binaries`
+
+`cmake ..`
+
+Then to make the uf2
+
+`make`
 
 # UF2 Binary
 
 In `./binaries` after bundling, you can drag and drop main.uf2 into your RP2040 plugged in via USB to program it.
+
+This will remove the USB detection when it flashes successfully. To reset, on the RP2040, hold down the reset button, then hold down the boot button, and release the reset button. This will put it back to factory settings. 
 
 # COMMANDS
 

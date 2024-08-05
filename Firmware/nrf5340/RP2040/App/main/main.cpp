@@ -9,13 +9,13 @@
 #include "hardware/timer.h"
 #include "hardware/clocks.h"
 #include "hardware/rtc.h"
-#include "pico/sleep.h"
+//#include "pico/sleep.h"
 #include "pico/multicore.h"
 
 #define DEFAULT_PULSE_WIDTH_US 200
 #define DEFAULT_PERIOD_US (1000000 / 250) // 250Hz
 #define DEFAULT_INITIAL_DELAY_US 0
-#define CORE_CLOCK_KHZ 60000
+#define CORE_CLOCK_KHZ 80000
 
 #define WAKE_CHECK_INTERVAL 5 // Interval in seconds to wake up and check for a wake command
 
@@ -31,45 +31,45 @@ uint32_t selectPeriod(char preset) {
 }
 
 // Function to enter deep sleep and periodically wake up to check for a wake command
-void enterPeriodicDeepSleep() {
-    while (true) {
-        // Set RTC to wake up the microcontroller after WAKE_CHECK_INTERVAL seconds
-        datetime_t t;
-        rtc_get_datetime(&t);
-        t.sec += WAKE_CHECK_INTERVAL;
-        if (t.sec >= 60) {
-            t.sec -= 60;
-            t.min += 1;
-        }
-        if (t.min >= 60) {
-            t.min -= 60;
-            t.hour += 1;
-        }
-        if (t.hour >= 24) {
-            t.hour -= 24;
-            t.dotw += 1;
-        }
-        rtc_set_alarm(&t, NULL);
+// void enterPeriodicDeepSleep() {
+//     while (true) {
+//         // Set RTC to wake up the microcontroller after WAKE_CHECK_INTERVAL seconds
+//         datetime_t t;
+//         rtc_get_datetime(&t);
+//         t.sec += WAKE_CHECK_INTERVAL;
+//         if (t.sec >= 60) {
+//             t.sec -= 60;
+//             t.min += 1;
+//         }
+//         if (t.min >= 60) {
+//             t.min -= 60;
+//             t.hour += 1;
+//         }
+//         if (t.hour >= 24) {
+//             t.hour -= 24;
+//             t.dotw += 1;
+//         }
+//         rtc_set_alarm(&t, NULL);
 
-        // Enter sleep
-        sleep_run_from_rtc();
+//         // Enter sleep
+//         sleep_run_from_rtc();
 
-        // Check for a wake command
-        std::string receivedString;
-        UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
-        while (uartController.isReadable()) {
-            char receivedChar = uartController.read();
-            if (receivedChar == '\n') {
-                if (receivedString == "WAKE") {
-                    return; // Exit sleep loop if WAKE command is received
-                }
-                receivedString.clear();
-            } else {
-                receivedString += receivedChar;
-            }
-        }
-    }
-}
+//         // Check for a wake command
+//         std::string receivedString;
+//         UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
+//         while (uartController.isReadable()) {
+//             char receivedChar = uartController.read();
+//             if (receivedChar == '\n') {
+//                 if (receivedString == "WAKE") {
+//                     return; // Exit sleep loop if WAKE command is received
+//                 }
+//                 receivedString.clear();
+//             } else {
+//                 receivedString += receivedChar;
+//             }
+//         }
+//     }
+// }
 
 // Global variables to share data between cores
 std::vector<PWMController> pwmControllers = {
@@ -104,6 +104,17 @@ void core1_entry() {
     }
 }
 
+void initPWMRoutine() {
+    
+    running = true;
+    for (auto& controller : pwmControllers) {
+        controller.init();
+        controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
+    }
+    //multicore_launch_core1(core1_entry); // Restart core 1 if needed
+
+}
+
 // Function to parse the received command
 void parseCommand(const std::string& command) {
     std::stringstream ss(command);
@@ -114,23 +125,14 @@ void parseCommand(const std::string& command) {
         running = false;
     } else if (cmd == "SLEEP") {
         // Enter periodic deep sleep
-        enterPeriodicDeepSleep();
+        //enterPeriodicDeepSleep();
     } else if (cmd == "WAKE") {
         // Re-initialize the controllers and resume operation
-        running = true;
-        for (auto& controller : pwmControllers) {
-            controller.init();
-            controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
-            controller.setPWMValues();
-        }
-        multicore_launch_core1(core1_entry); // Restart core 1 if needed
+        initPWMRoutine();
     } else if (cmd.length() == 1 && std::isalpha(cmd[0])) {
         // Handle frequency preset command
         periodUs = selectPeriod(cmd[0]);
-        for (auto& controller : pwmControllers) {
-            controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width
-            controller.setPWMValues();
-        }
+        initPWMRoutine();
     } else {
         // Assume the command is to set period, pulse width, or initial delay
         std::string parameter;
@@ -148,7 +150,6 @@ void parseCommand(const std::string& command) {
         // Apply the new settings
         for (auto& controller : pwmControllers) {
             controller.updateWrapValue(pulseWidthUs, periodUs);
-            controller.setPWMValues();
         }
     }
 }
@@ -162,21 +163,18 @@ int main() {
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
-    // Initialize the PWM controllers
-    for (auto& controller : pwmControllers) {
-        controller.init();
-        controller.updateWrapValue(pulseWidthUs, periodUs); // Initial pulse width and period
-        controller.setPWMValues();
-    }
 
-    // Launch core 1 to handle PWM
-    multicore_launch_core1(core1_entry);
+    // Initialize the PWM controllers
+    initPWMRoutine();
 
     while (true) {
         if (uartController.isReadable()) {
             char receivedChar = uartController.read();
 
-            if (receivedChar == '\n') {
+            if (receivedChar == '\r') {
+                // Ignore carriage return
+                continue;
+            } else if (receivedChar == '\n') {
                 // End of the string received, process it
                 parseCommand(receivedString);
 

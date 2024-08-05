@@ -29,18 +29,13 @@ endif()
 
 # Is this installation the result of a crosscompile?
 if(NOT DEFINED CMAKE_CROSSCOMPILING)
-  set(CMAKE_CROSSCOMPILING "TRUE")
-endif()
-
-# Set default install directory permissions.
-if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/Program Files/Raspberry Pi/Pico SDK v1.5.1/gcc-arm-none-eabi/bin/arm-none-eabi-objdump.exe")
+  set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/pico-sdk/cmake_install.cmake")
-  include("C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/main/cmake_install.cmake")
+  include("C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/binaries/pico-sdk/cmake_install.cmake")
+  include("C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/binaries/main/cmake_install.cmake")
 
 endif()
 
@@ -52,5 +47,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/brews/Documents/Github/nRF52-Biosensing-Boards/Firmware/nrf5340/RP2040/App/binaries/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
