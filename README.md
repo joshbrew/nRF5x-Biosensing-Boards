@@ -35,21 +35,19 @@ Features Zephyr RTOS test firmware, which is hardware-agnostic.
 
 You can fairly easily add more sensor modules, which are all plug-and-play so the board can run with any combination of sensors. We'll clean this up more as we go for easier customization and feature inclusions. The BT840/BT40, BC840M, and BC40M prototypes include battery chargers with TVS diodes for safety so the boards could be FDA-approved.
 
-![breakout](Revs.PNG)
+![breakout](img/Revs.PNG)
 
-![bc840m](BC840M_pinout.png)
+![bc840m](img/BC840M_pinout.png)
 
-![bt40](BT40_pinout_updated.PNG)
+![bt40](img/BTSeries-Pinout-Edit.PNG)
 
 Version 3 (BT40/BT840, BC840M R2 & BC40M R1 designs) by Joshua Brewster and Bojan Jovanovich. Firmware by Bojan Jovanovich, drawings and frontend software by Josh Brewster. 
-
-- Incoming minified BC840M revision for the [Open Source Smart Glasses](https://github.com/TeamOpenSmartGlasses/OpenSourceSmartGlasses) project 
 
 Versions 2 (BC840M R1) by Joshua Brewster, Jacob Tinkhauser, Bojan Jovanovich. Firmware by Bojan, drawings and frontend software by Josh Brewster. Testing and early design phase included Jacob Tinkhauser. 
 
 Version 0 (BT832A) by Joshua Brewster, Jacob Tinkhauser, and Bojan Jovanovich. Firmware by Bojan and Jacob, drawings and frontend by Joshua Brewster.
 
-Developed for creating open source [Brains@Play](https://brainsatplay.com) and [MyAlyce (WIP)](https://github.com/myalyce/myalyce) wearables for biofeedback and treatment recovery monitoring.
+Developed for creating open source wearables for biofeedback and treatment recovery monitoring.
 
 Related:
 - [BLE & USB Web drivers and debugger](https://github.com/joshbrew/device_debugger)
@@ -57,16 +55,16 @@ Related:
 Below results with the ADS131M08 doing quick tests. Noise floor was around 350 nanovolts when shorted. These are not final results but show lots of promise.
 
 - EEG alpha waves (spikes are blinks through a digital bandpass filter)
-![EEG](./eegalpha.png)
+![EEG](./img/eegalpha.png)
 
 - ECG with additional digital 50Hz lowpass
-![ECG](./ECG.png)
+![ECG](./img/ECG.png)
 
 - Raw EOG
-![EOG](./EOG.png)
+![EOG](./img/EOG.png)
 
 - Raw PPG wave (red LED + Photodiode BPW 34 w/ basic 1MOhm + 200pf lowpass filter)
-![PPG](./ppgraw.PNG)
+![PPG](./img/ppgraw.PNG)
 
 Note the ADS131M08 is pretty much completely useless on USB power as we do not have digital or power isolators. We recommend sticking with the Bluetooth 5 and battery support except for when debugging.
 
