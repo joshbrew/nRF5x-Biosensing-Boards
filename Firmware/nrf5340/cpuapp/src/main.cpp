@@ -390,11 +390,11 @@ static int setupadc(ADS131M08 * adc) {
     #if CONFIG_USE_ADS131M08
     
     configureSPS(*&adc, SPS_250_OSR);
-    // if(adc->writeReg(ADS131_CLOCK,0b1111111100011111)){  //< Clock register (page 55 in datasheet)
-    //     //LOG_INF("ADS131_CLOCK register successfully configured");
-    // } else {
-    //     LOG_ERR("***ERROR: Writing ADS131_CLOCK register.");
-    // }
+    if(adc->writeReg(ADS131_CLOCK,0b1111111100011111)){  //< Clock register (page 55 in datasheet)
+        //LOG_INF("ADS131_CLOCK register successfully configured");
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_CLOCK register.");
+    }
     k_msleep(10);
     if(adc->setGain(32)){    //< Gain Setting, 1-128
         //LOG_INF("ADC Gain properly set to 32");
