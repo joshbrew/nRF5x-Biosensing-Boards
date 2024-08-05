@@ -12,6 +12,12 @@
 //#include "pico/sleep.h"
 #include "pico/multicore.h"
 
+#define ADC_SPS_A 250
+#define ADC_SPS_B 500
+#define ADC_SPS_C 1000
+#define ADC_SPS_D 2000
+
+#define DEFAULT_CLOCK_FREQUENCY 80000000U // 80 MHz clock frequency
 #define DEFAULT_PULSE_WIDTH_US 200
 #define DEFAULT_PERIOD_US (1000000 / 250) // 250Hz
 #define DEFAULT_INITIAL_DELAY_US 0
@@ -71,10 +77,15 @@ uint32_t selectPeriod(char preset) {
 //     }
 // }
 
+
 // Global variables to share data between cores
 std::vector<PWMController> pwmControllers = {
-    PWMController(2, 1),
-    PWMController(3, 2)
+    PWMController(2, 1, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(3, 2, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(5, 4, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(6, 5, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)
 };
 volatile uint32_t periodUs = DEFAULT_PERIOD_US;
 volatile uint32_t pulseWidthUs = DEFAULT_PULSE_WIDTH_US;
@@ -104,15 +115,18 @@ void core1_entry() {
     }
 }
 
+bool launched = false;
+
 void initPWMRoutine() {
-    
     running = true;
     for (auto& controller : pwmControllers) {
-        controller.init();
+        controller.init(DEFAULT_CLOCK_FREQUENCY);
         controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
     }
-    //multicore_launch_core1(core1_entry); // Restart core 1 if needed
-
+    if(!launched) {
+        multicore_launch_core1(core1_entry); // Restart core 1 if needed
+        launched = true;
+    }
 }
 
 // Function to parse the received command
@@ -123,16 +137,25 @@ void parseCommand(const std::string& command) {
 
     if (cmd == "STOP") {
         running = false;
+        for (auto& controller : pwmControllers) {
+            controller.stop();
+        }
     } else if (cmd == "SLEEP") {
         // Enter periodic deep sleep
-        //enterPeriodicDeepSleep();
+        for (auto& controller : pwmControllers) {
+            controller.stop();
+        }
     } else if (cmd == "WAKE") {
         // Re-initialize the controllers and resume operation
         initPWMRoutine();
     } else if (cmd.length() == 1 && std::isalpha(cmd[0])) {
         // Handle frequency preset command
         periodUs = selectPeriod(cmd[0]);
-        initPWMRoutine();
+        // Apply the new settings
+        for (auto& controller : pwmControllers) {
+            controller.updateWrapValue(pulseWidthUs, periodUs);
+        }
+
     } else {
         // Assume the command is to set period, pulse width, or initial delay
         std::string parameter;
@@ -157,15 +180,15 @@ void parseCommand(const std::string& command) {
 int main() {
     stdio_init_all();
 
-    // Set system clock to 60MHz
+    // Set system clock to 80MHz
     set_sys_clock_khz(CORE_CLOCK_KHZ, true);
     
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
-
     // Initialize the PWM controllers
     initPWMRoutine();
+    parseCommand("A"); // Auto start to test
 
     while (true) {
         if (uartController.isReadable()) {
