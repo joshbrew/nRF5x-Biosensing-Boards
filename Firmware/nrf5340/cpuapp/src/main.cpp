@@ -405,14 +405,14 @@ static int setupadc(ADS131M08 * adc) {
     //DC Block Filter settings:
     if(adc->writeReg(ADS131_THRSHLD_LSB,0b0000000000001010)){ //0b0000000000001010 //< DC Block register (page 55 in datasheet)
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
-        adc->writeReg(ADS131_CH0_CFG,0b0000000000000100); 
-        adc->writeReg(ADS131_CH1_CFG,0b0000000000000100);
-        adc->writeReg(ADS131_CH2_CFG,0b0000000000000100);
-        adc->writeReg(ADS131_CH3_CFG,0b0000000000000100);
-        adc->writeReg(ADS131_CH4_CFG,0b0000000000000100);
-        adc->writeReg(ADS131_CH5_CFG,0b0000000000000100);
-        adc->writeReg(ADS131_CH6_CFG,0b0000000000000100);
-        adc->writeReg(ADS131_CH7_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH0_CFG,0b0000000000000100); 
+        // adc->writeReg(ADS131_CH1_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH2_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH3_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH4_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH5_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH6_CFG,0b0000000000000100);
+        // adc->writeReg(ADS131_CH7_CFG,0b0000000000000100);
     } else {
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
     }
