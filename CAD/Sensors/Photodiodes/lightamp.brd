@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.5.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -562,7 +562,7 @@ design rules under a new name.</description>
 <attribute name="PURCHASE-URL" value="https://pricing.snapeda.com/search/part/BPW34S/?ref=eda" x="15.31604375" y="14.8561" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="17.48310625" y="16.752140625" size="0.762" layer="27" rot="R180"/>
 </element>
-<element name="C1" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="C025-025X050" package3d_urn="urn:adsk.eagle:package:6240323/1" value="2.2pF" x="22.118325" y="12.293603125" smashed="yes" rot="R90">
+<element name="C1" library="adafruit" library_urn="urn:adsk.eagle:library:420" package="C025-025X050" package3d_urn="urn:adsk.eagle:package:6240323/1" value="220pF" x="22.118325" y="12.293603125" smashed="yes" rot="R90">
 <attribute name="NAME" x="23.0606625" y="16.060421875" size="0.9906" layer="25" ratio="10" rot="R180"/>
 <attribute name="VALUE" x="20.83054375" y="8.70456875" size="0.8128" layer="27" ratio="10"/>
 </element>

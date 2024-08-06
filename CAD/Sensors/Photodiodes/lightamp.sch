@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.2">
+<eagle version="9.5.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -6207,7 +6207,7 @@ type 0309, grid 2.5 mm</description>
 </classes>
 <parts>
 <part name="D1" library="BPW34S" deviceset="BPW34S" device=""/>
-<part name="C1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="025-025X050" package3d_urn="urn:adsk.eagle:package:6240323/1" value="2.2pF"/>
+<part name="C1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="025-025X050" package3d_urn="urn:adsk.eagle:package:6240323/1" value="220pF"/>
 <part name="R1" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="R-US_" device="0204/5" package3d_urn="urn:adsk.eagle:package:6240595/1" value="100k"/>
 <part name="C3" library="adafruit" library_urn="urn:adsk.eagle:library:420" deviceset="C-US" device="025-025X050" package3d_urn="urn:adsk.eagle:package:6240323/1" value="0.1uF"/>
 <part name="U1" library="OPA381AIDGKR" deviceset="OPA381AIDGKR" device=""/>
@@ -6218,21 +6218,21 @@ type 0309, grid 2.5 mm</description>
 <plain>
 </plain>
 <instances>
-<instance part="D1" gate="G$1" x="24.13" y="24.13" smashed="yes">
-<attribute name="NAME" x="21.0312" y="28.6258" size="1.27" layer="95"/>
-<attribute name="VALUE" x="20.574" y="20.828" size="1.27" layer="96"/>
+<instance part="D1" gate="G$1" x="44.45" y="36.83" smashed="yes">
+<attribute name="NAME" x="41.3512" y="41.3258" size="1.27" layer="95"/>
+<attribute name="VALUE" x="40.894" y="33.528" size="1.27" layer="96"/>
 </instance>
-<instance part="C1" gate="G$1" x="46.99" y="13.97" smashed="yes">
-<attribute name="NAME" x="45.085" y="7.366" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="48.006" y="9.779" size="1.778" layer="96"/>
+<instance part="C1" gate="G$1" x="85.09" y="64.77" smashed="yes" rot="R270">
+<attribute name="NAME" x="78.486" y="66.675" size="1.778" layer="95"/>
+<attribute name="VALUE" x="81.026" y="60.579" size="1.778" layer="96"/>
 </instance>
-<instance part="R1" gate="G$1" x="57.15" y="12.7" smashed="yes" rot="R90">
-<attribute name="NAME" x="55.6514" y="8.89" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="60.452" y="8.89" size="1.778" layer="96" rot="R90"/>
+<instance part="R1" gate="G$1" x="83.82" y="54.61" smashed="yes">
+<attribute name="NAME" x="80.01" y="56.1086" size="1.778" layer="95"/>
+<attribute name="VALUE" x="80.01" y="51.308" size="1.778" layer="96"/>
 </instance>
-<instance part="C3" gate="G$1" x="39.37" y="13.97" smashed="yes">
-<attribute name="NAME" x="37.465" y="7.366" size="1.778" layer="95" rot="R90"/>
-<attribute name="VALUE" x="35.687" y="11.684" size="1.778" layer="96" rot="R90"/>
+<instance part="C3" gate="G$1" x="54.61" y="16.51" smashed="yes" rot="R180">
+<attribute name="NAME" x="56.515" y="23.114" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="58.293" y="18.796" size="1.778" layer="96" rot="R270"/>
 </instance>
 <instance part="U1" gate="A" x="82.55" y="34.29" smashed="yes">
 <attribute name="NAME" x="69.85" y="45.45" size="2.0828" layer="95" ratio="10" rot="SR0"/>
@@ -6249,13 +6249,13 @@ type 0309, grid 2.5 mm</description>
 <net name="GND" class="0">
 <segment>
 <pinref part="D1" gate="G$1" pin="A"/>
-<wire x1="16.51" y1="24.13" x2="15.24" y2="24.13" width="0.1524" layer="91"/>
-<label x="8.89" y="24.13" size="1.778" layer="95"/>
+<wire x1="36.83" y1="36.83" x2="35.56" y2="36.83" width="0.1524" layer="91"/>
+<label x="29.21" y="36.83" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="C3" gate="G$1" pin="1"/>
-<wire x1="39.37" y1="16.51" x2="39.37" y2="17.78" width="0.1524" layer="91"/>
-<label x="39.37" y="17.78" size="1.778" layer="95"/>
+<wire x1="54.61" y1="13.97" x2="54.61" y2="12.7" width="0.1524" layer="91"/>
+<label x="54.61" y="12.7" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="-IN"/>
@@ -6276,23 +6276,23 @@ type 0309, grid 2.5 mm</description>
 <net name="+IN" class="0">
 <segment>
 <pinref part="D1" gate="G$1" pin="C"/>
-<wire x1="29.21" y1="24.13" x2="30.48" y2="24.13" width="0.1524" layer="91"/>
-<label x="30.48" y="24.13" size="1.778" layer="95"/>
+<wire x1="49.53" y1="36.83" x2="50.8" y2="36.83" width="0.1524" layer="91"/>
+<label x="50.8" y="36.83" size="1.778" layer="95"/>
 </segment>
 <segment>
 <pinref part="C1" gate="G$1" pin="2"/>
-<wire x1="46.99" y1="8.89" x2="46.99" y2="7.62" width="0.1524" layer="91"/>
-<label x="48.26" y="6.35" size="1.778" layer="95"/>
+<wire x1="80.01" y1="64.77" x2="78.74" y2="64.77" width="0.1524" layer="91"/>
+<label x="77.47" y="63.5" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="57.15" y1="7.62" x2="57.15" y2="6.35" width="0.1524" layer="91"/>
-<label x="57.15" y="3.81" size="1.778" layer="95"/>
+<wire x1="78.74" y1="54.61" x2="77.47" y2="54.61" width="0.1524" layer="91"/>
+<label x="74.93" y="54.61" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <pinref part="C3" gate="G$1" pin="2"/>
-<wire x1="39.37" y1="8.89" x2="39.37" y2="7.62" width="0.1524" layer="91"/>
-<label x="39.37" y="5.08" size="1.778" layer="95"/>
+<wire x1="54.61" y1="21.59" x2="54.61" y2="22.86" width="0.1524" layer="91"/>
+<label x="54.61" y="25.4" size="1.778" layer="95" rot="R180"/>
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="+IN"/>
@@ -6320,13 +6320,13 @@ type 0309, grid 2.5 mm</description>
 </segment>
 <segment>
 <pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="57.15" y1="17.78" x2="57.15" y2="19.05" width="0.1524" layer="91"/>
-<label x="57.15" y="19.05" size="1.778" layer="95"/>
+<wire x1="88.9" y1="54.61" x2="90.17" y2="54.61" width="0.1524" layer="91"/>
+<label x="90.17" y="54.61" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <pinref part="C1" gate="G$1" pin="1"/>
-<wire x1="46.99" y1="16.51" x2="46.99" y2="17.78" width="0.1524" layer="91"/>
-<label x="46.99" y="17.78" size="1.778" layer="95"/>
+<wire x1="87.63" y1="64.77" x2="88.9" y2="64.77" width="0.1524" layer="91"/>
+<label x="88.9" y="64.77" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <pinref part="U1" gate="A" pin="OUT"/>
