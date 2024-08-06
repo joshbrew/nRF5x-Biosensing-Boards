@@ -108,10 +108,10 @@ uint16_t ADS131M08::readReg(uint8_t reg) {
     cmdFrame[0] = commandWord >> 8;
     cmdFrame[1] = (uint8_t)(commandWord & 0xFF);
 
-/* Send Command Frame */
+    /* Send Command Frame */
     spiCommandFrame(nWordsInFrame*nBytesInWord, cmdFrame);
     k_msleep(1);
-/* Read Response */
+    /* Read Response */
     return spiResponseFrame(3);    
 }
 

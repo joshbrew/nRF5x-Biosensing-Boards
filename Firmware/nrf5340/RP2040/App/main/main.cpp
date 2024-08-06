@@ -3,14 +3,21 @@
 #include <string>
 #include <vector>
 #include <sstream>
+
 #include "pwmcontroller.hpp"
 #include "uartcontroller.hpp"
+#include "WS2812.hpp"
+
 #include "hardware/pwm.h"
 #include "hardware/timer.h"
 #include "hardware/clocks.h"
 #include "hardware/rtc.h"
 //#include "pico/sleep.h"
 #include "pico/multicore.h"
+
+#define RGB_PIN 16
+#define PIO_INSTANCE pio0
+
 
 #define ADC_SPS_A 250
 #define ADC_SPS_B 500
@@ -91,6 +98,7 @@ std::vector<PWMController> pwmControllers = {
     PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY),
     PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)
 };
+
 volatile uint32_t periodUs = DEFAULT_PERIOD_US;
 volatile uint32_t pulseWidthUs = DEFAULT_PULSE_WIDTH_US;
 volatile uint32_t initialDelayUs = DEFAULT_INITIAL_DELAY_US;
@@ -184,8 +192,18 @@ int main() {
     // Set system clock to 80MHz
     set_sys_clock_khz(CORE_CLOCK_KHZ, true);
     
+    WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
+
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
+
+    ws2812.fill(WS2812::RGB(255,0,255)); // Purple
+    ws2812.show();
+
+    busy_wait_us(100000);
+
+    ws2812.fill(WS2812::RGB(0,0,0)); // Purple
+    ws2812.show();
 
     for (auto& controller : pwmControllers) {
         controller.init(DEFAULT_CLOCK_FREQUENCY);
@@ -201,11 +219,17 @@ int main() {
                 // Ignore carriage return
                 continue;
             } else if (receivedChar == '\n') {
+                
+                ws2812.fill(WS2812::RGB(0,255,0)); // Green
+                ws2812.show();
                 // End of the string received, process it
                 parseCommand(receivedString);
 
                 // Clear the receivedString for the next input 
                 receivedString.clear();
+                
+                ws2812.fill(WS2812::RGB(0,0,0)); // 0ff
+                ws2812.show();
             } else {
                 // Append the character to the received string
                 receivedString += receivedChar;

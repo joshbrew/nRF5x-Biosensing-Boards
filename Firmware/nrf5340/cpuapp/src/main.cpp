@@ -271,23 +271,13 @@ static int gpio_init(void) {
         return -1;
 	}        
 
-    //init_ads131_gpio_int();
-    //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
-    
     configureGPIO(RED_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
     configureGPIO(GREEN_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
     configureGPIO(BLUE_LED, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
-    setGPIO(RED_LED, 0);
-    setGPIO(GREEN_LED, 1);
-    setGPIO(BLUE_LED, 1);
 
-    //LOG_INF("Entering sleep...");
-    k_sleep(K_MSEC(500)); // give some time to ADS131 to settle after power on
-    //LOG_INF("Waking up...");
-
-    setGPIO(RED_LED, 1);
-    setGPIO(GREEN_LED, 0);
-    setGPIO(BLUE_LED, 0);
+    //init_ads131_gpio_int();
+    //ret = gpio_pin_configure(gpio_0_dev, DATA_READY_GPIO, GPIO_INPUT | GPIO_ACTIVE_LOW);
+    
     return 0;
 }
 
@@ -405,14 +395,14 @@ static int setupadc(ADS131M08 * adc) {
     //DC Block Filter settings:
     if(adc->writeReg(ADS131_THRSHLD_LSB,0b0000000000001010)){ //0b0000000000001010 //< DC Block register (page 55 in datasheet)
         //LOG_INF("ADS131_THRSHLD_LSB register successfully configured");
-        // adc->writeReg(ADS131_CH0_CFG,0b0000000000000100); 
-        // adc->writeReg(ADS131_CH1_CFG,0b0000000000000100);
-        // adc->writeReg(ADS131_CH2_CFG,0b0000000000000100);
-        // adc->writeReg(ADS131_CH3_CFG,0b0000000000000100);
-        // adc->writeReg(ADS131_CH4_CFG,0b0000000000000100);
-        // adc->writeReg(ADS131_CH5_CFG,0b0000000000000100);
-        // adc->writeReg(ADS131_CH6_CFG,0b0000000000000100);
-        // adc->writeReg(ADS131_CH7_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH0_CFG,0b0000000000000100); 
+        adc->writeReg(ADS131_CH1_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH2_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH3_CFG,0b0000000000000100);
+        adc->writeReg(ADS131_CH4_CFG,0b0000000000000000);
+        adc->writeReg(ADS131_CH5_CFG,0b0000000000000000);
+        adc->writeReg(ADS131_CH6_CFG,0b0000000000000000);
+        adc->writeReg(ADS131_CH7_CFG,0b0000000000000000);
     } else {
         LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
     }
@@ -578,6 +568,19 @@ static void setupPeripherals() {
     int ret = 0;
 
     gpio_init();
+
+    setGPIO(RED_LED, 0);
+    setGPIO(GREEN_LED, 1);
+    setGPIO(BLUE_LED, 1);
+
+    //LOG_INF("Entering sleep...");
+    k_sleep(K_MSEC(1000)); // give some time to ADS131 to settle after power on
+    //LOG_INF("Waking up...");
+
+    setGPIO(RED_LED, 1);
+    setGPIO(GREEN_LED, 0);
+    setGPIO(BLUE_LED, 0);
+
     ret = init_sensor_gpio_int();
 
     //peripherals won't break anything if undetected, can run all of them in general (audio is nRF53 ONLY)

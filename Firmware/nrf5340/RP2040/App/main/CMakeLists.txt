@@ -3,14 +3,19 @@ if (TARGET tinyusb_device)
         main.cpp 
         pwmcontroller.cpp 
         uartcontroller.cpp
+        WS2812.cpp
     )
 
-    # pull in common dependencies
-    target_link_libraries(main pico_stdlib pico_multicore hardware_pwm hardware_rtc hardware_clocks)
 
-    # enable usb output, disable uart output
-    pico_enable_stdio_usb(main 1)
-    pico_enable_stdio_uart(main 0)
+    pico_generate_pio_header(main ${CMAKE_CURRENT_LIST_DIR}/WS2812.pio)
+
+
+    #pico_enable_stdio_usb(main 1)
+    #pico_enable_stdio_uart(main 0)
+
+    # pull in common dependencies
+    target_link_libraries(main pico_stdlib pico_multicore hardware_pwm hardware_rtc hardware_clocks hardware_pio)
+
 
     # create map/bin/hex/uf2 file etc.
     pico_add_extra_outputs(main)
