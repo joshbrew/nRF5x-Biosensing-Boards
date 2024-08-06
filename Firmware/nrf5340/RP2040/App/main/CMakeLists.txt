@@ -9,9 +9,8 @@ if (TARGET tinyusb_device)
 
     pico_generate_pio_header(main ${CMAKE_CURRENT_LIST_DIR}/WS2812.pio)
 
-
-    #pico_enable_stdio_usb(main 1)
-    #pico_enable_stdio_uart(main 0)
+    pico_enable_stdio_usb(main 1)
+    pico_enable_stdio_uart(main 0)
 
     # pull in common dependencies
     target_link_libraries(main pico_stdlib pico_multicore hardware_pwm hardware_rtc hardware_clocks hardware_pio)

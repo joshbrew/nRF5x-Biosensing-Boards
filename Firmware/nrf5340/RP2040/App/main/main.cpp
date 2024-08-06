@@ -16,7 +16,7 @@
 #include "pico/multicore.h"
 
 #define RGB_PIN 16
-#define PIO_INSTANCE pio0
+#define PIO_INSTANCE pio1
 
 
 #define ADC_SPS_A 250
@@ -93,10 +93,13 @@ uint32_t selectPeriod(char preset) {
 std::vector<PWMController> pwmControllers = {
     PWMController(2, 1, DEFAULT_CLOCK_FREQUENCY),
     PWMController(3, 2, DEFAULT_CLOCK_FREQUENCY),
+    //PWMController(4, 3, DEFAULT_CLOCK_FREQUENCY),
     PWMController(5, 4, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(6, 5, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)
+     PWMController(6, 5, DEFAULT_CLOCK_FREQUENCY),
+    // //PWMController(7, 6, DEFAULT_CLOCK_FREQUENCY),
+     PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY),
+     PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)
+    //PWMController(10, 9, DEFAULT_CLOCK_FREQUENCY)
 };
 
 volatile uint32_t periodUs = DEFAULT_PERIOD_US;
@@ -142,32 +145,35 @@ void initPWMRoutine() {
 
 // Function to parse the received command
 void parseCommand(const std::string& command) {
-    std::stringstream ss(command);
-    std::string cmd;
-    ss >> cmd;
 
-    if (cmd == "STOP") {
+    printf("Received command: %s\n", command.c_str());
+
+    if (command == "STOP") {
         running = false;
         for (auto& controller : pwmControllers) {
             controller.stop();
         }
-    } else if (cmd == "SLEEP") {
+    } else if (command == "SLEEP") {
         // Enter periodic deep sleep
         for (auto& controller : pwmControllers) {
             controller.stop();
         }
-    } else if (cmd == "WAKE") {
+    } else if (command == "WAKE") {
         // Re-initialize the controllers and resume operation
         initPWMRoutine();
-    } else if (cmd.length() == 1 && std::isalpha(cmd[0])) {
+    } else if (command.length() == 1 && std::isalpha(command[0])) {
         // Handle frequency preset command
-        periodUs = selectPeriod(cmd[0]);
+        periodUs = selectPeriod(command[0]);
         // Apply the new settings
         initPWMRoutine();
 
     } else {
+        std::stringstream ss(command);
+        std::string cmd;
+        ss >> cmd;
         // Assume the command is to set period, pulse width, or initial delay
         std::string parameter;
+
         uint32_t value;
         while (ss >> parameter >> value) {
             if (parameter == "PULSEWIDTH") {
@@ -189,52 +195,65 @@ void parseCommand(const std::string& command) {
 int main() {
     stdio_init_all();
 
+    printf("RP2040 Booted\n");
+
     // Set system clock to 80MHz
     set_sys_clock_khz(CORE_CLOCK_KHZ, true);
     
-    WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
+    //WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
 
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
-    ws2812.fill(WS2812::RGB(255,0,255)); // Purple
-    ws2812.show();
+    //ws2812.fill(WS2812::RGB(255,0,255)); // Purple
+    //ws2812.show();
 
     busy_wait_us(100000);
 
-    ws2812.fill(WS2812::RGB(0,0,0)); // Purple
-    ws2812.show();
+    //ws2812.fill(WS2812::RGB(0,0,0)); // Purple
+    //ws2812.show();
 
     for (auto& controller : pwmControllers) {
         controller.init(DEFAULT_CLOCK_FREQUENCY);
     }
     // Initialize the PWM controllers
-    //parseCommand("A"); // Auto start to test
+    parseCommand("A"); // Auto start to test
+
+    printf("RP2040 Running\n");
+
 
     while (true) {
         if (uartController.isReadable()) {
             char receivedChar = uartController.read();
 
+            //printf("Char: %c (ASCII: %d)\n", receivedChar, (int)receivedChar);
+
             if (receivedChar == '\r') {
                 // Ignore carriage return
                 continue;
             } else if (receivedChar == '\n') {
+                // Debug print to show the accumulated command before parsing
+                //printf("Complete command: %s\n", receivedString.c_str());
                 
-                ws2812.fill(WS2812::RGB(0,255,0)); // Green
-                ws2812.show();
+                //ws2812.fill(WS2812::RGB(0,255,0)); // Green
+                //ws2812.show();
+
                 // End of the string received, process it
                 parseCommand(receivedString);
 
                 // Clear the receivedString for the next input 
                 receivedString.clear();
                 
-                ws2812.fill(WS2812::RGB(0,0,0)); // 0ff
-                ws2812.show();
-            } else {
+                //ws2812.fill(WS2812::RGB(0,0,0)); // 0ff
+                //ws2812.show();
+            } else if ((int)receivedChar > 0) {
                 // Append the character to the received string
                 receivedString += receivedChar;
+                // Debug print to show the string length and its current content
+                //printf("Received string so far: %s (Length: %d)\n", receivedString.c_str(), receivedString.length());
             }
         }
+
     }
 
     return 0;
