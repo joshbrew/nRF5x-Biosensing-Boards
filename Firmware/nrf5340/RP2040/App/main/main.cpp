@@ -91,14 +91,14 @@ uint32_t selectPeriod(char preset) {
 
 // Global variables to share data between cores
 std::vector<PWMController> pwmControllers = {
-    PWMController(2, 1, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(3, 2, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(2, 1, DEFAULT_CLOCK_FREQUENCY), //r
+    PWMController(3, 2, DEFAULT_CLOCK_FREQUENCY), //ir
     //PWMController(4, 3, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(5, 4, DEFAULT_CLOCK_FREQUENCY),
-     PWMController(6, 5, DEFAULT_CLOCK_FREQUENCY),
+    PWMController(5, 4, DEFAULT_CLOCK_FREQUENCY), //r
+    PWMController(6, 5, DEFAULT_CLOCK_FREQUENCY), //ir
     // //PWMController(7, 6, DEFAULT_CLOCK_FREQUENCY),
-     PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY),
-     PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)
+    PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY), //r
+    PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)  //ir
     //PWMController(10, 9, DEFAULT_CLOCK_FREQUENCY)
 };
 
@@ -107,28 +107,50 @@ volatile uint32_t pulseWidthUs = DEFAULT_PULSE_WIDTH_US;
 volatile uint32_t initialDelayUs = DEFAULT_INITIAL_DELAY_US;
 volatile bool running = true;
 std::string receivedString; 
+volatile size_t currentLed = 0;
 
-// Core 1 entry function
-void core1_entry() {
-    size_t currentLed = 0;
+bool repeating_timer_callback(repeating_timer_t  *t) {
+    if (!running) return false;  // Stop the timer if the running flag is false
 
-    while (running) {
-        // Apply initial delay before starting the first pulse
-        if (initialDelayUs > 0) busy_wait_us(initialDelayUs);
+    if (initialDelayUs > 0) busy_wait_us(initialDelayUs);
 
-        // Start the current LED
-        pwmControllers[currentLed].start();
-        // Wait for the pulse width
-        busy_wait_us(pulseWidthUs);
-        // Stop the current LED
-        pwmControllers[currentLed].stop();
-        // Wait for the remainder of the period
-        if (periodUs > 0) busy_wait_us(periodUs - pulseWidthUs);
+    pwmControllers[currentLed].start();
+    busy_wait_us(pulseWidthUs);
+    pwmControllers[currentLed].stop();
 
-        // Move to the next LED
-        currentLed = (currentLed + 1) % pwmControllers.size();
-    }
+    currentLed = (currentLed + 1) % pwmControllers.size();
+    return true;  // Keep repeating the timer
 }
+
+void core1_entry() {
+    repeating_timer_t timer;
+
+    // Set up the initial delay if required
+    WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
+
+    // Initialize the repeating timer
+    bool timer_added = add_repeating_timer_us(-static_cast<int64_t>(periodUs), repeating_timer_callback, NULL, &timer);
+
+    if (timer_added) {
+        // printf("Timer added successfully\n");
+        // ws2812.fill(WS2812::RGB(0, 255, 0)); // Green
+        // ws2812.show();
+    } else {
+        //printf("Failed to add timer\n");
+        ws2812.fill(WS2812::RGB(255, 0, 0)); // Red
+        ws2812.show();
+        return;
+    }
+
+    // Main loop can remain to check if the running flag changes and stop the timer
+    while (true) {
+        //tight_loop_contents();  // Low-power wait
+    }
+
+    // If running is set to false, remove the timer
+    cancel_repeating_timer(&timer);
+}
+
 
 bool launched = false;
 
@@ -200,18 +222,18 @@ int main() {
     // Set system clock to 80MHz
     set_sys_clock_khz(CORE_CLOCK_KHZ, true);
     
-    //WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
+    WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
 
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
-    //ws2812.fill(WS2812::RGB(255,0,255)); // Purple
-    //ws2812.show();
+    ws2812.fill(WS2812::RGB(155,0,255)); // Purple
+    ws2812.show();
 
     busy_wait_us(100000);
 
-    //ws2812.fill(WS2812::RGB(0,0,0)); // Purple
-    //ws2812.show();
+    ws2812.fill(WS2812::RGB(0,0,0)); // Purple
+    ws2812.show();
 
     for (auto& controller : pwmControllers) {
         controller.init(DEFAULT_CLOCK_FREQUENCY);
@@ -235,8 +257,8 @@ int main() {
                 // Debug print to show the accumulated command before parsing
                 //printf("Complete command: %s\n", receivedString.c_str());
                 
-                //ws2812.fill(WS2812::RGB(0,255,0)); // Green
-                //ws2812.show();
+                ws2812.fill(WS2812::RGB(0,255,0)); // Green
+                ws2812.show();
 
                 // End of the string received, process it
                 parseCommand(receivedString);
@@ -244,8 +266,8 @@ int main() {
                 // Clear the receivedString for the next input 
                 receivedString.clear();
                 
-                //ws2812.fill(WS2812::RGB(0,0,0)); // 0ff
-                //ws2812.show();
+                ws2812.fill(WS2812::RGB(0,0,0)); // 0ff
+                ws2812.show();
             } else if ((int)receivedChar > 0) {
                 // Append the character to the received string
                 receivedString += receivedChar;
