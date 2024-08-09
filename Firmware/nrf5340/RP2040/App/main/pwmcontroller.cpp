@@ -2,8 +2,8 @@
 #include "hardware/pwm.h"
 
 
-PWMController::PWMController(uint8_t pwmPin, uint8_t ledNumber, uint32_t clockFrequency) 
-    : _pwmPin(pwmPin), _ledNumber(ledNumber), _clockFrequency(clockFrequency) 
+PWMController::PWMController(uint8_t pwmPin, uint32_t clockFrequency) 
+    : _pwmPin(pwmPin), _clockFrequency(clockFrequency) 
 {
     // Initialize the PWM configuration
     init(clockFrequency);
@@ -56,12 +56,6 @@ void PWMController::updateWrapValue(uint32_t pulseWidthUs, uint32_t periodUs)
     
     // Set the PWM duty cycle to control the pulse width for the specific channel
     pwm_set_chan_level(_sliceNum, _channel, level);
-}
-
-// Get the LED number associated with this controller
-uint8_t PWMController::getLedNumber(void)
-{
-    return _ledNumber;
 }
 
 // Destructor for PWMController

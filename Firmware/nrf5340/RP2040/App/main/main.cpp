@@ -25,7 +25,7 @@
 #define ADC_SPS_D 2000
 
 #define DEFAULT_CLOCK_FREQUENCY 80000000U // 80 MHz clock frequency
-#define DEFAULT_PULSE_WIDTH_US 500
+#define DEFAULT_PULSE_WIDTH_US 250
 #define DEFAULT_PERIOD_US (1000000 / 250) // 250Hz
 #define DEFAULT_INITIAL_DELAY_US 0
 #define CORE_CLOCK_KHZ 80000
@@ -90,16 +90,16 @@ uint32_t selectPeriod(char preset) {
 
 
 // Global variables to share data between cores
-std::vector<PWMController> pwmControllers = {
-    PWMController(2, 1, DEFAULT_CLOCK_FREQUENCY), //r
-    PWMController(3, 2, DEFAULT_CLOCK_FREQUENCY), //ir
-    //PWMController(4, 3, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(5, 4, DEFAULT_CLOCK_FREQUENCY), //r
-    PWMController(6, 5, DEFAULT_CLOCK_FREQUENCY), //ir
-    // //PWMController(7, 6, DEFAULT_CLOCK_FREQUENCY),
-    PWMController(8, 7, DEFAULT_CLOCK_FREQUENCY), //r
-    PWMController(9, 8, DEFAULT_CLOCK_FREQUENCY)  //ir
-    //PWMController(10, 9, DEFAULT_CLOCK_FREQUENCY)
+std::vector<PWMController*> pwmControllers = {
+    //new PWMController(2, DEFAULT_CLOCK_FREQUENCY), //r
+    new PWMController(3, DEFAULT_CLOCK_FREQUENCY), //ir
+    NULL, // Skipping this stage
+    // new PWMController(5, DEFAULT_CLOCK_FREQUENCY), //r
+    // new PWMController(6, DEFAULT_CLOCK_FREQUENCY), //ir
+    // NULL, // Skipping this stage
+    // new PWMController(8, DEFAULT_CLOCK_FREQUENCY), //r
+    // new PWMController(9, DEFAULT_CLOCK_FREQUENCY)  //ir
+    // You can add more PWMControllers or NULL for no operation
 };
 
 volatile uint32_t periodUs = DEFAULT_PERIOD_US;
@@ -109,14 +109,17 @@ volatile bool running = true;
 std::string receivedString; 
 volatile size_t currentLed = 0;
 
-bool repeating_timer_callback(repeating_timer_t  *t) {
+bool repeating_timer_callback(repeating_timer_t *t) {
     if (!running) return false;  // Stop the timer if the running flag is false
 
     if (initialDelayUs > 0) busy_wait_us(initialDelayUs);
 
-    pwmControllers[currentLed].start();
-    busy_wait_us(pulseWidthUs);
-    pwmControllers[currentLed].stop();
+    // Check if the current controller is not NULL before starting/stopping
+    if (pwmControllers[currentLed] != NULL) {
+        pwmControllers[currentLed]->start();
+        busy_wait_us(pulseWidthUs);
+        pwmControllers[currentLed]->stop();
+    }
 
     currentLed = (currentLed + 1) % pwmControllers.size();
     return true;  // Keep repeating the timer
@@ -143,12 +146,12 @@ void core1_entry() {
     }
 
     // Main loop can remain to check if the running flag changes and stop the timer
-    while (true) {
-        //tight_loop_contents();  // Low-power wait
-    }
+    // while (true) {
+    //     //tight_loop_contents();  // Low-power wait
+    // }
 
-    // If running is set to false, remove the timer
-    cancel_repeating_timer(&timer);
+    // // If running is set to false, remove the timer
+    // cancel_repeating_timer(&timer);
 }
 
 
@@ -157,7 +160,7 @@ bool launched = false;
 void initPWMRoutine() {
     running = true;
     for (auto& controller : pwmControllers) {
-        controller.updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
+        if(controller != NULL) controller->updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
     }
     if(!launched) {
         multicore_launch_core1(core1_entry); // Restart core 1 if needed
@@ -173,12 +176,12 @@ void parseCommand(const std::string& command) {
     if (command == "STOP") {
         running = false;
         for (auto& controller : pwmControllers) {
-            controller.stop();
+            if(controller != NULL) controller->stop();
         }
     } else if (command == "SLEEP") {
         // Enter periodic deep sleep
         for (auto& controller : pwmControllers) {
-            controller.stop();
+            if(controller != NULL) controller->stop();
         }
     } else if (command == "WAKE") {
         // Re-initialize the controllers and resume operation
@@ -209,7 +212,7 @@ void parseCommand(const std::string& command) {
 
         // Apply the new settings
         for (auto& controller : pwmControllers) {
-            controller.updateWrapValue(pulseWidthUs, periodUs);
+            if(controller != NULL) controller->updateWrapValue(pulseWidthUs, periodUs);
         }
     }
 }
@@ -236,7 +239,7 @@ int main() {
     ws2812.show();
 
     for (auto& controller : pwmControllers) {
-        controller.init(DEFAULT_CLOCK_FREQUENCY);
+        if(controller != NULL) controller->init(DEFAULT_CLOCK_FREQUENCY);
     }
     // Initialize the PWM controllers
     parseCommand("A"); // Auto start to test
