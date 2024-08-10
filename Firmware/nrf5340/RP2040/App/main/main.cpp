@@ -36,16 +36,156 @@
 
 #define WAKE_CHECK_INTERVAL 5 // Interval in seconds to wake up and check for a wake command
 
+
+WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
+
+void flicker() {
+    ws2812.fill(WS2812::RGB(0,100,100)); // Teal
+    ws2812.show();
+
+    busy_wait_us(50000);
+    
+    ws2812.fill(WS2812::RGB(0,100,0)); // Green
+    ws2812.show();
+
+    busy_wait_us(50000);
+
+    ws2812.fill(WS2812::RGB(0,0,0)); 
+    ws2812.show();
+
+}
+
+void flickerB() {
+    ws2812.fill(WS2812::RGB(0,0,100)); // Blue
+    ws2812.show();
+
+    busy_wait_us(100000);
+    
+    ws2812.fill(WS2812::RGB(100,0,100)); // Purple
+    ws2812.show();
+
+    busy_wait_us(100000);
+
+    ws2812.fill(WS2812::RGB(0,0,100)); // Blue
+    ws2812.show();
+
+    busy_wait_us(100000);
+    
+    ws2812.fill(WS2812::RGB(100,0,100)); // Purple
+    ws2812.show();
+
+    busy_wait_us(100000);
+
+    ws2812.fill(WS2812::RGB(0,0,0)); 
+    ws2812.show();
+
+}
+
+
+
+// LED GPIO pins list with -1 representing NULL, so it will be used to subdivide the duty cycles
+std::vector<int> gpioPins = { 5, -1, 8, -1 };//{ 5,  -1 };//{ 2, 3, 5, 6, 8, 9, -1 };
+//IMPORTANT: SHARED PWM CHANNELS WILL BE FORCED TO USE THE SAME PHASE OFFSET, MEANING WE ONLY GET 8 PWMS NOT 16
+
+std::vector<PWMController*> pwmControllers;
+
+volatile uint32_t timingWindowUs = DEFAULT_PERIOD_US;
+volatile uint32_t pulseWidthUs = DEFAULT_PULSE_WIDTH_US;
+volatile uint32_t initialDelayUs = DEFAULT_INITIAL_DELAY_US;
+volatile float defaultDutyCycle = 0.0f;
+volatile bool running = false;
+std::string receivedString; 
+volatile size_t currentLed = 0;
+
 // Function to select the period based on a preset character
-uint32_t selectPeriod(char preset) {
+uint32_t selectPerioduS(char preset) {
     switch (preset) {
-        case 'A': return 1000000 / 250; // 250Hz
-        case 'B': return 1000000 / 500; // 500Hz
-        case 'C': return 1000000 / 1000; // 1000Hz
-        case 'D': return 1000000 / 2000; // 2000Hz
+        case 'A': return 4000; // 250Hz
+        case 'B': return 2000; // 500Hz
+        case 'C': return 1000; // 1000Hz
+        case 'D': return 500;  // 2000Hz
         default: return DEFAULT_PERIOD_US; // Default to 250Hz
     }
 }
+
+void cleanupPWMControllers() {
+    for (auto controller : pwmControllers) {
+        if (controller != NULL) {
+            controller->stop();
+            delete controller;
+        }
+    }
+    pwmControllers.clear();  // Clear the vector to remove all elements
+}
+
+void initPWMRoutine(std::vector<int> gpioPins) {
+    cleanupPWMControllers();
+
+    running = true;
+
+    // Calculate the period for each controller by scaling the base period with the number of GPIO pins
+    uint32_t totalPeriodUs = timingWindowUs * gpioPins.size();  // timingWindowUs is used as the base period, scaled by the number of pins
+
+    size_t activeControllerIndex = 0;
+
+    for (size_t i = 0; i < gpioPins.size(); i++) {
+        int gpio = gpioPins[i];
+        if (gpio != -1) {
+            pwmControllers.push_back(new PWMController(gpio, DEFAULT_CLOCK_FREQUENCY));
+
+            // Calculate the start time to evenly divide the period across all active controllers and blanks
+            uint32_t startUs = (totalPeriodUs / gpioPins.size()) * i;
+
+            // Update the PWM controller timing with the correct period, pulse width, and start time
+            pwmControllers[activeControllerIndex]->updateTiming(totalPeriodUs, pulseWidthUs, startUs);
+
+
+            activeControllerIndex++;
+        }
+    }
+
+    activeControllerIndex = 0;
+    for (size_t i = 0; i < gpioPins.size(); i++) {
+        int gpio = gpioPins[i];
+        if (gpio != -1) {
+            // Start the PWM controller
+            pwmControllers[activeControllerIndex]->start();
+            activeControllerIndex++;
+        }
+    }
+    flickerB(); // Confirm with LED blink
+}
+
+bool core1Launched = false;
+
+// Core1 function to run PWM routine
+void core1_entry() {
+    // Initialize the PWM controllers on core1
+    initPWMRoutine(gpioPins);
+
+    // Core1 can now continuously manage PWM without interruptions from UART handling on core0
+    // while (true) {
+    //     // PWM updates or checks can be handled here, if necessary
+    //     // For now, just let it run the initialized routine
+    // }
+}
+
+
+// Function to stop core1 if it's already running
+void stopCore1() {
+    if (core1Launched) {
+        multicore_reset_core1();
+        core1Launched = false;
+    }
+}
+// Function to start core1 with the PWM routine
+void startCore1() {
+    stopCore1(); // Ensure core1 is stopped before restarting
+    multicore_launch_core1(core1_entry);
+    core1Launched = true;
+    printf("Core1 launched with PWM routine\n");
+}
+
 
 // Function to enter deep sleep and periodically wake up to check for a wake command
 // void enterPeriodicDeepSleep() {
@@ -89,84 +229,6 @@ uint32_t selectPeriod(char preset) {
 // }
 
 
-// Global variables to share data between cores
-std::vector<PWMController*> pwmControllers = {
-    //new PWMController(2, DEFAULT_CLOCK_FREQUENCY), //r
-    new PWMController(3, DEFAULT_CLOCK_FREQUENCY), //ir
-    NULL, // Skipping this stage
-    // new PWMController(5, DEFAULT_CLOCK_FREQUENCY), //r
-    // new PWMController(6, DEFAULT_CLOCK_FREQUENCY), //ir
-    // NULL, // Skipping this stage
-    // new PWMController(8, DEFAULT_CLOCK_FREQUENCY), //r
-    // new PWMController(9, DEFAULT_CLOCK_FREQUENCY)  //ir
-    // You can add more PWMControllers or NULL for no operation
-};
-
-volatile uint32_t periodUs = DEFAULT_PERIOD_US;
-volatile uint32_t pulseWidthUs = DEFAULT_PULSE_WIDTH_US;
-volatile uint32_t initialDelayUs = DEFAULT_INITIAL_DELAY_US;
-volatile bool running = true;
-std::string receivedString; 
-volatile size_t currentLed = 0;
-
-bool repeating_timer_callback(repeating_timer_t *t) {
-    if (!running) return false;  // Stop the timer if the running flag is false
-
-    if (initialDelayUs > 0) busy_wait_us(initialDelayUs);
-
-    // Check if the current controller is not NULL before starting/stopping
-    if (pwmControllers[currentLed] != NULL) {
-        pwmControllers[currentLed]->start();
-        busy_wait_us(pulseWidthUs);
-        pwmControllers[currentLed]->stop();
-    }
-
-    currentLed = (currentLed + 1) % pwmControllers.size();
-    return true;  // Keep repeating the timer
-}
-
-void core1_entry() {
-    repeating_timer_t timer;
-
-    // Set up the initial delay if required
-    WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
-
-    // Initialize the repeating timer
-    bool timer_added = add_repeating_timer_us(-static_cast<int64_t>(periodUs), repeating_timer_callback, NULL, &timer);
-
-    if (timer_added) {
-        // printf("Timer added successfully\n");
-        // ws2812.fill(WS2812::RGB(0, 255, 0)); // Green
-        // ws2812.show();
-    } else {
-        //printf("Failed to add timer\n");
-        ws2812.fill(WS2812::RGB(255, 0, 0)); // Red
-        ws2812.show();
-        return;
-    }
-
-    // Main loop can remain to check if the running flag changes and stop the timer
-    // while (true) {
-    //     //tight_loop_contents();  // Low-power wait
-    // }
-
-    // // If running is set to false, remove the timer
-    // cancel_repeating_timer(&timer);
-}
-
-
-bool launched = false;
-
-void initPWMRoutine() {
-    running = true;
-    for (auto& controller : pwmControllers) {
-        if(controller != NULL) controller->updateWrapValue(pulseWidthUs, periodUs); // Use current pulse width and period
-    }
-    if(!launched) {
-        multicore_launch_core1(core1_entry); // Restart core 1 if needed
-        launched = true;
-    }
-}
 
 // Function to parse the received command
 void parseCommand(const std::string& command) {
@@ -175,47 +237,54 @@ void parseCommand(const std::string& command) {
 
     if (command == "STOP") {
         running = false;
+        stopCore1();
         for (auto& controller : pwmControllers) {
-            if(controller != NULL) controller->stop();
+            if (controller != NULL) controller->stop();
         }
     } else if (command == "SLEEP") {
-        // Enter periodic deep sleep
+        stopCore1();
         for (auto& controller : pwmControllers) {
-            if(controller != NULL) controller->stop();
+            if (controller != NULL) controller->stop();
         }
     } else if (command == "WAKE") {
-        // Re-initialize the controllers and resume operation
-        initPWMRoutine();
+        startCore1(); // Re-initialize the controllers and resume operation on core1
     } else if (command.length() == 1 && std::isalpha(command[0])) {
         // Handle frequency preset command
-        periodUs = selectPeriod(command[0]);
-        // Apply the new settings
-        initPWMRoutine();
+        timingWindowUs = selectPerioduS(command[0]);
+        startCore1(); // Apply the new settings and re-launch core1
 
     } else {
         std::stringstream ss(command);
         std::string cmd;
         ss >> cmd;
-        // Assume the command is to set period, pulse width, or initial delay
         std::string parameter;
 
+        uint32_t startUs = 0;
+        uint32_t endUs = 0;
         uint32_t value;
+
         while (ss >> parameter >> value) {
             if (parameter == "PULSEWIDTH") {
                 pulseWidthUs = value;
             } else if (parameter == "PERIOD") {
-                periodUs = value;
+                timingWindowUs = value;
             } else if (parameter == "INITIALDELAY") {
                 initialDelayUs = value;
+            } else if (parameter == "STARTUS") {
+                startUs = value;
+            } else if (parameter == "ENDUS") {
+                endUs = value;
             }
         }
 
-        // Apply the new settings
-        for (auto& controller : pwmControllers) {
-            if(controller != NULL) controller->updateWrapValue(pulseWidthUs, periodUs);
-        }
+        startCore1(); // Apply the new settings and re-launch core1 with updated timing
     }
 }
+
+
+
+
+
 
 int main() {
     stdio_init_all();
@@ -225,24 +294,14 @@ int main() {
     // Set system clock to 80MHz
     set_sys_clock_khz(CORE_CLOCK_KHZ, true);
     
-    WS2812 ws2812(RGB_PIN, 1, PIO_INSTANCE, 0, WS2812::FORMAT_RGB);
 
     // Initialize the UART controller
     UARTController uartController(UART_ID, BAUD_RATE, TX_PIN, RX_PIN);
 
-    ws2812.fill(WS2812::RGB(155,0,255)); // Purple
-    ws2812.show();
+    flicker();
 
-    busy_wait_us(100000);
-
-    ws2812.fill(WS2812::RGB(0,0,0)); // Purple
-    ws2812.show();
-
-    for (auto& controller : pwmControllers) {
-        if(controller != NULL) controller->init(DEFAULT_CLOCK_FREQUENCY);
-    }
     // Initialize the PWM controllers
-    parseCommand("A"); // Auto start to test
+    //parseCommand("A"); // Auto start to test
 
     printf("RP2040 Running\n");
 
@@ -260,6 +319,7 @@ int main() {
                 // Debug print to show the accumulated command before parsing
                 //printf("Complete command: %s\n", receivedString.c_str());
                 
+                //busy_wait_us(3000000);
                 ws2812.fill(WS2812::RGB(0,255,0)); // Green
                 ws2812.show();
 
