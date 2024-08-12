@@ -25,7 +25,7 @@
 #define ADC_SPS_D 2000
 
 #define DEFAULT_CLOCK_FREQUENCY 80000000U // 80 MHz clock frequency
-#define DEFAULT_PULSE_WIDTH_US 250
+#define DEFAULT_PULSE_WIDTH_US 100
 #define DEFAULT_PERIOD_US (1000000 / 250) // 250Hz
 #define DEFAULT_INITIAL_DELAY_US 0
 #define CORE_CLOCK_KHZ 80000
@@ -84,7 +84,10 @@ void flickerB() {
 
 
 // LED GPIO pins list with -1 representing NULL, so it will be used to subdivide the duty cycles
-std::vector<int> gpioPins = { 5, -1, 8, -1 };//{ 5,  -1 };//{ 2, 3, 5, 6, 8, 9, -1 };
+std::vector<int> gpioPins = {
+    3, //middle IR pin
+    -1
+};//{ 5, -1, 8, -1 };//{ 5,  -1 };//{ 2, 3, 5, 6, 8, 9, -1 };
 //IMPORTANT: SHARED PWM CHANNELS WILL BE FORCED TO USE THE SAME PHASE OFFSET, MEANING WE ONLY GET 8 PWMS NOT 16
 
 std::vector<PWMController*> pwmControllers;
@@ -131,10 +134,10 @@ void initPWMRoutine(std::vector<int> gpioPins) {
     for (size_t i = 0; i < gpioPins.size(); i++) {
         int gpio = gpioPins[i];
         if (gpio != -1) {
-            pwmControllers.push_back(new PWMController(gpio, DEFAULT_CLOCK_FREQUENCY));
+            pwmControllers.push_back(new PWMController(gpio, DEFAULT_CLOCK_FREQUENCY, 80.0f));
 
             // Calculate the start time to evenly divide the period across all active controllers and blanks
-            uint32_t startUs = (totalPeriodUs / gpioPins.size()) * i;
+            uint32_t startUs = timingWindowUs * i;
 
             // Update the PWM controller timing with the correct period, pulse width, and start time
             pwmControllers[activeControllerIndex]->updateTiming(totalPeriodUs, pulseWidthUs, startUs);

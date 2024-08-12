@@ -37,13 +37,13 @@ void PWMController::init(uint32_t clockFrequency, float clockDiv)
 void PWMController::updateTiming(uint32_t periodUs, uint32_t pulseWidthUs, uint32_t startUs) 
 {
     // Calculate the wrap value based on the system clock frequency, clock divider, and the desired period
-    _wrapValue = (uint32_t)((_clockFrequency / _clockDiv) * (periodUs / 1000000.0f));
+    _wrapValue = (uint16_t)((_clockFrequency / (_clockDiv * 1000000.0f)) * periodUs);
 
     // Calculate the level based on the pulse width (duration for which the signal is high) in clock cycles
-    uint32_t level = (uint32_t)((_clockFrequency / (_clockDiv * 1000000.0f)) * pulseWidthUs);
+    uint16_t level = (uint16_t)((_wrapValue * pulseWidthUs) / periodUs);
 
     // Enable phase-correct mode on this PWM slice
-    pwm_set_phase_correct(_sliceNum, true);
+    //pwm_set_phase_correct(_sliceNum, true);
 
     // Set the PWM wrap value to control the period
     pwm_set_wrap(_sliceNum, _wrapValue);
@@ -53,8 +53,8 @@ void PWMController::updateTiming(uint32_t periodUs, uint32_t pulseWidthUs, uint3
 
     // Optionally adjust the counter to start at a specific phase within the wrap range, if needed
     if (startUs > 0) {
-        uint32_t startCount = (uint32_t)((_clockFrequency / (_clockDiv * 1000000.0f)) * startUs);
-        if (startCount > _wrapValue) startCount = _wrapValue - 1;  // Cap startCount to prevent overflow
+        uint16_t startCount = (uint16_t)((_wrapValue * startUs) / periodUs);
+        if (startCount >= _wrapValue) startCount = _wrapValue - 1;  // Cap startCount to prevent overflow
         pwm_set_counter(_sliceNum, startCount);
     }
 

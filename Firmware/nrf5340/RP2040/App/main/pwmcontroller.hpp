@@ -5,10 +5,10 @@ class PWMController
 {
     public:
         // Constructor
-        PWMController(uint8_t pwmPin, uint32_t clockFrequency=125000000U, float clockDiv = 78.125f);
+        PWMController(uint8_t pwmPin, uint32_t clockFrequency=125000000U, float clockDiv = 125.0f);
 
         // Initialization method
-        void init(uint32_t clockFrequency, float clockDiv = 78.125f);  // 78.125f default clock div 
+        void init(uint32_t clockFrequency, float clockDiv = 125.0f);  // 125.0f default clock div for 125MHz even division
 
         // Method to update wrap value, period, and pulse width
         void updateTiming(uint32_t periodUs, uint32_t pulseWidthUs, uint32_t startUs);
