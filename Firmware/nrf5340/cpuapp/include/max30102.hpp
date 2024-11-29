@@ -1,11 +1,11 @@
 #pragma once
 
 #include <zephyr/types.h>
-#include <zephyr/device.h>
-#include <zephyr/drivers/gpio.h>
+#include <device.h>
+#include <drivers/gpio.h>
 //#include <drivers/i2c.h>
-#include <zephyr/sys/util.h>
-#include <zephyr/sys/atomic.h>
+#include <sys/util.h>
+#include <atomic>
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
 #include "ble_types.hpp"
@@ -131,10 +131,7 @@ class UsbCommHandler;
  */
 class Max30102 {
 
-    // using I2C_1DeviceName = DeviceString<'I', '2', 'C', '_', '1'>;
-    // using I2C_1DeviceName = DeviceString<'i', '2', 'c', '1', 'm', 'a', 'x'>;
-    using I2C_1DeviceName = DeviceString<'m', 'a', 'x', '3', '0', '1', '0', '2'>;
-
+    using I2C_1DeviceName = DeviceString<'I', '2', 'C', '_', '1'>; 
 
     constexpr static uint8_t max30102_i2c_address = 0x57; //I2C Address
     constexpr static uint8_t max30102_id = 0x15; // Part ID
@@ -232,4 +229,5 @@ private:
     std::atomic<bool> max30102_is_on_i2c_bus_; ///< Device status
     I2CTransport<I2C_1DeviceName, max30102_i2c_address> transport; ///< I2C transport for device
     UsbCommHandler &serialHandler; ///< USB communication controller
+
 };

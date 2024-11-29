@@ -2,8 +2,8 @@
 
 #include <functional>
 
-#include <zephyr/bluetooth/gatt.h>
-#include <zephyr/sys/atomic.h>
+#include <bluetooth/gatt.h>
+#include <sys/atomic.h>
 
 #include "ble_types.hpp"
 #include "commandid.hpp"

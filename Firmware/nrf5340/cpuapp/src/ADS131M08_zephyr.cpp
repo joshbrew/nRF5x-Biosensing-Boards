@@ -1,16 +1,14 @@
-#include <zephyr/kernel.h>
+#include <zephyr.h>
 #include <string.h>
-#include <zephyr/init.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/sys/printk.h>
+#include <init.h>
+#include <drivers/gpio.h>
+#include <sys/printk.h>
 //#include <sys/__assert.h>
 #include <stdlib.h>
-#include <zephyr/drivers/spi.h>
-#include <zephyr/logging/log.h>
+#include <drivers/spi.h>
+#include <logging/log.h>
 
 #include "ADS131M08_zephyr.hpp"
-
-#define DEVICE_NODE DT_BUS(DT_NODELABEL(ads131m08_0))
 
 LOG_MODULE_REGISTER(ads131m08, LOG_LEVEL_INF);
 
@@ -29,13 +27,13 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
 /* Configure DRDY and SYNC/RESET GPIOs */
     uint8_t SYNCRST;
     if(sync_rst_pin >= 100) {
-        gpioDevice = DEVICE_DT_GET(DT_NODELABEL(gpio1));
+        gpioDevice = device_get_binding("GPIO_1");
         SYNCRST = sync_rst_pin - 100;
     } else if(sync_rst_pin >= 32) {
-        gpioDevice = DEVICE_DT_GET(DT_NODELABEL(gpio1));
+        gpioDevice = device_get_binding("GPIO_1");
         SYNCRST = sync_rst_pin - 32;
     } else {
-        gpioDevice = DEVICE_DT_GET(DT_NODELABEL(gpio0));
+        gpioDevice = device_get_binding("GPIO_0");
         SYNCRST = sync_rst_pin;
     }
     if(gpioDevice == nullptr){
@@ -44,8 +42,8 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
     }
 
     ret = gpio_pin_configure(gpioDevice, SYNCRST, GPIO_OUTPUT_ACTIVE); // Set SYNC/RESET pin to HIGH
-    // ret += gpio_pin_configure(gpioDevice, drdy_pin, GPIO_INPUT | GPIO_PULL_UP);
-    // ret += gpio_pin_interrupt_configure(gpioDevice, drdy_pin, GPIO_INT_EDGE_FALLING);
+    //ret += gpio_pin_configure(gpioDevice, drdy_pin, GPIO_INPUT | GPIO_PULL_UP);
+    //ret += gpio_pin_interrupt_configure(gpioDevice, drdy_pin, GPIO_INT_EDGE_FALLING);
     //gpio_init_callback(&callback, ads131m08_drdy_cb, BIT(drdy_pin));    
     //ret += gpio_add_callback(gpioDevice, &callback);
     if (ret != 0){
@@ -59,29 +57,28 @@ void ADS131M08::init(uint8_t cs_pin, uint8_t drdy_pin, uint8_t sync_rst_pin, uin
     // Try to bind chip select device
 
     if(cs_pin >= 100) {
-        csConfig.gpio.port = DEVICE_DT_GET(DT_NODELABEL(gpio1));
-        csConfig.gpio.pin = cs_pin - 100;
+        csConfig.gpio_dev = device_get_binding("GPIO_1");
+        csConfig.gpio_pin = cs_pin - 100;
     } else if(cs_pin >= 32) {
-        csConfig.gpio.port = DEVICE_DT_GET(DT_NODELABEL(gpio1));
-        csConfig.gpio.pin = cs_pin - 32;
+        csConfig.gpio_dev = device_get_binding("GPIO_1");
+        csConfig.gpio_pin = cs_pin - 32;
     } else {
-        csConfig.gpio.port = DEVICE_DT_GET(DT_NODELABEL(gpio0));
-        csConfig.gpio.pin = cs_pin;
+        csConfig.gpio_dev = device_get_binding("GPIO_0");
+        csConfig.gpio_pin = cs_pin;
     }
 
     csConfig.delay = 0;
-    csConfig.gpio.dt_flags = GPIO_ACTIVE_LOW;
+    csConfig.gpio_dt_flags = GPIO_ACTIVE_LOW;
 
     // Bind SPI device only if chip select device successfully binded
-    if (csConfig.gpio.port)
+    if (csConfig.gpio_dev)
     {
         spiConfig.frequency = spi_frequency;
         spiConfig.operation = SPI_MODE_CPHA | SPI_WORD_SET(8); //< Default Word Size of ADS131M08 is 24
         spiConfig.slave = 0;
-        spiConfig.cs = csConfig;
+        spiConfig.cs = &csConfig;
 
-        spiDevice = DEVICE_DT_GET(DEVICE_NODE);
-        // spiDevice = device_get_binding("spi0");
+        spiDevice = device_get_binding("SPI_0");
     }
 
     if (spiDevice == nullptr)
@@ -111,10 +108,10 @@ uint16_t ADS131M08::readReg(uint8_t reg) {
     cmdFrame[0] = commandWord >> 8;
     cmdFrame[1] = (uint8_t)(commandWord & 0xFF);
 
-/* Send Command Frame */
+    /* Send Command Frame */
     spiCommandFrame(nWordsInFrame*nBytesInWord, cmdFrame);
     k_msleep(1);
-/* Read Response */
+    /* Read Response */
     return spiResponseFrame(3);    
 }
 
@@ -126,13 +123,13 @@ void ADS131M08::spiCommandFrame(uint8_t frame_size, uint8_t *cmdFrame) {
         const struct spi_buf txBuffers[] = {
             {
                 .buf = cmdFrame,
-                .len = (size_t)frame_size,
+                .len = frame_size,
             },
         };
         const struct spi_buf rxBuffers[] = {
             {
                 .buf = NULL,
-                .len = (size_t)frame_size,
+                .len = frame_size,
             },
         };
         const struct spi_buf_set txSet = {
@@ -151,7 +148,7 @@ void ADS131M08::spiCommandFrame(uint8_t frame_size, uint8_t *cmdFrame) {
 }
 
 uint16_t ADS131M08::spiResponseFrame(uint8_t frame_size) {
-    // uint16_t value = 0;
+    uint16_t value = 0;
     uint8_t resp_buffer[2] = {0};
 
     if (spiDevice != nullptr)
@@ -160,17 +157,17 @@ uint16_t ADS131M08::spiResponseFrame(uint8_t frame_size) {
         const struct spi_buf txBuffers[] = {
             {
                 .buf = NULL,
-                .len = (size_t)frame_size,
+                .len = frame_size,
             },
         };
         const struct spi_buf rxBuffers[] = {
             {
                 .buf = resp_buffer,
-                .len = (size_t)2,
+                .len = 2,
             },
             {
                 .buf = NULL,
-                .len = (size_t)(frame_size - 2),
+                .len = (frame_size - 2),
             },
         };
         const struct spi_buf_set txSet = {
@@ -199,13 +196,13 @@ void ADS131M08::spiDataFrame(uint8_t frame_size, uint8_t *data_buffer) {
         const struct spi_buf txBuffers[] = {
             {
                 .buf = dummy_frame,
-                .len = (size_t)frame_size,
+                .len = frame_size,
             },
         };
         const struct spi_buf rxBuffers[] = {
             {
                 .buf = data_buffer,
-                .len = (size_t)frame_size,
+                .len = frame_size,
             },
         };
         const struct spi_buf_set txSet = {
@@ -473,11 +470,11 @@ uint32_t ADS131M08::spiTransferWord(uint16_t bytes) {
     const struct spi_buf buf[2] = { 
         {
             .buf = bytes,
-            .len = (size_t)2
+            .len = 2
         }, 
         {
             .buf = 0x00,
-            .len = (size_t)1
+            .len = 1
         }
     };
     const struct spi_buf_set tx = {

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <zephyr/types.h>
-#include <zephyr/device.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/sys/util.h>
+#include <device.h>
+#include <drivers/gpio.h>
+#include <sys/util.h>
 #include <atomic>
 #include "ble_types.hpp"
 #include "ble_commands.hpp"

@@ -1,12 +1,12 @@
 #pragma once
 
-#include <zephyr/kernel.h>
-#include <zephyr/device.h>
-#include <zephyr/devicetree.h>
-#include <zephyr/drivers/sensor.h>
-#include <zephyr/sys/atomic.h>
+#include <zephyr.h>
+#include <device.h>
+#include <devicetree.h>
+#include <drivers/sensor.h>
+#include <atomic>
 #include <stdlib.h>
-#include <zephyr/logging/log.h>
+#include <logging/log.h>
 
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"

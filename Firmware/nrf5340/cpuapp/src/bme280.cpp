@@ -13,7 +13,7 @@ Bme280::Bme280(UsbCommHandler &controller) : serialHandler(controller) {
 int Bme280::Initialize() {
 
     int ret = 0;
-    // uint8_t part_id;
+    uint8_t part_id;
     
     LOG_DBG("Starting Bme280 Initialization..."); 
     
@@ -81,7 +81,6 @@ void Bme280::GetChipId(const struct device *dev){
 }
 const struct device * Bme280::get_bme280_device(void){
 	
-    // const struct device *dev = DEVICE_DT_GET(DT_BUS(DT_NODELABEL(bme280)));
     const struct device *dev = DEVICE_DT_GET_ANY(bosch_bme280);
 
 	if (dev == nullptr) {

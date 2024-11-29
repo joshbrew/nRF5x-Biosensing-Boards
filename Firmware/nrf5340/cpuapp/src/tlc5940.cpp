@@ -1,10 +1,10 @@
-#include <zephyr/kernel.h>
+#include <zephyr.h>
 #include <string.h>
-#include <zephyr/init.h>
+#include <init.h>
 
-#include <zephyr/sys/printk.h>
+#include <sys/printk.h>
 #include <stdlib.h>
-#include <zephyr/logging/log.h>
+#include <logging/log.h>
 
 #include "tlc5940.hpp"
 #include "ble_service.hpp"

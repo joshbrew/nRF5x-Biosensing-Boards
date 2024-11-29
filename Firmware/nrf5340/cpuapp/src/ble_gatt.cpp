@@ -1,13 +1,13 @@
-#include <zephyr/kernel.h>
+#include <zephyr.h>
 
-#include <zephyr/bluetooth/gatt.h>
-#include <zephyr/bluetooth/uuid.h>
+#include <bluetooth/gatt.h>
+#include <bluetooth/uuid.h>
 #include "ble_service.hpp"
 #include <functional>
 
-#include <zephyr/logging/log.h>
+#include <logging/log.h>
 
-#include <zephyr/sys/atomic.h>
+#include <sys/atomic.h>
 
 #include "ble_gatt.hpp"
 #include "qmc5883l.hpp"
@@ -16,10 +16,10 @@
 #include <stddef.h>
 #include <errno.h>
 
-#include <zephyr/bluetooth/bluetooth.h>
-#include <zephyr/bluetooth/hci.h>
-#include <zephyr/bluetooth/conn.h>
-#include <zephyr/sys/byteorder.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/conn.h>
+#include <sys/byteorder.h>
 
 namespace Bluetooth::Gatt
 {

@@ -2,14 +2,14 @@
 
 #include <string.h>
 #include <nrf.h>
-#include <zephyr/kernel.h>
+#include <kernel.h>
 
 #include <zephyr/types.h>
-#include <zephyr/device.h>
-#include <zephyr/drivers/gpio.h>
+#include <device.h>
+#include <drivers/gpio.h>
 
-#include <zephyr/sys/util.h>
-#include <zephyr/sys/atomic.h>
+#include <sys/util.h>
+#include <atomic>
 #include "ble_types.hpp"
 #include "ble_commands.hpp"
 #include "device_string.hpp"
@@ -17,17 +17,18 @@
 /*************************/
 #include <string.h>
 #include <nrf.h>
-#include <zephyr/device.h>
-#include <zephyr/drivers/i2s.h>
-#include <zephyr/drivers/gpio.h>
+#include <kernel.h>
+#include <device.h>
+#include <drivers/i2s.h>
+#include <drivers/gpio.h>
 
-#include <zephyr/logging/log.h>
-#include <zephyr/sys/printk.h>
+#include <logging/log.h>
+#include <sys/printk.h>
 
 /* Prepare for 32 sample values */
-#define NUM_SAMPLES     32
-#define I2S_BLOCK_SIZE  128
-#define NUM_BLOCKS      5
+#define NUM_SAMPLES 32
+#define BLOCK_SIZE 128
+#define NUM_BLOCKS 5
 // #define J_LIMIT sizeof(rawAudioData) / (NUM_BLOCKS * NUM_SAMPLES * 2)
 // #define J_LIMIT (93056 / (NUM_BLOCKS * NUM_SAMPLES * 2))
 

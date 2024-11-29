@@ -1,12 +1,11 @@
-#include <zephyr/kernel.h>
-#include <zephyr/device.h>
-#include <zephyr/devicetree.h>
-#include <zephyr/drivers/spi.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/logging/log.h>
-#include <zephyr/sys/printk.h>
+#include <zephyr.h>
+#include <device.h>
+#include <devicetree.h>
+#include <drivers/spi.h>
+#include <drivers/gpio.h>
+#include <logging/log.h>
+#include <sys/printk.h>
 
-#include "ble_service.hpp"
 #include "ADS131M08_zephyr.hpp"
 #include "max30102.hpp"
 #include "mpu6050.hpp"
@@ -19,8 +18,8 @@
 
 #include "ble_service.hpp"
 // Needed for OTA
-// #include "os_mgmt/os_mgmt.h"
-// #include "img_mgmt/img_mgmt.h"
+#include "os_mgmt/os_mgmt.h"
+#include "img_mgmt/img_mgmt.h"
 
 /* Global variables*/
 const struct device *gpio_0_dev;
@@ -58,17 +57,7 @@ static int  init_sensor_gpio_int(void);
 #define SPS_1000_OSR 0b101
 #define SPS_2000_OSR 0b100
 
-// #if CONFIG_USE_USB
-// SerialController serial;
-// UsbCommHandler usbCommHandler(serial);
-// #endif
-
-/* The devicetree node identifier for device alias. */
-#define LED_NODE(x) DT_ALIAS(x)
-/* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS   1000
 #if CONFIG_USE_ADS131M08
-
 /* Static Functions */
 static int  init_ads131_gpio_int(void);
 static void ads131m08_drdy_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins);
@@ -154,7 +143,8 @@ static int init_uart(void);
 /* Global variables */
 const struct device *uart_dev; /** UART device. For communication with RP2040 */
 static uint8_t recvBuffer[CONFIG_UART_RX_TX_BUF_SZ]; ///< receive buffer. Contains data received from RP2040
-#endif /* CONFIG_USE_MCU2MCU */
+#endif
+
 
 #if CONFIG_USE_ADS131M08
 ADS131M08 adc;
@@ -194,23 +184,8 @@ DmicModule dmic;
 Tlc5940 tlc;
 #endif
 
+// GPIO Macros
 
-/* GPIO Macros */
-static int configureGPIOport(void) {
-    gpio_0_dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
-    // gpio_0_dev = device_get_binding("GPIO_0");
-	if (gpio_0_dev == NULL) {
-		LOG_ERR("%s: ***ERROR: GPIO_0 device binding!", __func__);
-        return -1;
-	}  
-    gpio_1_dev = DEVICE_DT_GET(DT_NODELABEL(gpio1));
-    // gpio_1_dev = device_get_binding("GPIO_1");
-	if (gpio_1_dev == NULL) {
-		LOG_ERR("%s: ***ERROR: GPIO_1 device binding!", __func__);
-        return -1;
-	}
-    return 0;
-}
 
 static int configureGPIO(int pin, gpio_flags_t rule) {
     int ret = 0;
@@ -236,7 +211,7 @@ static int configureInterrupt(int pin, gpio_flags_t rule) {
     return ret;
 }
 
-static int addGPIOCallback(int pin, struct gpio_callback *gpio_cb, void (*cb)(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins)) {
+static int addGPIOCallback(int pin, gpio_callback * gpio_cb, void (*cb)(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins)) {
     int ret = 0;
     if(pin < 32) {
         gpio_init_callback(gpio_cb, cb, BIT(pin));    
@@ -280,8 +255,6 @@ static int setGPIO(int pin, int state) {
     }
     return ret;
 }
-/* GPIO Macros END */
-
 
 // //////////////////////////////
 
@@ -321,9 +294,9 @@ static int init_sensor_gpio_int(void){
     ret += addGPIOCallback(MAX_INT, &max30102_callback, &max30102_irq_cb);
 
     if (ret != 0){
-        LOG_ERR("%s: ***ERROR: GPIO initialization\n", __func__);
+        LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("%s: Max30102 Interrupt pin Int'd!", __func__);
+        LOG_INF("Max30102 Interrupt pin Int'd!");
     } 
 #endif
 
@@ -335,9 +308,9 @@ static int init_sensor_gpio_int(void){
     ret += addGPIOCallback(MPU_INT, &mpu6050_callback, &mpu6050_irq_cb);
 
     if (ret != 0){
-        LOG_ERR("%s: ***ERROR: GPIO initialization\n", __func__);
+        LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("%s: Mpu6050 Interrupt pin Int'd!", __func__);
+        LOG_INF("Mpu6050 Interrupt pin Int'd!");
     } 
 #endif
 /* QMC5883L Interrupt */
@@ -347,9 +320,9 @@ static int init_sensor_gpio_int(void){
     ret += configureInterrupt( QMC5883L_DRDY, GPIO_INT_EDGE_RISING);
     ret += addGPIOCallback(QMC5883L_DRDY, &qmc5883l_callback, &qmc5883l_irq_cb);
     if (ret != 0){
-        LOG_ERR("%s: ***ERROR: GPIO initialization\n", __func__);
+        LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("%s: QMC5883L Interrupt pin Int'd!", __func__);
+        LOG_INF("QMC5883L Interrupt pin Int'd!");
     } 
 #endif 
 
@@ -366,9 +339,9 @@ static int init_ads131_gpio_int(void){
     ret += addGPIOCallback(DATA_READY_GPIO, &callback, &ads131m08_drdy_cb);
 
     if (ret != 0){
-        LOG_ERR("%s: ***ERROR: GPIO initialization\n", __func__);
+        LOG_ERR("***ERROR: GPIO initialization\n");
     } else {
-        LOG_INF("%s: Data Ready Int'd!", __func__);
+        LOG_INF("Data Ready Int'd!");
     } 
 
 //ADS131M08_1
@@ -397,7 +370,7 @@ static int configureSPS(ADS131M08* adc, uint16_t osr) {
         //LOG_INF("ADS131_CLOCK register successfully configured");
         return 0;  // Success
     } else {
-        LOG_ERR("%s: ***ERROR: Writing ADS131_CLOCK register.", __func__);
+        LOG_ERR("***ERROR: Writing ADS131_CLOCK register.");
         return 1;  // Error
     }
 }
@@ -407,17 +380,16 @@ static int setupadc(ADS131M08 * adc) {
     #if CONFIG_USE_ADS131M08
     
     configureSPS(*&adc, SPS_250_OSR);
-     if(adc->writeReg(ADS131_CLOCK,0b1111111100011111)){  //< Clock register (page 55 in datasheet)
-         LOG_INF("ADS131_CLOCK register successfully configured");
-     } 
-   else {
-        LOG_ERR("***ERROR : Writing ADS131_CLOCK register.");
+    if(adc->writeReg(ADS131_CLOCK,0b1111111100011111)){  //< Clock register (page 55 in datasheet)
+        //LOG_INF("ADS131_CLOCK register successfully configured");
+    } else {
+        LOG_ERR("***ERROR: Writing ADS131_CLOCK register.");
     }
     k_msleep(10);
     if(adc->setGain(32)){    //< Gain Setting, 1-128
         //LOG_INF("ADC Gain properly set to 32");
     } else {
-        LOG_ERR("%s: ***ERROR: Setting ADC gain!", __func__);
+        LOG_ERR("***ERROR: Setting ADC gain!");
     }
     k_msleep(10);
     //DC Block Filter settings:
@@ -432,7 +404,7 @@ static int setupadc(ADS131M08 * adc) {
         adc->writeReg(ADS131_CH6_CFG,0b0000000000000000);
         adc->writeReg(ADS131_CH7_CFG,0b0000000000000000);
     } else {
-        LOG_ERR("%s: ***ERROR: Writing ADS131_THRSHLD_LSB register.", __func__);
+        LOG_ERR("***ERROR: Writing ADS131_THRSHLD_LSB register.");
     }
     k_msleep(10);
 
@@ -440,7 +412,7 @@ static int setupadc(ADS131M08 * adc) {
     if(adc->writeReg(ADS131_MODE,0x0110)){  
         //LOG_INF("ADS131_MODE register successfully configured");
     } else {
-        LOG_ERR("%s: ***ERROR: Writing ADS131_MODE register.", __func__);
+        LOG_ERR("***ERROR: Writing ADS131_MODE register.");
     }
     k_msleep(10);
   
@@ -527,7 +499,7 @@ static void ads131m08_1_interrupt_workQueue_handler(struct k_work* wrk)
 #endif        
     }
 }
-#endif /* CONFIG_USE_ADS131M08_1 */
+#endif
 
 #if CONFIG_USE_MAX30102
 static void max30102_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
@@ -545,7 +517,7 @@ static void max30102_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("Max30102 Interrupt!");
     max30102.HandleInterrupt();
 }
-#endif /* CONFIG_USE_MAX30102 */
+#endif
 
 #if CONFIG_USE_MPU6050
 static void mpu6050_irq_cb(const struct device *port, struct gpio_callback *cb, gpio_port_pins_t pins){
@@ -563,7 +535,7 @@ static void mpu6050_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("MPU6050 Interrupt!");
     mpu6050.HandleInterrupt();
 }
-#endif /* CONFIG_USE_MPU6050 */
+#endif
 
 
 #if CONFIG_USE_QMC5883L
@@ -582,8 +554,7 @@ static void qmc5883l_interrupt_workQueue_handler(struct k_work* wrk)
     //LOG_INF("QMC5883L Interrupt!");
     qmc5883l.HandleInterrupt();
 }
-#endif /* CONFIG_USE_QMC5883L */
-
+#endif
 
 void uart_poll_buffer(const struct device *dev, const uint8_t *data, size_t size)
 {
@@ -592,8 +563,8 @@ void uart_poll_buffer(const struct device *dev, const uint8_t *data, size_t size
     }
 }
 
-static void setupPeripherals()
-{
+static void setupPeripherals() {
+    
     int ret = 0;
 
     gpio_init();
@@ -611,10 +582,8 @@ static void setupPeripherals()
     setGPIO(BLUE_LED, 0);
 
     ret = init_sensor_gpio_int();
-    if (ret == 0){
-        LOG_INF("%s: All GPIOs interrupts Int'd!", __func__);
-    }
 
+    //peripherals won't break anything if undetected, can run all of them in general (audio is nRF53 ONLY)
     #if CONFIG_USE_ADS131M08    
         k_work_init(&interrupt_work_item, interrupt_workQueue_handler);
         k_work_init(&ads131m08_1_interrupt_work_item, ads131m08_1_interrupt_workQueue_handler);
@@ -649,21 +618,21 @@ static void setupPeripherals()
     #if CONFIG_USE_MAX30102
         max30102.Initialize();
         if(max30102.IsOnI2cBus()){
-            LOG_DBG("%s: MAX30102 is on I2C bus!", __func__);
+            LOG_DBG("MAX30102 is on I2C bus!");
             max30102.Configure(max30102_default_config);
             max30102.StartSampling();
         } else {
-            LOG_WRN("%s: ***WARNING: MAX30102 is not connected or properly initialized!", __func__);
+            LOG_WRN("***WARNING: MAX30102 is not connected or properly initialized!");
         }
     #endif
 
     #if CONFIG_USE_MPU6050
         mpu6050.Initialize();
         if(mpu6050.IsOnI2cBus()){
-            LOG_DBG("%s: MPU6050 is on I2C bus!", __func__);
+            LOG_DBG("MPU6050 is on I2C bus!");
             mpu6050.Configure(mpu6050_default_config);
         } else {
-            LOG_WRN("%s: ***WARNING: MPU6050 is not connected or properly initialized!", __func__);
+            LOG_WRN("***WARNING: MPU6050 is not connected or properly initialized!");
         }
     #endif
 
@@ -673,34 +642,34 @@ static void setupPeripherals()
             // LOG_INF("Start BME280 sampling...");
             bme280.StartSampling();
         } else {
-            LOG_WRN("%s: ***WARNING: BME280 is not connected or properly initialized!", __func__);
+            LOG_WRN("***WARNING: BME280 is not connected or properly initialized!");
         }
     #endif
 
     #if CONFIG_USE_QMC5883L
         qmc5883l.Initialize();
         if(qmc5883l.IsOnI2cBus()){
-            LOG_DBG("%s: QMC5883L is on I2C bus!", __func__);
+            LOG_DBG("QMC5883L is on I2C bus!");
             qmc5883l.Configure(qmc5883l_default_config);
             qmc5883l.StartSampling();
         } else {
-            LOG_WRN("%s: ***WARNING: QMC5883L is not connected or properly initialized!", __func__);
+            LOG_WRN("***WARNING: QMC5883L is not connected or properly initialized!");
         }
     #endif
 
     #if CONFIG_USE_I2S
         ret = audio.Initialize();
-        LOG_DBG("%s: audio.Initialize: %d", __func__, ret);
+        LOG_DBG("audio.Initialize: %d", ret);
     #endif
 
     #if CONFIG_USE_DMIC
         ret = dmic.Initialize();
-        LOG_DBG("%s: dmic.Initialize: %d", __func__, ret);
+        LOG_DBG("dmic.Initialize: %d", ret);
     #endif
 
     #if CONFIG_USE_TLC5940
         ret = tlc.Initialize(0x000);
-        LOG_DBG("%s: tlc.Initialize: %d", __func__, ret);
+        LOG_DBG("tlc.Initialize: %d", ret);
     #endif
 
     #if CONFIG_USE_MCU2MCU
@@ -709,18 +678,18 @@ static void setupPeripherals()
 
     #if CONFIG_USE_ADS131M08
         setupadc(&adc);
-        // setupadc(&adc_1);
+        setupadc(&adc_1); 
         init_ads131_gpio_int();
     #endif
 
     //need to time this correctly with the ADC if controlling LEDs on second MCU
     #if CONFIG_USE_MCU2MCU    
-        uint8_t command[] = "ledNum=1,  Config=A\r\n";
+        uint8_t command[] = "A\r\n"; //see README in RP2040/ for commands
         uart_poll_buffer(uart_dev, command, sizeof(command));
     #endif 
 
 
-    // uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
+    //uint8_t adcRawData[adc.nWordsInFrame * adc.nBytesInWord] = {0};       
 
 }
 
@@ -729,9 +698,9 @@ static void setupPeripherals()
 static int init_uart(void){
     int ret = 0;
 
-    uart_dev =  DEVICE_DT_GET(DT_NODELABEL(uart3));
-	if (!device_is_ready(uart_dev)) {
-		LOG_ERR("%s: Could not find  %s!\n\r", __func__,uart_dev->name);
+    uart_dev =  device_get_binding(DT_LABEL(DT_NODELABEL(uart3)));
+	if (uart_dev == NULL) {
+		LOG_ERR("Could not find  %s!\n\r",DT_LABEL(DT_NODELABEL(uart3)));
         return -1;		
 	}
 
@@ -798,22 +767,22 @@ static void uart_cb(const struct device *dev, struct uart_event *evt, void *user
 
 
 
-/*    MAIN    */
-int main(void)
+/**    MAIN    */
+
+void main(void)
 {
     LOG_INF("Entry point");
 
-    /* Needed for OTA 
-    Auto done at startup by anabling CONFIG_NCS_SAMPLE_MCUMGR_BT_OTA_DFU=y
-    https://devzone.nordicsemi.com/f/nordic-q-a/99110/mcuboot-without-partition-manager
-    https://devzone.nordicsemi.com/f/nordic-q-a/99052/undefined-reference-to-os-and-img-_mgmt_register_group-while-trying-to-add-dfu-to-peripheral_lbs-sample 
-    os_mgmt_register_group(); 
-    img_mgmt_register_group(); 
-    */
+    // Needed for OTA
+    os_mgmt_register_group();
+    img_mgmt_register_group();
 
     setupPeripherals(); //will setup interrupts etc
 
     Bluetooth::SetupBLE();
+    
+    
+}
 
 
 //test stuff from main function
@@ -878,8 +847,6 @@ int main(void)
     //     k_msleep(10000);
     // }
 
-    return 0;
-}
 
 
 

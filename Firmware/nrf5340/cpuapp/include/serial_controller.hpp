@@ -1,12 +1,12 @@
 #pragma once
 
-#include <zephyr/kernel.h>
+#include <zephyr.h>
 
 #include <atomic>
 
-#include <zephyr/device.h>
-#include <zephyr/drivers/uart.h>
-#include <zephyr/sys/atomic.h>
+#include <device.h>
+#include <drivers/uart.h>
+#include <sys/atomic.h>
 #include "istatus_reporter.hpp"
 
 /**

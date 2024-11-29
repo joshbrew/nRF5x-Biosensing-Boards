@@ -1,33 +1,31 @@
-#include <zephyr/kernel.h>
+#include <zephyr.h>
 #include <string.h>
-#include <zephyr/init.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/sys/printk.h>
+#include <init.h>
+#include <drivers/gpio.h>
+#include <sys/printk.h>
 //#include <sys/__assert.h>
 #include <stdlib.h>
-#include <zephyr/logging/log.h>
+#include <logging/log.h>
 
 #include "max30102.hpp"
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
-
-#define DEVICE_NODE DT_BUS(DT_NODELABEL(max30102))
 
 LOG_MODULE_REGISTER(max30102, LOG_LEVEL_INF);
 
 Max30102::Max30102(UsbCommHandler &controller) : serialHandler(controller) {
     LOG_DBG("Max30102 Constructor!");
 }
+
 int Max30102::Initialize() {
 
-    // int ret = 0;
+    int ret = 0;
     uint8_t part_id;
     uint8_t interrupt_status_reg;
     
     LOG_DBG("Starting Max30102 Initialization..."); 
     packet_cnt = 0;
-    const struct device* dev = DEVICE_DT_GET(DEVICE_NODE);
-    transport.Initialize(dev);
+    transport.Initialize();   
     
     max30102_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
 
@@ -122,7 +120,7 @@ void Max30102::Shutdown() {
 }
 
 void Max30102::Wakeup() {
-    // uint8_t mode_cfg_reg;
+    uint8_t mode_cfg_reg;
     // Write 0 to SHDN bit
     transport.UpdateRegister(MAX30102_REG_MODE_CFG, MAX30102_MODE_CFG_SHDN_MASK, 0);
 }

@@ -1,8 +1,7 @@
 #pragma once
-#include <zephyr/sys/atomic.h>
-#include <zephyr/drivers/i2c.h>
+#include <atomic>
+#include <drivers/i2c.h>
 
-// #define MAX30102_NODE DT_NODELABEL(max30102)
 /**
  * @brief template transport class used to read/write device registers via i2c bus
  * 
@@ -18,23 +17,16 @@ public:
      */
     I2CTransport()
     {
-        // dev = device_get_binding(DeviceName::c_str());
-        // dev = DEVICE_DT_GET(MAX30102_NODE);
-        // if(strcmp(DeviceName::c_str(), "i2c1max"))
-        // {
-        //     dev = DEVICE_DT_GET(DT_NODELABEL(i2c1max));
-        // }
+        dev = device_get_binding(DeviceName::c_str());
         deviceStatus.store(0, std::memory_order_relaxed);
     }
 
     /**
      * @brief Initialization function used to intialize when underlayer infrastructure is ready
      */
-    void Initialize(const device* dev_arg)
+    void Initialize()
     {
-        dev = dev_arg;
-        int status = i2c_configure(dev, I2C_SPEED_SET(I2C_SPEED_FAST) | I2C_MODE_CONTROLLER);
-        // int status = i2c_configure(dev, I2C_SPEED_SET(I2C_SPEED_FAST) | I2C_MODE_MASTER);
+        int status = i2c_configure(dev, I2C_SPEED_SET(I2C_SPEED_FAST) | I2C_MODE_MASTER);
         deviceStatus.store(status, std::memory_order_relaxed);
     }
 

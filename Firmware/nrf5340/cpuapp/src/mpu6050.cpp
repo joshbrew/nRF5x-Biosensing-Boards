@@ -1,17 +1,15 @@
-#include <zephyr/kernel.h>
+#include <zephyr.h>
 #include <string.h>
-#include <zephyr/init.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/sys/printk.h>
+#include <init.h>
+#include <drivers/gpio.h>
+#include <sys/printk.h>
 //#include <sys/__assert.h>
 #include <stdlib.h>
-#include <zephyr/logging/log.h>
+#include <logging/log.h>
 
 #include "mpu6050.hpp"
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
-
-#define DEVICE_NODE DT_NODELABEL(i2c1)
 
 LOG_MODULE_REGISTER(mpu6050, LOG_LEVEL_INF);
 
@@ -21,14 +19,13 @@ Mpu6050::Mpu6050(UsbCommHandler &controller) : serialHandler(controller) {
 
 int Mpu6050::Initialize() {
 
-    // int ret = 0;
+    int ret = 0;
     uint8_t part_id;
     
     LOG_DBG("Starting Mpu6050 Initialization..."); 
     sample_cnt = 0;
     packet_cnt = 0;
-    const struct device* dev = DEVICE_DT_GET(DEVICE_NODE);
-    transport.Initialize(dev);
+    transport.Initialize();   
     
     mpu6050_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
 
