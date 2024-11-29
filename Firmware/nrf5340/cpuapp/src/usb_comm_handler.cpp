@@ -1,8 +1,8 @@
 #include "usb_comm_handler.hpp"
 
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(UsbCommHandler);
 

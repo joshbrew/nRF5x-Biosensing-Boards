@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <atomic>
+#include <zephyr/sys/atomic.h>
 #include <functional>
 
 #include "ble_service.hpp"

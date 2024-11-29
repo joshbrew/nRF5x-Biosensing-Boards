@@ -1,17 +1,19 @@
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 #include <string.h>
-#include <init.h>
-#include <drivers/gpio.h>
-#include <sys/printk.h>
+#include <zephyr/init.h>
+#include <zephyr/drivers/gpio.h>
+#include <zephyr/sys/printk.h>
 //#include <sys/__assert.h>
 #include <stdlib.h>
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 #include "qmc5883l.hpp"
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
 // For registering callback
 #include "ble_service.hpp"
+
+#define DEVICE_NODE DT_NODELABEL(i2c1)
 
 LOG_MODULE_REGISTER(qmc5883l, LOG_LEVEL_INF);
 
@@ -27,7 +29,8 @@ int Qmc5883l::Initialize() {
     LOG_DBG("Starting Qmc5883l Initialization..."); 
     sample_cnt = 0;
     packet_cnt = 0;
-    transport.Initialize();   
+    const struct device* dev = DEVICE_DT_GET(DEVICE_NODE);
+    transport.Initialize(dev);   
     
     qmc5883l_is_on_i2c_bus_.store(false, std::memory_order_relaxed);
 

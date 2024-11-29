@@ -1,0 +1,6 @@
+
+description: Audio Module on I2S bus
+
+compatible: "joshua,audiomodule"
+
+include: i2s-device.yaml

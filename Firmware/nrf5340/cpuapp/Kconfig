@@ -20,6 +20,10 @@ mainmenu "Application"
         bool "Include the ADS131M08 sensors in compilation"
         default n
 
+    config USE_ADS131M08_1
+        bool "Include the ADS131M08_1 sensors in compilation"
+        default n
+
     config USE_BME280
         bool "Include the BME280 sensor in compilation"
         default n

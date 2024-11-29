@@ -1,10 +1,12 @@
-#include <logging/log.h>
-#include <sys/printk.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/printk.h>
 #include "dmic_module.hpp"
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
 // For registering callback
 #include "ble_service.hpp"
+
+#define DEVICE_NODE DT_NODELABEL(dmicdev)
 
 /** Register log module */
 LOG_MODULE_REGISTER(dmic, LOG_LEVEL_INF);
@@ -24,7 +26,7 @@ DmicModule::DmicModule() {
 int DmicModule::Initialize() {
 
     LOG_DBG("Starting DmicModule Initialization...");
-    dmic_dev = DEVICE_DT_GET(DT_NODELABEL(dmic_dev));
+    dmic_dev = DEVICE_DT_GET(DEVICE_NODE);
 	
     if (!device_is_ready(dmic_dev)) {
 		LOG_ERR("%s is not ready", dmic_dev->name);
@@ -135,62 +137,62 @@ int DmicModule::StopSampling(){
     return ret;
 }
 
-    /**
-     * @brief Main working thread. Used to perform I2S transport.
-     * It required a separate stack to not break main BLE stack state machine
-     *
-     * @param data pointer to this
-     */
-    void DmicModule::WorkingThreadDmic(void *data, void *, void *){
-        DmicModule *self = static_cast<DmicModule *>(data);
-        int ret = 0;
-        static arm_rfft_instance_q15 RealFFT_Instance;
-        arm_cfft_radix4_instance_q15 MyComplexFFT_Instance;
-        static volatile int16_t MicFFT[2*FFT_LENGTH];
-        static int16_t MicFFT_Mag[2*FFT_LENGTH];
+/**
+ * @brief Main working thread. Used to perform I2S transport.
+ * It required a separate stack to not break main BLE stack state machine
+ *
+ * @param data pointer to this
+ */
+void DmicModule::WorkingThreadDmic(void *data, void *, void *){
+    DmicModule *self = static_cast<DmicModule *>(data);
+    int ret = 0;
+    static arm_rfft_instance_q15 RealFFT_Instance;
+    // arm_cfft_radix4_instance_q15 MyComplexFFT_Instance;
+    static volatile int16_t MicFFT[2*FFT_LENGTH];
+    static int16_t MicFFT_Mag[2*FFT_LENGTH];
 
-        // Initialize the FFT Structures
-        ret = arm_rfft_init_q15(&RealFFT_Instance,
-                        //&MyComplexFFT_Instance,
-                        FFT_LENGTH,
-                        0,
-                        1); //  Bit Reverse Flag enabled
+    // Initialize the FFT Structures
+    ret = arm_rfft_init_q15(&RealFFT_Instance,
+                    //&MyComplexFFT_Instance,
+                    FFT_LENGTH,
+                    0,
+                    1); //  Bit Reverse Flag enabled
 
-        if (ret < 0){
-            LOG_ERR("arm_rfft_init_q15: %d", ret);
-        } else {
-            LOG_DBG("arm_rfft_init_q15: SUCESS");
-        }
+    if (ret < 0){
+        LOG_ERR("arm_rfft_init_q15: %d", ret);
+    } else {
+        LOG_DBG("arm_rfft_init_q15: SUCESS");
+    }
 
-        for (;;)
-        {
-            for (int i = 0; i < BLOCK_COUNT; ++i) {
-                void *buffer;
-                uint32_t size;
+    for (;;)
+    {
+        for (int i = 0; i < BLOCK_COUNT; ++i) {
+            void *buffer;
+            uint32_t size;
 
-                ret = dmic_read(self->dmic_dev, 0, &buffer, &size, READ_TIMEOUT);
-                if (ret < 0) {
-                    LOG_ERR("%d - read failed: %d", i, ret);                    
-                }
-
-                // Compute FFT
-                arm_rfft_q15(&RealFFT_Instance,
-                            (q15_t *)buffer,
-                            (q15_t *)MicFFT);
-
-                // Scale the input before computing magnitude
-                for(int k = 0; k < 2*FFT_LENGTH; k++){
-                    MicFFT[k]<<=6;
-                }
-
-                // FFT functions returns the real/imaginary values. We need to compute the magnitude
-                arm_cmplx_mag_q15((q15_t *)MicFFT,
-                                (q15_t *)MicFFT_Mag,
-                                FFT_LENGTH);
-
-                LOG_HEXDUMP_INF(MicFFT_Mag, FFT_LENGTH, "micFFT_Mag");
-
-                k_mem_slab_free(&mem_slab, &buffer);
+            ret = dmic_read(self->dmic_dev, 0, &buffer, &size, READ_TIMEOUT);
+            if (ret < 0) {
+                LOG_ERR("%d - read failed: %d", i, ret);                    
             }
+
+            // Compute FFT
+            arm_rfft_q15(&RealFFT_Instance,
+                        (q15_t *)buffer,
+                        (q15_t *)MicFFT);
+
+            // Scale the input before computing magnitude
+            for(int k = 0; k < 2*FFT_LENGTH; k++){
+                MicFFT[k]<<=6;
+            }
+
+            // FFT functions returns the real/imaginary values. We need to compute the magnitude
+            arm_cmplx_mag_q15((q15_t *)MicFFT,
+                            (q15_t *)MicFFT_Mag,
+                            FFT_LENGTH);
+
+            LOG_HEXDUMP_INF(MicFFT_Mag, FFT_LENGTH, "micFFT_Mag");
+
+            k_mem_slab_free(&mem_slab, &buffer);
         }
     }
+}

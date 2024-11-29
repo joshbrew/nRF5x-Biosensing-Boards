@@ -1,11 +1,11 @@
 #pragma once
 
 #include <zephyr/types.h>
-#include <device.h>
-#include <drivers/gpio.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 //#include <drivers/i2c.h>
-#include <sys/util.h>
-#include <atomic>
+#include <zephyr/sys/util.h>
+#include <zephyr/sys/atomic.h>
 #include "i2c_transport.hpp"
 #include "device_string.hpp"
 #include "ble_types.hpp"

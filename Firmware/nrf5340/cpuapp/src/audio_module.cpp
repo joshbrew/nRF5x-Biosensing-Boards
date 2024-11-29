@@ -1,11 +1,13 @@
-#include <logging/log.h>
-#include <sys/printk.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/printk.h>
 
 #include "audio_module.hpp"
 #include "ble_service.hpp"
 #include "usb_comm_handler.hpp"
 // For registering callback
 #include "ble_service.hpp"
+
+#define DEVICE_NODE DT_BUS(DT_NODELABEL(i2s_rxtx))
 
 /** Register log module */
 LOG_MODULE_REGISTER(i2s, LOG_LEVEL_INF);
@@ -16,7 +18,7 @@ LOG_MODULE_REGISTER(i2s, LOG_LEVEL_INF);
   |    0...31    |    0...31    |    0...31    |    0...31    |    0...31    |
   |______________|______________|______________|______________|______________|
 */
-static K_MEM_SLAB_DEFINE(mem_slab, BLOCK_SIZE, NUM_BLOCKS, NUM_SAMPLES);
+static K_MEM_SLAB_DEFINE(mem_slab, I2S_BLOCK_SIZE, NUM_BLOCKS, NUM_SAMPLES);
 
 AudioModule::AudioModule() {
     LOG_DBG("AudioModule Constructor!");
@@ -26,7 +28,7 @@ int AudioModule::Initialize() {
 
     LOG_DBG("Starting AudioModule Initialization...");
 
-    i2s_dev = DEVICE_DT_GET(DT_NODELABEL(i2s_rxtx));
+    i2s_dev = DEVICE_DT_GET(DEVICE_NODE);
     if (!device_is_ready(i2s_dev)) {
         LOG_ERR("%s is not ready\n", i2s_dev->name);
         return -1;
@@ -41,7 +43,7 @@ int AudioModule::Initialize() {
     i2s_cfg.options = I2S_OPT_BIT_CLK_MASTER | I2S_OPT_FRAME_CLK_MASTER;
     i2s_cfg.frame_clk_freq = 44100;
     i2s_cfg.mem_slab = &mem_slab;
-    i2s_cfg.block_size = BLOCK_SIZE;
+    i2s_cfg.block_size = I2S_BLOCK_SIZE;
     i2s_cfg.timeout = 1000;
     
     int ret = i2s_configure(i2s_dev, I2S_DIR_TX, &i2s_cfg);
@@ -153,7 +155,7 @@ int AudioModule::StopSampling(){
                 j = 0;
             }
             /* Write Data */
-            ret = i2s_buf_write(self->i2s_dev, self->mem_blocks, BLOCK_SIZE);
+            ret = i2s_buf_write(self->i2s_dev, self->mem_blocks, I2S_BLOCK_SIZE);
             if (ret < 0) {
                 LOG_ERR("Error: i2s_write failed with %d", ret);
             }

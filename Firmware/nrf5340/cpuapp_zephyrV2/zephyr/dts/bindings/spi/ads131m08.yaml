@@ -1,0 +1,5 @@
+description: ADS131M08 8-channel 24-bit Analog-to-Digital Converter
+
+compatible: "ads131m08"
+
+include: spi-device.yaml

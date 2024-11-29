@@ -5,139 +5,337 @@
 
 / {
     
-    aliases {
-        //pwmadc = &pwm_dev0;
-        //tlc = &tlc5940;
-    };
+	chosen {
+		//  zephyr,console = &uart0;
+	};
 
-    //pwmdevs {
-    //    compatible = "pwm-leds";
-    //    pwm_dev0: pwm_dev_0 {
-    //        pwms = <&pwm0 33>;
-    //    };
-    //};
+	aliases {
+		errorled = &led2;
+		powerled = &led3;
+		debugled = &led1;
+		ads0 = &ads131m08_0;
+		ads1 = &ads131m08_1;
+		max = &max30102;
+		bme = &bme280;
+		// i2srxtx = &i2s_rxtx;
+	};
 
-    // tlc5940: tlc5940_node {
-    //     // compatible = "gpio-leds";
-    //     tlc-gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>, /* output pin, GSCLK */
-    //                 <&gpio1 1 GPIO_ACTIVE_HIGH>, /* output pin, XLAT */
-    //                 <&gpio1 4 GPIO_ACTIVE_HIGH>, /* output pin, BLANK */
-    //                 <&gpio1 5 GPIO_ACTIVE_HIGH>, /* output pin, SIN */
-    //                 <&gpio1 6 GPIO_ACTIVE_HIGH>; /* output pin, SCLK */
-    //     status = "okay";
-    // };
-
+	buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			status = "disabled";
+		};
+		button1: button_1 {
+			status = "disabled";
+		};
+		button2: button_2 {
+			status = "disabled";
+		};
+		button3: button_3 {
+			status = "disabled";
+		};
+	};
+		
+	leds {
+		compatible = "gpio-leds";
+		led1: led_1 {
+			gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+			label = "blue_LED";
+		};
+		led2: led_2 {
+			gpios = <&gpio0 19 GPIO_ACTIVE_HIGH>;
+			label = "red_LED";
+		};
+		led3: led_3 {
+			gpios = <&gpio1 5 GPIO_ACTIVE_HIGH>;
+			label = "green_LED";
+		};
+	};
 };
 
-// &pwm0 {
-// 	status = "okay";
-// 	ch0-pin = <33>;
-// 	//ch0-inverted;
-// };
+&usbd {
+    status = "okay";
+};
 
+&led0 {
+	status = "disabled";
+};
+	
 &uart0 {
-    status = "disabled";
+	status = "disabled";
 };
 
 &uart1 {
-    status = "disabled";
+	status = "disabled";
 };
 
+	
 &uart2 {
     status = "okay";
     current-speed = <115200>;
-    tx-pin = <47>;
-    rx-pin = <45>;
-    rts-pin = <0xFFFFFFFF>;
-    cts-pin = <0xFFFFFFFF>;
+	pinctrl-0 = <&uart2_default>;
+	pinctrl-1 = <&uart2_sleep>;
+	pinctrl-names = "default", "sleep";
+	// label = "UART_2";
+    // tx-pin = <47>;
+    // rx-pin = <45>;
+    // rts-pin = <0xFFFFFFFF>;
+    // cts-pin = <0xFFFFFFFF>;
 };
 
 &uart3 {
-    status = "okay";
-    compatible = "nordic,nrf-uarte";
+	status = "okay";
     current-speed = <115200>;
-    tx-pin = <31>;
-    rx-pin = <17>;
-    rts-pin = <0xFFFFFFFF>;
-    cts-pin = <0xFFFFFFFF>;
+	pinctrl-0 = <&uart3_default>;
+	pinctrl-1 = <&uart3_sleep>;
+	pinctrl-names = "default", "sleep";
+	// label = "UART_3";
+    // tx-pin = <31>;
+    // rx-pin = <17>;
+    // rts-pin = <0xFFFFFFFF>;
+    // cts-pin = <0xFFFFFFFF>;
 };
 
 &spi0 {
-    compatible = "nordic,nrf-spim";
-    status = "okay";
-    sck-pin = <23>;
-    mosi-pin = <29>; //DIN
-    miso-pin = <20>; //DOUT
-    cs-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>, <&gpio0 25 GPIO_ACTIVE_LOW>;
-
-    ads131m08_0: ads131m08@0 {
-        status = "okay";
-        reg = <0>;
-        label = "ADS131M08_0";
-    };
-
-    ads131m08_1: ads131m08@1 {
-        status = "okay";
-        reg = <1>;
-        label = "ADS131M08_1";
-    };
+	status = "okay";
+	compatible = "nordic,nrf-spim";
+	pinctrl-0 = <&spi0_default>;
+	pinctrl-1 = <&spi0_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio0 22 GPIO_ACTIVE_LOW>, <&gpio0 25 GPIO_ACTIVE_LOW>;
+	// sck-pin = <23>;
+	// miso-pin = <20>; //DOUT
+	// mosi-pin = <29>; //DIN
+	
+	ads131m08_0: ads131m08@0 {
+		status = "okay";
+		// #address-cells = <1>;
+		// #size-cells = <0>;
+		spi-max-frequency = <DT_FREQ_M(8)>;
+		drdy-gpios = <&gpio0 15  GPIO_PULL_UP>;				// Data Ready gpio
+		sync-gpios = <&gpio0 12  GPIO_ACTIVE_HIGH>;			// ADC Reset gpio
+		compatible = "joshua,ads131m08";
+		reg = <0>;
+		// label = "ADS131M08_0";
+	};
+	
+	ads131m08_1: ads131m08@1 {
+		status = "okay";
+		// #address-cells = <1>;
+		// #size-cells = <0>;
+		spi-max-frequency = <DT_FREQ_M(8)>;
+		// drdy-gpios = <&gpio0 11  GPIO_PULL_UP>;				// Data Ready gpio
+		// sync-gpios = <&gpio0 9  GPIO_ACTIVE_HIGH>;			// ADC Reset gpio
+		compatible = "joshua,ads131m08";
+		reg = <1>;
+		// label = "ADS131M08_1";
+	};
 };
 
-&spi1 {
-    status = "disabled";
-};
-
-&spi2 {
-    status = "disabled";
-};
-
-&i2c0 {
-    status = "disabled";
+&spi4 {
+	status = "disabled";
 };
 
 &i2c1 {
-    status = "okay";
-    sda-pin = <34>;
-    scl-pin = <35>;
-    max30102@57 {
-        compatible = "maxim,max30102";
-        label = "MAX30102";
-        reg = <0x57>;
-        mode = <2>;
-        status = "okay";
-    };
-    bme280: bme280@76 {
-        /* 0x76 - SDO <-> GND */
-        /* 0x77 - SDO <-> VCC */
-        compatible = "bosch,bme280";
-        reg = <0x76>;
-        label = "ENVIRONMENTAL_SENSOR";
-    };
+   status = "okay";
+   pinctrl-0 = <&i2c1_default>;
+   pinctrl-1 = <&i2c1_sleep>;
+	// label = "name_label";
+	// sda-pin = <34>;
+	// scl-pin = <35>;
+   
+   max30102: max30102@57 {
+       status = "okay";
+	   compatible = "joshua,max30102";
+       reg = <0x57>;
+	   //    mode = <2>;
+	   //    label = "MAX30102";
+	};
+	
+	bme280: bme280@76 {
+	   /* 0x76 - SDO <-> GND */
+	   /* 0x77 - SDO <-> VCC */
+	   compatible = "bosch,bme280";
+	   reg = <0x76>;
+	   // label = "ENVIRONMENTAL_SENSOR";		// deprecated property
+	};
 };
 
+// i2s_rxtx: &i2s0 {
+&i2s0 {
+    status = "okay";
+	pinctrl-0 = <&i2s_default>;
+    pinctrl-names = "default"; 
+    // // sck-pin =   <43>; 
+    // // lrck-pin =  <8>; 
+    // // sdout-pin = <44>;
+    // // sdin-pin =  <46>; 
+    clock-source = "ACLK";
+	
+	i2s_rxtx: i2s_rxtx@0 {
+		status = "okay";
+		compatible = "joshua,audiomodule";
+		reg = <0x0>;
+	};
+};
+
+&pdm0 {
+	status = "okay";
+	pinctrl-0 = <&pdm_default>;
+    pinctrl-names = "default"; 
+	// clk-pin = <40>; 
+	// din-pin = <13>; 
+	clock-source = "ACLK";
+	dmicdev: dmicdev {
+		status = "okay";
+	};
+};
+	
 &zephyr_udc0 {
     cdc_acm_uart2 {
         compatible = "zephyr,cdc-acm-uart";
-        label = "CDC_ACM_0";
+        // label = "CDC_ACM_0";			// Deprecated
     };
+	status = "okay";
 };
 
 &clock {
     hfclkaudio-frequency = <11289600>;
 };
-
-i2s_rxtx: &i2s0 {
-    status = "okay";
-    sck-pin =   <43>; 
-    lrck-pin =  <8>; 
-    sdout-pin = <44>;
-    sdin-pin =  <46>; 
-    clock-source = "ACLK";
+ 
+&ieee802154 {
+	status = "disabled";
+};
+ 
+&mutex {
+	status = "disabled";
 };
 
-dmic_dev: &pdm0 {
+&nfct {
+	status = "disabled";
+};
+
+&oscillators {
+	status = "disabled";
+};
+
+&pwm0 {
+	status = "disabled";
+};
+
+&ctrlap {
+	status = "disabled";
+};
+
+&reset {
+	status = "disabled";
+};
+
+&dcnf {
+	status = "disabled";
+};
+
+
+&rtc1 {
+	status = "disabled";
+};
+
+&gpio0 {
 	status = "okay";
-	clk-pin = <40>; 
-	din-pin = <13>; 
-	clock-source = "ACLK";
 };
+
+&gpio1 {
+	status = "okay";
+};
+
+//-------------------------------------------------------------------
+&pinctrl {
+	uart2_default: uart2_default {
+		group1 {
+			psels = <NRF_PSEL(UART_TX, 1, 15)>,
+			<NRF_PSEL(UART_RTS, 0, 0xFFFFFFFF)>;
+		};
+		group2 {
+			psels = <NRF_PSEL(UART_RX, 1, 13)>,
+			<NRF_PSEL(UART_CTS, 0, 0xFFFFFFFF)>;
+			bias-pull-up;
+		};
+	};
+	
+	uart2_sleep: uart2_sleep {
+		group1 {
+			psels = <NRF_PSEL(UART_TX, 1, 15)>,
+			<NRF_PSEL(UART_RX, 1, 13)>,
+			<NRF_PSEL(UART_RTS, 0, 0xFFFFFFFF)>,
+			<NRF_PSEL(UART_CTS, 0, 0xFFFFFFFF)>;
+			low-power-enable;
+		};
+	};
+
+	uart3_default: uart3_default {
+		group1 {
+			psels = <NRF_PSEL(UART_TX, 0, 31)>;
+		};
+		group2 {
+			psels = <NRF_PSEL(UART_RX, 0, 17)>;
+			bias-pull-up;
+		};
+	};
+	
+	uart3_sleep: uart3_sleep {
+		group1 {
+			psels = <NRF_PSEL(UART_TX, 0, 31)>,
+			<NRF_PSEL(UART_RX, 0, 17)>;
+			low-power-enable;
+		};
+	};
+	
+	spi0_default: spi0_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 23)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 29)>,
+					<NRF_PSEL(SPIM_MISO, 0, 20)>;
+		};
+	};
+
+	spi0_sleep: spi0_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 23)>,
+				    <NRF_PSEL(SPIM_MISO, 0, 20)>,
+					<NRF_PSEL(SPIM_MOSI, 0, 29)>;
+			low-power-enable;
+		};
+	};
+	
+	i2c1_default: i2c1_default {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SDA, 1, 2)>,
+				<NRF_PSEL(TWIM_SCL, 1, 3)>;
+		};
+	};
+	
+	i2c1_sleep: i2c1_sleep {
+		group1 {
+			psels = <NRF_PSEL(TWIM_SDA, 1, 2)>,
+				<NRF_PSEL(TWIM_SCL, 1, 3)>;
+			low-power-enable;
+		};
+	};
+
+	i2s_default: i2s_default {
+		group1 {
+			psels = <NRF_PSEL(I2S_SCK_M, 1, 11)>,
+				<NRF_PSEL(I2S_LRCK_M, 0, 8)>,
+				<NRF_PSEL(I2S_SDIN, 1, 12)>,
+				<NRF_PSEL(I2S_SDOUT, 1, 14)>;
+		};
+	};
+
+	pdm_default: pdm_default {
+		group1 {
+			psels = <NRF_PSEL(PDM_CLK, 1, 8)>,
+				<NRF_PSEL(PDM_DIN, 0, 13)>;
+		};
+	};
+};
+

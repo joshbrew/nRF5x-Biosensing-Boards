@@ -1,18 +1,20 @@
-#include <zephyr.h>
+#include <zephyr/kernel.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/conn.h>
-#include <bluetooth/hci.h>
-#include <bluetooth/hci_vs.h>
-#include <sys/util.h>
-#include <sys/byteorder.h>
-#include <logging/log.h>
-#include <sys/atomic.h>
+#include <zephyr/bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/conn.h>
+#include <zephyr/bluetooth/hci.h>
+#include <zephyr/bluetooth/hci_vs.h>
+#include <zephyr/sys/util.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic.h>
 #include "ble_commands.hpp"
 
 #include "ble_gatt.hpp"
 #include "ble_service.hpp"
-#include <mgmt/mcumgr/smp_bt.h>
+extern "C" {
+#include <zephyr/mgmt/mcumgr/transport/smp_bt.h>
+}
 
 
 LOG_MODULE_REGISTER(bluetooth);
@@ -35,12 +37,14 @@ static uint16_t default_conn_handle = 0;
  */
 void exchange_func(struct bt_conn *conn, uint8_t err, struct bt_gatt_exchange_params *params)
  {
-    struct bt_conn_info info = {0};
+    struct bt_conn_info info = {};
+    // struct bt_conn_info info = {0};
 
     printk("MTU exchange %s\n", err == 0 ? "successful" : "failed");
     err = bt_conn_get_info(conn, &info);
 
-    if (info.role == BT_CONN_ROLE_MASTER) {
+    // if (info.role == BT_CONN_ROLE_MASTER) {
+    if (info.role == BT_CONN_ROLE_CENTRAL) {
 
     }
 }
@@ -77,8 +81,8 @@ void OnClientConnected(bt_conn *connected, uint8_t err)
             int error = bt_gatt_exchange_mtu(activeConnection, &exchange_params);
 
             bt_conn_le_phy_param phy_param = BT_CONN_LE_PHY_PARAM_INIT(
-            BT_GAP_LE_PHY_2M,
-            BT_GAP_LE_PHY_2M
+                BT_GAP_LE_PHY_2M,
+                BT_GAP_LE_PHY_2M
             );
             error = bt_conn_le_phy_update(connected, &phy_param);
 
@@ -151,11 +155,7 @@ void OnLeParamUpdated(struct bt_conn *conn, uint16_t interval,
     LOG_INF("Connection interval: %d x 1.25ms", interval);
     int error;
 
-    if(interval >= 6){ /* If connection interval is greater than 6 x 1.25ms = 7.5ms */
-
-        // uint16_t max = connectionIntervalMax;
-        // if(interval == 6) max = 6;
-
+    if(interval > connectionIntervalMax || interval < connectionIntervalMin){ /* If connection interval is greater than 6 x 1.25ms = 7.5ms */
         bt_le_conn_param param = BT_LE_CONN_PARAM_INIT(
             connectionIntervalMin,
             connectionIntervalMax,
@@ -251,14 +251,14 @@ namespace Bluetooth
  */
 int SetupBLE()
 {
-    //worker.Initialize();
+    // worker.Initialize();
 
     bt_conn_cb_register(&connectionCallbacks);
 
     int err = bt_enable(&Gatt::OnBluetoothStarted);
     if (err)
     {
-        LOG_INF("enable Bluetooth with status %d", err);
+        LOG_INF("Enable Bluetooth with status %d", err);
     }
 
     GattRegisterControlCallback(CommandId::BleCmd, OnBleCommand);

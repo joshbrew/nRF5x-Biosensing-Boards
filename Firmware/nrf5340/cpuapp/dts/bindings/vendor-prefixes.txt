@@ -1,0 +1,4 @@
+#
+# <vendor-prefix><TAB><Full name of vendor>
+
+joshua	Joshua Brewster, BT40 EEG/FNIR module

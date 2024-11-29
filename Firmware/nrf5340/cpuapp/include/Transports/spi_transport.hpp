@@ -3,7 +3,7 @@
 
 #include <atomic>
 
-#include <drivers/spi.h>
+#include <zephyr/drivers/spi.h>
 
 #define ADS131_DRV DT_NODELABEL(ads131drv) ///< ADS131M08 device
 

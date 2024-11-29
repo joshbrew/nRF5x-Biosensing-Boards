@@ -2,27 +2,26 @@
 
 #include <string.h>
 #include <nrf.h>
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 #include <zephyr/types.h>
-#include <device.h>
-#include <drivers/gpio.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/gpio.h>
 
-#include <sys/util.h>
-#include <atomic>
+#include <zephyr/sys/util.h>
+#include <zephyr/sys/atomic.h>
 #include "ble_types.hpp"
 #include "ble_commands.hpp"
 #include "device_string.hpp"
 
 /*************************/
-#include <zephyr.h>
-#include <device.h>
-#include <audio/dmic.h>
+#include <zephyr/device.h>
+#include <zephyr/audio/dmic.h>
 #include "arm_math.h"
 #include "dsp/transform_functions.h"
 
-#include <logging/log.h>
-#include <sys/printk.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/sys/printk.h>
 
 #define MAX_SAMPLE_RATE  16000
 #define SAMPLE_BIT_WIDTH 16

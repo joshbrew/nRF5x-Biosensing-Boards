@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <bluetooth/bluetooth.h>
+#include <zephyr/bluetooth/bluetooth.h>
 
 namespace Bluetooth
 {
