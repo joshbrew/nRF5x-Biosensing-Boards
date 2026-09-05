@@ -1,0 +1,61 @@
+// bt840_min: complete carrier overlay; automatically loaded by Zephyr.
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
+/ { aliases { bio-led = &led0; ads0 = &ads0; ads1 = &ads1; sensor-i2c = &i2c1; }; };
+&led0 { gpios = <&gpio0 25 GPIO_ACTIVE_HIGH>; };
+&led1 { status = "disabled"; };
+&led2 { status = "disabled"; };
+&led3 { status = "disabled"; };
+&button0 { status = "disabled"; };
+&button1 { status = "disabled"; };
+&button2 { status = "disabled"; };
+&button3 { status = "disabled"; };
+&gpio0 { /delete-property/ gpio-reserved-ranges; /delete-property/ gpio-line-names; };
+&gpio1 { /delete-property/ gpio-line-names; };
+&uart0 { status = "disabled"; };
+&uart1 { status = "disabled"; };
+&qspi { status = "disabled"; };
+&pwm0 { status = "disabled"; };
+&nfct { status = "disabled"; };
+&adc { status = "disabled"; };
+&i2c0 { status = "disabled"; };
+&spi1 { status = "disabled"; };
+&spi0 {
+	status = "okay";
+	compatible = "nordic,nrf-spim";
+	pinctrl-0 = <&bio_spi_default>;
+	pinctrl-1 = <&bio_spi_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	ads0: adc@0 {
+		compatible = "biosensing,ads131m08";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+		drdy-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		reset-gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+	};
+	// Extension mapping follows executable main.cpp, see hardware notes.
+	ads1: adc@1 {
+		compatible = "biosensing,ads131m08";
+		reg = <1>;
+		spi-max-frequency = <8000000>;
+		drdy-gpios = <&gpio1 8 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		reset-gpios = <&gpio0 29 GPIO_ACTIVE_LOW>;
+		status = "disabled";
+	};
+};
+&i2c1 {
+	compatible = "nordic,nrf-twim";
+	status = "okay";
+	clock-frequency = <400000>;
+	pinctrl-0 = <&bio_i2c_default>;
+	pinctrl-1 = <&bio_i2c_sleep>;
+	pinctrl-names = "default", "sleep";
+	bio_bme: bme280@76 { compatible = "bosch,bme280"; reg = <0x76>; };
+};
+&pinctrl {
+	bio_spi_default: bio_spi_default { group1 { psels = <NRF_PSEL(SPIM_SCK, 0, 15)>, <NRF_PSEL(SPIM_MOSI, 0, 14)>, <NRF_PSEL(SPIM_MISO, 1, 2)>; }; };
+	bio_spi_sleep: bio_spi_sleep { group1 { psels = <NRF_PSEL(SPIM_SCK, 0, 15)>, <NRF_PSEL(SPIM_MOSI, 0, 14)>, <NRF_PSEL(SPIM_MISO, 1, 2)>; low-power-enable; }; };
+	bio_i2c_default: bio_i2c_default { group1 { psels = <NRF_PSEL(TWIM_SDA, 0, 26)>, <NRF_PSEL(TWIM_SCL, 0, 27)>; }; };
+	bio_i2c_sleep: bio_i2c_sleep { group1 { psels = <NRF_PSEL(TWIM_SDA, 0, 26)>, <NRF_PSEL(TWIM_SCL, 0, 27)>; low-power-enable; }; };
+};

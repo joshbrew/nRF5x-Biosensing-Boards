@@ -1,0 +1,80 @@
+mainmenu "Fanstel biosensing bring-up"
+
+menu "Biosensing features"
+config BIO_PROFILE
+	string "Carrier profile name"
+	default "unknown"
+config BIO_ADS
+	bool "ADS131M08 acquisition and register controls"
+	default y
+	select SPI
+config BIO_ADS_SECOND
+	bool "Second ADS131M08 (verify extension wiring first)"
+	depends on BIO_ADS
+	depends on SOC_NRF52840 || SOC_NRF5340_CPUAPP
+config BIO_ADC_CLOCK
+	bool "BT840 ADC CLKIN from PWM on P1.05 (4 MHz)"
+	depends on BIO_ADS && SOC_NRF52840
+	select PWM
+config BIO_I2C_SENSORS
+	bool "MAX30102, MPU6050, QMC5883L and BME/BMP280"
+	depends on SOC_NRF52840 || SOC_NRF5340_CPUAPP
+	select I2C
+	select SENSOR
+	select BME280
+config BIO_USB
+	bool "USB CDC framed data and text commands"
+	depends on SOC_NRF52840 || SOC_NRF5340_CPUAPP
+	select SERIAL
+	select UART_INTERRUPT_DRIVEN
+	select UART_LINE_CTRL
+	select USB_DEVICE_STACK_NEXT
+	select USBD_CDC_ACM_CLASS
+config BIO_USB_VID
+	hex "USB vendor ID (replace with your assigned VID for distribution)"
+	default 0x1209
+config BIO_USB_PID
+	hex "USB product ID (0x0001 is for private development only)"
+	default 0x0001
+config BIO_AUX_UART
+	bool "RP2040 UART bridge (BT5340 uart2)"
+	depends on SOC_NRF5340_CPUAPP
+	select SERIAL
+	select UART_INTERRUPT_DRIVEN
+config BIO_AUDIO
+	bool "MAX98357A I2S test tone"
+	depends on SOC_NRF5340_CPUAPP
+	select I2S
+config BIO_DMIC
+	bool "PDM microphone PCM stream"
+	depends on SOC_NRF5340_CPUAPP
+	select AUDIO
+	select AUDIO_DMIC
+config BIO_BEACONS
+	bool "Passive iBeacon scan and reports"
+	depends on SOC_NRF52840 || SOC_NRF5340_CPUAPP
+	select BT_OBSERVER
+config BIO_TX_DEPTH
+	int "Bounded BLE packet queue depth"
+	default 8
+	range 2 32
+config BIO_COMMAND_DEPTH
+	int "Pending commands"
+	default 4
+	range 1 8
+config BIO_REPLY_DEPTH
+	int "Pending Bluetooth replies"
+	default 2
+	range 1 8
+config BIO_ADS_STACK
+	int "ADC worker stack bytes"
+	default 1536
+	range 1024 4096
+endmenu
+config SHELL_STACK_SIZE
+	default 2048
+config SHELL_CMD_BUFF_SIZE
+	default 128
+config LOG_BUFFER_SIZE
+	default 1024
+source "Kconfig.zephyr"

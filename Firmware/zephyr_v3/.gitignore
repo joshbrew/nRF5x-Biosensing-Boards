@@ -1,0 +1,4 @@
+build*/
+.cache/
+__pycache__/
+.validation/

@@ -1,0 +1,53 @@
+{
+  "folders": [
+    {
+      "name": "bt832a",
+      "path": "bt832a"
+    },
+    {
+      "name": "bt832a_min",
+      "path": "bt832a_min"
+    },
+    {
+      "name": "bt840",
+      "path": "bt840"
+    },
+    {
+      "name": "bt840_min",
+      "path": "bt840_min"
+    },
+    {
+      "name": "bt840_full",
+      "path": "bt840_full"
+    },
+    {
+      "name": "bt5340",
+      "path": "bt5340"
+    },
+    {
+      "name": "bt5340_min",
+      "path": "bt5340_min"
+    },
+    {
+      "name": "bt5340_full",
+      "path": "bt5340_full"
+    }
+  ],
+  "settings": {
+    "nrf-connect.applications": [
+      "${workspaceFolder:bt832a}",
+      "${workspaceFolder:bt832a_min}",
+      "${workspaceFolder:bt840}",
+      "${workspaceFolder:bt840_min}",
+      "${workspaceFolder:bt840_full}",
+      "${workspaceFolder:bt5340}",
+      "${workspaceFolder:bt5340_min}",
+      "${workspaceFolder:bt5340_full}"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "nordic-semiconductor.nrf-connect-extension-pack"
+    ]
+  }
+}

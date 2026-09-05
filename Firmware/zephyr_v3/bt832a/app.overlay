@@ -1,0 +1,36 @@
+// bt832a: complete carrier overlay; automatically loaded by Zephyr.
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/pinctrl/nrf-pinctrl.h>
+/ { aliases { bio-led = &led0; ads0 = &ads0; }; };
+&led0 { gpios = <&gpio0 13 GPIO_ACTIVE_HIGH>; };
+&led1 { status = "disabled"; };
+&led2 { status = "disabled"; };
+&led3 { status = "disabled"; };
+&button0 { status = "disabled"; };
+&button1 { status = "disabled"; };
+&button2 { status = "disabled"; };
+&button3 { status = "disabled"; };
+&uart0 { status = "disabled"; };
+&i2c0 { status = "disabled"; };
+&adc { status = "disabled"; };
+&gpio0 { /delete-property/ gpio-reserved-ranges; };
+&spi0 {
+	// Polling SPI also works on nRF52810, which has no SPIM EasyDMA.
+	compatible = "nordic,nrf-spi";
+	status = "okay";
+	pinctrl-0 = <&bio_spi_default>;
+	pinctrl-1 = <&bio_spi_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
+	ads0: adc@0 {
+		compatible = "biosensing,ads131m08";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+		drdy-gpios = <&gpio0 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		reset-gpios = <&gpio0 7 GPIO_ACTIVE_LOW>;
+	};
+};
+&pinctrl {
+	bio_spi_default: bio_spi_default { group1 { psels = <NRF_PSEL(SPIM_SCK, 0, 29)>, <NRF_PSEL(SPIM_MOSI, 0, 25)>, <NRF_PSEL(SPIM_MISO, 0, 28)>; }; };
+	bio_spi_sleep: bio_spi_sleep { group1 { psels = <NRF_PSEL(SPIM_SCK, 0, 29)>, <NRF_PSEL(SPIM_MOSI, 0, 25)>, <NRF_PSEL(SPIM_MISO, 0, 28)>; low-power-enable; }; };
+};

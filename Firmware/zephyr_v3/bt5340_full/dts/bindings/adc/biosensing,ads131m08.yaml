@@ -1,0 +1,10 @@
+description: Application-managed ADS131M08, fixed 24-bit SPI frames
+compatible: "biosensing,ads131m08"
+include: spi-device.yaml
+properties:
+  drdy-gpios:
+    type: phandle-array
+    required: true
+  reset-gpios:
+    type: phandle-array
+    required: true

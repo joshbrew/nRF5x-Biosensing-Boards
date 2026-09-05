@@ -1,0 +1,4 @@
+# Select the SDK's controller image only on the dual-core SoC.
+config NRF_DEFAULT_BLUETOOTH
+	default y
+source "share/sysbuild/Kconfig"
