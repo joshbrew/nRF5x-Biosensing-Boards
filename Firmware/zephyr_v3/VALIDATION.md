@@ -16,11 +16,11 @@ inside each build by the application's own CMake setup.
 
 | Application | Flash used (bytes) | RAM used (bytes) | Result |
 | --- | ---: | ---: | --- |
-| bt832a | 129140 | 23108 | Pass |
-| bt832a_min | 121744 | 21316 | Pass |
-| bt840 | 223292 | 54396 | Pass |
-| bt840_min | 172964 | 46140 | Pass |
-| bt840_full | 253228 | 64948 | Pass |
+| bt52832a | 129140 | 23108 | Pass |
+| bt52832a_min | 121744 | 21316 | Pass |
+| bt52840 | 223292 | 54396 | Pass |
+| bt52840_min | 172964 | 46140 | Pass |
+| bt52840_full | 253228 | 64948 | Pass |
 | bt5340 | 159676 | 54348 | Pass |
 | bt5340_min | 142064 | 48324 | Pass |
 | bt5340_full | 199184 | 71924 | Pass |
@@ -72,7 +72,7 @@ and nothing was flashed.** Probe routing, device protection, electrical wiring,
 ADC clocks, physical sampling, sustained throughput, reconnect behavior on
 hardware and runtime stack margin still require bench testing.
 
-Start with a default or minimal copy. Do not flash `bt840_full` onto a carrier
+Start with a default or minimal copy. Do not flash `bt52840_full` onto a carrier
 whose ADC clock net is already driven externally: this preset enables the
 P1.05 clock output at boot. Confirm all expanded wiring against the hardware.
 If moving a copy, do not reuse its old build cache; build afresh at the new

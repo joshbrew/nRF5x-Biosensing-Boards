@@ -19,11 +19,11 @@ optional wiring and need a hardware check before flashing.
 
 | Application folder | Board target to select | Included features |
 | --- | --- | --- |
-| `bt832a` | `nrf52dk/nrf52810` | One ADS131M08, BLE, minimal RTT logs; ADC-only sensor profile |
-| `bt832a_min` | `nrf52dk/nrf52810` | BLE/command/LED baseline; no ADC acquisition |
-| `bt840` | `nrf52840dk/nrf52840` | ADC, I2C sensors, BLE, beacon scanning, RTT shell; **no audio** |
-| `bt840_min` | `nrf52840dk/nrf52840` | BLE/command/LED baseline |
-| `bt840_full` | `nrf52840dk/nrf52840` | BT840 default plus second ADC, USB and 4 MHz ADC clock; **no audio** |
+| `bt52832a` | `nrf52dk/nrf52810` | One ADS131M08, BLE, minimal RTT logs; ADC-only sensor profile |
+| `bt52832a_min` | `nrf52dk/nrf52810` | BLE/command/LED baseline; no ADC acquisition |
+| `bt52840` | `nrf52840dk/nrf52840` | ADC, I2C sensors, BLE, beacon scanning, RTT shell; **no audio** |
+| `bt52840_min` | `nrf52840dk/nrf52840` | BLE/command/LED baseline |
+| `bt52840_full` | `nrf52840dk/nrf52840` | BT840 default plus second ADC, USB and 4 MHz ADC clock; **no audio** |
 | `bt5340` | `nrf5340dk/nrf5340/cpuapp` | ADC, I2C sensors, BLE, beacon scanning, RTT shell |
 | `bt5340_min` | `nrf5340dk/nrf5340/cpuapp` | BLE/command/LED baseline |
 | `bt5340_full` | `nrf5340dk/nrf5340/cpuapp` | BT5340 default plus second ADC, USB, I2S test tone, PDM microphone and RP2040 UART |
@@ -69,7 +69,7 @@ or extra logging without rechecking its memory usage.
 - Default applications do not generate an ADC clock and leave optional second
   ADC, USB, audio, microphone and auxiliary UART off. Sampling and scanning start
   stopped. Missing sensors do not prevent BLE access.
-- **`bt840_full` drives P1.05 with a 4 MHz clock at boot.** Do not flash it if an
+- **`bt52840_full` drives P1.05 with a 4 MHz clock at boot.** Do not flash it if an
   external oscillator drives the same net. ADS rate labels assume 8.192 MHz, so
   actual rates with this clock are multiplied by 4 / 8.192. For USB/second ADC
   with an external clock, change `CONFIG_BIO_ADC_CLOCK=n` in that copy's `prj.conf`
