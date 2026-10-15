@@ -9,16 +9,16 @@
       "path": "bt832a_min"
     },
     {
-      "name": "bt840",
-      "path": "bt840"
+      "name": "bt52840",
+      "path": "bt52840"
     },
     {
-      "name": "bt840_min",
-      "path": "bt840_min"
+      "name": "bt52840_min",
+      "path": "bt52840_min"
     },
     {
-      "name": "bt840_full",
-      "path": "bt840_full"
+      "name": "bt52840_full",
+      "path": "bt52840_full"
     },
     {
       "name": "bt5340",
@@ -37,9 +37,9 @@
     "nrf-connect.applications": [
       "${workspaceFolder:bt832a}",
       "${workspaceFolder:bt832a_min}",
-      "${workspaceFolder:bt840}",
-      "${workspaceFolder:bt840_min}",
-      "${workspaceFolder:bt840_full}",
+      "${workspaceFolder:bt52840}",
+      "${workspaceFolder:bt52840_min}",
+      "${workspaceFolder:bt52840_full}",
       "${workspaceFolder:bt5340}",
       "${workspaceFolder:bt5340_min}",
       "${workspaceFolder:bt5340_full}"

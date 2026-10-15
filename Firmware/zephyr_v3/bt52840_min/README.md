@@ -1,4 +1,4 @@
-# bt840_min — standalone nRF Connect application
+# bt52840_min — standalone nRF Connect application
 
 Fanstel BT840 / nRF52840: ADS131M08, I2C sensors, BLE, beacon scanning and RTT shell. No audio or microphone.
 

@@ -1,4 +1,4 @@
-> Standalone copy: **bt840** (default). Enabled optional features: none. The tables below cover all carriers; only this copy's `prj.conf` and `app.overlay` are built. In an expanded copy the optional wiring is already enabled.
+> Standalone copy: **bt52840** (default). Enabled optional features: none. The tables below cover all carriers; only this copy's `prj.conf` and `app.overlay` are built. In an expanded copy the optional wiring is already enabled.
 
 # Carrier wiring and bring-up assumptions
 

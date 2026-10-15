@@ -19,8 +19,8 @@ optional wiring and need a hardware check before flashing.
 
 | Application folder | Board target to select | Included features |
 | --- | --- | --- |
-| `bt52832a` | `nrf52dk/nrf52810` | One ADS131M08, BLE, minimal RTT logs; ADC-only sensor profile |
-| `bt52832a_min` | `nrf52dk/nrf52810` | BLE/command/LED baseline; no ADC acquisition |
+| `bt832a` | `nrf52dk/nrf52810` | One ADS131M08, BLE, minimal RTT logs; ADC-only sensor profile |
+| `bt832a_min` | `nrf52dk/nrf52810` | BLE/command/LED baseline; no ADC acquisition |
 | `bt52840` | `nrf52840dk/nrf52840` | ADC, I2C sensors, BLE, beacon scanning, RTT shell; **no audio** |
 | `bt52840_min` | `nrf52840dk/nrf52840` | BLE/command/LED baseline |
 | `bt52840_full` | `nrf52840dk/nrf52840` | BT840 default plus second ADC, USB and 4 MHz ADC clock; **no audio** |
@@ -92,14 +92,14 @@ rejects an incorrect board rather than reusing incompatible carrier wiring.
 The CMake source list still excludes disabled modules from the binary.
 
 These are deliberately independent copies. Changes do **not** synchronize to
-other applications or to the earlier shared `zephyr v3/app`. Keep fixes aligned
+other applications. Keep fixes aligned
 manually if you intend to maintain multiple copies. Do not edit generated files
 under `build`; pristine builds replace them.
 
 The new sibling is named **`zephyr_v3`**, with an underscore, because the Windows
 Zephyr toolchain does not reliably handle spaces in source/configuration paths.
-The earlier **`zephyr v3`** folder and its CLI workflow remain intact. Do not open
-its generated `.zephyr-v3-build` staging directories as your source projects.
+The earlier shared **`zephyr v3`** source tree and its tests are not included in
+this checkout. Use the eight application folders listed above as source projects.
 
 You can copy any application folder by itself to another **short, space-free
 path** and open it in VS Code. Exclude its generated `build` directory, or create
